@@ -63,24 +63,29 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+
+
 # add include directory
 include_directories("${CMAKE_SOURCE_DIR}/include/")
 
 # add libraries
-add_library(bingo STATIC src/AGraph.cc)
+add_library(bingo STATIC src/acyclic_graph.cc)
+target_link_libraries(bingo Eigen3::Eigen)
+set_target_properties(bingo PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
  
  
 # ---------- main executable ----------
-add_executable(BingoCpp src/test.cc)
-target_link_libraries(BingoCpp bingo Eigen3::Eigen)
+add_executable(runBingoCpp src/driver.cc)
+target_link_libraries(runBingoCpp bingo Eigen3::Eigen)
 
 
 # ---------- python binding ----------
-pybind11_add_module(bingocpp src/bingocppmodule.cc)
+pybind11_add_module(bingocpp src/bingocpp_pymodule.cc)
+target_link_libraries(bingocpp bingo)
 
 
 # ---------Testing executable-------------
-add_executable(run_tests test/test_main.cc test/AGraph_tests.cc)
+add_executable(run_tests test/test_main.cc test/acyclic_graph_tests.cc)
 target_link_libraries(run_tests gtest bingo)
 
 
