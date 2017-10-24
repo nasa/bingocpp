@@ -1,4 +1,13 @@
-// A simple program that computes the square root of a number
+/*!
+ * \file acyclic_graph.cc
+ *
+ * \author Geoffrey F. Bomarito
+ * \date
+ *
+ * This file contains the functions associated with an acyclic graph
+ * representation of a symbolic equation.
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -7,10 +16,10 @@
 #include <map>
 #include <iostream>
 
-#include "BingoCpp/acyclic_graph.hh"
+#include "BingoCpp/acyclic_graph.h"
 
 
-
+// The print strings accociated with each function
 std::map<int, std::string> OperatorString = {
   {0, "X"},
   {1, "C"},
@@ -23,7 +32,7 @@ std::map<int, std::string> OperatorString = {
 
 Eigen::ArrayXXd SimplifyAndEvaluate(CommandStack stack, Eigen::ArrayXXd x,
                                     std::vector<double> constants) {
-                                  
+  // Simplifies a stack then evaluates it.
   CommandStack simple_stack = SimplifyStack(stack);
   return Evaluate(simple_stack, x, constants);
 }
@@ -31,6 +40,7 @@ Eigen::ArrayXXd SimplifyAndEvaluate(CommandStack stack, Eigen::ArrayXXd x,
 
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
   CommandStack stack, Eigen::ArrayXXd x, std::vector<double> constants) {
+  // Evaluates a stack and its derivative after simplification.
   CommandStack simple_stack = SimplifyStack(stack);
   return EvaluateWithDerivative(simple_stack, x, constants);
 }
@@ -38,6 +48,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
 
 Eigen::ArrayXXd Evaluate(CommandStack stack, Eigen::ArrayXXd x,
                          std::vector<double> constants) {
+  // Evaluates a stack at the given x using the given constants.
   std::vector<Eigen::ArrayXXd> forward_eval(stack.size());
 
   for (std::size_t i = 0; i < stack.size(); ++i) {
@@ -85,12 +96,14 @@ Eigen::ArrayXXd Evaluate(CommandStack stack, Eigen::ArrayXXd x,
 
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
   CommandStack stack, Eigen::ArrayXXd x, std::vector<double> constants) {
+  // Evaluates a stack and its derivative with the given x and constants.
   std::vector<Eigen::ArrayXXd> forward_eval(stack.size());
   std::vector<Eigen::ArrayXXd> reverse_eval(stack.size());
   std::vector<std::vector<int>> x_dependencies(x.cols(), std::vector<int>(0));
   std::vector<std::vector<int>> stack_dependencies(stack.size(),
                              std::vector<int>(0));
 
+  // TODO(gbomarito) refactor this function
   // forward eval with dependencies
   for (std::size_t i = 0; i < stack.size(); ++i) {
     switch (stack[i].first) {
@@ -178,7 +191,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
 
           } else {
             reverse_eval[i] += reverse_eval[dependency] *
-                               ( -forward_eval[dependency] /
+                               (-forward_eval[dependency] /
                                  forward_eval[stack[dependency].second[1]]);
           }
 
@@ -205,6 +218,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
 
 
 void PrintStack(CommandStack stack) {
+  // Prints a stack to std::cout.
   for (std::size_t i = 0; i < stack.size(); ++i) {
     std::cout << "(" << i << ") = " << OperatorString[stack[i].first] << " : ";
 
@@ -219,6 +233,7 @@ void PrintStack(CommandStack stack) {
 
 
 CommandStack SimplifyStack(CommandStack stack) {
+  // Simplifies a stack.
   std::vector<bool> used_command = FindUsedCommands(stack);
   std::map<int, int> reduced_param_map;
   CommandStack new_stack;
@@ -246,6 +261,7 @@ CommandStack SimplifyStack(CommandStack stack) {
 
 
 std::vector<bool> FindUsedCommands(CommandStack stack) {
+  // Finds which commands are utilized in a stack.
   std::vector<bool> used_command(stack.size());
   used_command.back() = true;
 
@@ -262,6 +278,8 @@ std::vector<bool> FindUsedCommands(CommandStack stack) {
 
   return used_command;
 }
+
+
 
 
 

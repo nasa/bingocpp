@@ -1,4 +1,12 @@
-// A simple program that computes the square root of a number
+/*!
+ * \file driver.cc
+ *
+ * \author Geoffrey F. Bomarito
+ * \date
+ *
+ * This file contains the main function for BingoCpp.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -6,11 +14,10 @@
 
 #include <iostream>
 
-#include "BingoCpp/version.hh"
-#include "BingoCpp/acyclic_graph.hh"
+#include "BingoCpp/version.h"
+#include "BingoCpp/acyclic_graph.h"
 
 
-// using Eigen::MatrixXd;
 int test_eig() {
   Eigen::MatrixXd m(2, 2);
   m(0, 0) = 3;
@@ -32,5 +39,6 @@ int main(int argc, char *argv[]) {
   test_eig();
   return 0;
 }
+
 
 

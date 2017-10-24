@@ -7,8 +7,8 @@ project (BingoCpp)
 set (Tutorial_VERSION_MAJOR 0)
 set (Tutorial_VERSION_MINOR 1)
 configure_file (
-  "${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/version.hh.in"
-  "${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/version.hh"
+  "${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/version.h.in"
+  "${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/version.h"
   )
 
 

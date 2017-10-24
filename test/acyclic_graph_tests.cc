@@ -1,10 +1,20 @@
+/*!
+ * \file acyclic_graph_tests.cc
+ *
+ * \author Geoffrey F. Bomarito
+ * \date
+ *
+ * This file contains the unit tests for the functions associated with the
+ * acyclic graph representation of a symbolic equation.
+ */
+
 #include <stdio.h>
 #include <math.h>
 
 #include <iostream>
 
 #include "gtest/gtest.h"
-#include "BingoCpp/acyclic_graph.hh"
+#include "BingoCpp/acyclic_graph.h"
 
 namespace {
 
@@ -69,8 +79,9 @@ class AcyclicGraphTest : public::testing::Test {
 
 TEST_F(AcyclicGraphTest, evaluate) {
   Eigen::ArrayXXd y = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd y_true = x.col(0) * ( constants[0] + constants[1] / x.col(1) )
+  Eigen::ArrayXXd y_true = x.col(0) * (constants[0] + constants[1] / x.col(1))
                            - x.col(0);
+
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(y(i), y_true(i));
   }
@@ -78,16 +89,18 @@ TEST_F(AcyclicGraphTest, evaluate) {
 
 
 TEST_F(AcyclicGraphTest, derivative) {
-  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy = 
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy =
     EvaluateWithDerivative(stack, x, constants);
-  Eigen::ArrayXXd y_true = x.col(0) * ( constants[0] + constants[1] / x.col(1) )
+  Eigen::ArrayXXd y_true = x.col(0) * (constants[0] + constants[1] / x.col(1))
                            - x.col(0);
-  Eigen::ArrayXXd dy_true = Eigen::ArrayXXd::Zero(3,3);
+  Eigen::ArrayXXd dy_true = Eigen::ArrayXXd::Zero(3, 3);
   dy_true.col(0) = constants[0] + constants[1] / x.col(1) - 1.;
   dy_true.col(1) = - x.col(0) * constants[1] / x.col(1) / x.col(1);
+
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(y_and_dy.first(i), y_true(i));
   }
+
   for (size_t i = 0; i < x.size(); ++i) {
     ASSERT_DOUBLE_EQ(y_and_dy.second(i), dy_true(i));
   }
@@ -123,4 +136,5 @@ TEST_F(AcyclicGraphTest, utilization) {
 
 
 }  // namespace
+
 
