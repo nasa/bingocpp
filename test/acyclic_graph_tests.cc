@@ -18,21 +18,42 @@ class AcyclicGraphTest : public::testing::Test {
   }
 
   void SetUp() {
-    stack.push_back(std::make_pair(1, std::vector<int>()));
+    // y = x_0 * ( C_0 + C_1/x_1 ) - x_0
+    stack.push_back(std::make_pair(0, std::vector<int>()));
     stack[0].second.push_back(0);
     stack.push_back(std::make_pair(0, std::vector<int>()));
     stack[1].second.push_back(1);
-    stack.push_back(std::make_pair(2, std::vector<int>()));
+    stack.push_back(std::make_pair(1, std::vector<int>()));
     stack[2].second.push_back(0);
-    stack[2].second.push_back(1);
-    stack.push_back(std::make_pair(2, std::vector<int>()));
+    stack.push_back(std::make_pair(1, std::vector<int>()));
     stack[3].second.push_back(1);
-    stack[3].second.push_back(2);
-    stack.push_back(std::make_pair(2, std::vector<int>()));
+    stack.push_back(std::make_pair(5, std::vector<int>()));
+    stack[4].second.push_back(3);
     stack[4].second.push_back(1);
-    stack[4].second.push_back(2);
+    stack.push_back(std::make_pair(5, std::vector<int>()));
+    stack[5].second.push_back(3);
+    stack[5].second.push_back(1);
+    stack.push_back(std::make_pair(2, std::vector<int>()));
+    stack[6].second.push_back(4);
+    stack[6].second.push_back(2);
+    stack.push_back(std::make_pair(2, std::vector<int>()));
+    stack[7].second.push_back(4);
+    stack[7].second.push_back(2);
+    stack.push_back(std::make_pair(4, std::vector<int>()));
+    stack[8].second.push_back(6);
+    stack[8].second.push_back(0);
+    stack.push_back(std::make_pair(4, std::vector<int>()));
+    stack[9].second.push_back(5);
+    stack[9].second.push_back(6);
+    stack.push_back(std::make_pair(3, std::vector<int>()));
+    stack[10].second.push_back(7);
+    stack[10].second.push_back(6);
+    stack.push_back(std::make_pair(3, std::vector<int>()));
+    stack[11].second.push_back(8);
+    stack[11].second.push_back(0);
     x << 1., 4., 7., 2., 5., 8., 3., 6., 9.;
     constants.push_back(3.14);
+    constants.push_back(10.0);
   }
 
   void TearDown() {
@@ -48,9 +69,28 @@ class AcyclicGraphTest : public::testing::Test {
 
 TEST_F(AcyclicGraphTest, evaluate) {
   Eigen::ArrayXXd y = Evaluate(stack, x, constants);
-  ASSERT_DOUBLE_EQ(y(0), 11.14);
-  ASSERT_DOUBLE_EQ(y(1), 13.14);
-  ASSERT_DOUBLE_EQ(y(2), 15.14);
+  Eigen::ArrayXXd y_true = x.col(0) * ( constants[0] + constants[1] / x.col(1) )
+                           - x.col(0);
+  for (size_t i = 0; i < x.rows(); ++i) {
+    ASSERT_DOUBLE_EQ(y(i), y_true(i));
+  }
+}
+
+
+TEST_F(AcyclicGraphTest, derivative) {
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy = 
+    EvaluateWithDerivative(stack, x, constants);
+  Eigen::ArrayXXd y_true = x.col(0) * ( constants[0] + constants[1] / x.col(1) )
+                           - x.col(0);
+  Eigen::ArrayXXd dy_true = Eigen::ArrayXXd::Zero(3,3);
+  dy_true.col(0) = constants[0] + constants[1] / x.col(1) - 1.;
+  dy_true.col(1) = - x.col(0) * constants[1] / x.col(1) / x.col(1);
+  for (size_t i = 0; i < x.rows(); ++i) {
+    ASSERT_DOUBLE_EQ(y_and_dy.first(i), y_true(i));
+  }
+  for (size_t i = 0; i < x.size(); ++i) {
+    ASSERT_DOUBLE_EQ(y_and_dy.second(i), dy_true(i));
+  }
 }
 
 
@@ -78,7 +118,7 @@ TEST_F(AcyclicGraphTest, utilization) {
     }
   }
 
-  ASSERT_EQ(num_used_commands, 4);
+  ASSERT_EQ(num_used_commands, 8);
 }
 
 

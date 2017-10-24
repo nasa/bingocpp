@@ -23,39 +23,52 @@ std::map<int, std::string> OperatorString = {
 
 Eigen::ArrayXXd SimplifyAndEvaluate(CommandStack stack, Eigen::ArrayXXd x,
                                     std::vector<double> constants) {
+                                  
   CommandStack simple_stack = SimplifyStack(stack);
   return Evaluate(simple_stack, x, constants);
 }
 
+
+std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
+  CommandStack stack, Eigen::ArrayXXd x, std::vector<double> constants) {
+  CommandStack simple_stack = SimplifyStack(stack);
+  return EvaluateWithDerivative(simple_stack, x, constants);
+}
+
+
 Eigen::ArrayXXd Evaluate(CommandStack stack, Eigen::ArrayXXd x,
                          std::vector<double> constants) {
-  std::vector<Eigen::ArrayXXd> R(stack.size());
+  std::vector<Eigen::ArrayXXd> forward_eval(stack.size());
 
   for (std::size_t i = 0; i < stack.size(); ++i) {
     switch (stack[i].first) {
       case 0:
-        R[i] = x.col(stack[i].second[0]);
+        forward_eval[i] = x.col(stack[i].second[0]);
         break;
 
       case 1:
-        R[i] = Eigen::ArrayXXd::Constant(x.rows(), 1,
-                                         constants[stack[i].second[0]]);
+        forward_eval[i] = Eigen::ArrayXXd::Constant(x.rows(), 1,
+                          constants[stack[i].second[0]]);
         break;
 
       case 2:
-        R[i] = R[stack[i].second[0]] + R[stack[i].second[1]];
+        forward_eval[i] = forward_eval[stack[i].second[0]] +
+                          forward_eval[stack[i].second[1]];
         break;
 
       case 3:
-        R[i] = R[stack[i].second[0]] - R[stack[i].second[1]];
+        forward_eval[i] = forward_eval[stack[i].second[0]] -
+                          forward_eval[stack[i].second[1]];
         break;
 
       case 4:
-        R[i] = R[stack[i].second[0]] * R[stack[i].second[1]];
+        forward_eval[i] = forward_eval[stack[i].second[0]] *
+                          forward_eval[stack[i].second[1]];
         break;
 
       case 5:
-        R[i] = R[stack[i].second[0]] / R[stack[i].second[1]];
+        forward_eval[i] = forward_eval[stack[i].second[0]] /
+                          forward_eval[stack[i].second[1]];
         break;
 
       default:
@@ -65,16 +78,137 @@ Eigen::ArrayXXd Evaluate(CommandStack stack, Eigen::ArrayXXd x,
     // std::cout << "R["<< i <<"] = " << R[i] << "\n\n";
   }
 
-  return R.back();
+  return forward_eval.back();
+}
+
+
+
+std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
+  CommandStack stack, Eigen::ArrayXXd x, std::vector<double> constants) {
+  std::vector<Eigen::ArrayXXd> forward_eval(stack.size());
+  std::vector<Eigen::ArrayXXd> reverse_eval(stack.size());
+  std::vector<std::vector<int>> x_dependencies(x.cols(), std::vector<int>(0));
+  std::vector<std::vector<int>> stack_dependencies(stack.size(),
+                             std::vector<int>(0));
+
+  // forward eval with dependencies
+  for (std::size_t i = 0; i < stack.size(); ++i) {
+    switch (stack[i].first) {
+      case 0:
+        forward_eval[i] = x.col(stack[i].second[0]);
+        x_dependencies[stack[i].second[0]].push_back(i);
+        break;
+
+      case 1:
+        forward_eval[i] = Eigen::ArrayXXd::Constant(x.rows(), 1,
+                          constants[stack[i].second[0]]);
+        break;
+
+      case 2:
+        forward_eval[i] = forward_eval[stack[i].second[0]] +
+                          forward_eval[stack[i].second[1]];
+        stack_dependencies[stack[i].second[0]].push_back(i);
+        stack_dependencies[stack[i].second[1]].push_back(i);
+        break;
+
+      case 3:
+        forward_eval[i] = forward_eval[stack[i].second[0]] -
+                          forward_eval[stack[i].second[1]];
+        stack_dependencies[stack[i].second[0]].push_back(i);
+        stack_dependencies[stack[i].second[1]].push_back(i);
+        break;
+
+      case 4:
+        forward_eval[i] = forward_eval[stack[i].second[0]] *
+                          forward_eval[stack[i].second[1]];
+        stack_dependencies[stack[i].second[0]].push_back(i);
+        stack_dependencies[stack[i].second[1]].push_back(i);
+        break;
+
+      case 5:
+        forward_eval[i] = forward_eval[stack[i].second[0]] /
+                          forward_eval[stack[i].second[1]];
+        stack_dependencies[stack[i].second[0]].push_back(i);
+        stack_dependencies[stack[i].second[1]].push_back(i);
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  // reverse pass through stack
+  reverse_eval[stack.size() - 1] = Eigen::ArrayXXd::Ones(x.rows(), 1);
+
+  for (int i = stack.size() - 2; i >= 0; --i) {
+    reverse_eval[i] = Eigen::ArrayXXd::Zero(x.rows(), 1);
+
+    for (auto const& dependency : stack_dependencies[i]) {
+      switch (stack[dependency].first) {
+        case 2:  // + add
+          reverse_eval[i] += reverse_eval[dependency];
+          break;
+
+        case 3:  // - subtract
+          if (stack[dependency].second[0] == i) {
+            reverse_eval[i] += reverse_eval[dependency];
+
+          } else {
+            reverse_eval[i] -= reverse_eval[dependency];
+          }
+
+          break;
+
+        case 4:  // * multiply
+          if (stack[dependency].second[0] == i) {
+            reverse_eval[i] += reverse_eval[dependency] *
+                               forward_eval[stack[dependency].second[1]];
+
+          } else {
+            reverse_eval[i] += reverse_eval[dependency] *
+                               forward_eval[stack[dependency].second[0]];
+          }
+
+          break;
+
+        case 5:  // / divide
+          if (stack[dependency].second[0] == i) {
+            reverse_eval[i] += reverse_eval[dependency] /
+                               forward_eval[stack[dependency].second[1]];
+
+          } else {
+            reverse_eval[i] += reverse_eval[dependency] *
+                               ( -forward_eval[dependency] /
+                                 forward_eval[stack[dependency].second[1]]);
+          }
+
+          break;
+
+        default:
+          break;
+      }
+    }
+  }
+
+  // build derivative array
+  Eigen::ArrayXXd deriv_x = Eigen::ArrayXXd::Zero(x.rows(), x.cols());
+
+  for (std::size_t i = 0; i < x.cols(); ++i) {
+    for (auto const& dependency : x_dependencies[i]) {
+      deriv_x.col(i) += reverse_eval[dependency];
+    }
+  }
+
+  return std::make_pair(forward_eval.back(), deriv_x);
 }
 
 
 
 void PrintStack(CommandStack stack) {
-  for (auto const& command : stack) {
-    std::cout << OperatorString[command.first] << " : ";
+  for (std::size_t i = 0; i < stack.size(); ++i) {
+    std::cout << "(" << i << ") = " << OperatorString[stack[i].first] << " : ";
 
-    for (auto const& param : command.second) {
+    for (auto const& param : stack[i].second) {
       std::cout << " (" << param << ")";
     }
 
@@ -128,9 +262,6 @@ std::vector<bool> FindUsedCommands(CommandStack stack) {
 
   return used_command;
 }
-
-
-
 
 
 

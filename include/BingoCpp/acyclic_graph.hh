@@ -11,6 +11,9 @@ Eigen::ArrayXXd Evaluate(CommandStack stack, Eigen::ArrayXXd x,
 
 Eigen::ArrayXXd SimplifyAndEvaluate(CommandStack stack, Eigen::ArrayXXd x,
                                     std::vector<double> constants) ;
+                                    
+std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
+  CommandStack stack, Eigen::ArrayXXd x, std::vector<double> constants) ;
 
 void PrintStack(CommandStack stack) ;
 CommandStack SimplifyStack(CommandStack stack) ;
