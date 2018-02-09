@@ -18,65 +18,18 @@
 #include <iostream>
 
 #include "BingoCpp/acyclic_graph.h"
+#include "BingoCpp/acyclic_graph_nodes.h"
 
-
-// The print strings accociated with each function
-std::map<int, std::string> OperatorString = {
-  {0, "X"},
-  {1, "C"},
-  {2, "+"},
-  {3, "-"},
-  {4, "*"},
-  {5, "/"}
-};
-
-
+// create an instance of the Operator_Interface map
+OperatorInterface op_map;
 
 void ForwardSingleCommand(const SingleCommand &command,
                           const Eigen::ArrayXXd &x,
                           const std::vector<double> &constants,
                           std::vector<Eigen::ArrayXXd> &buffer,
                           std::size_t result_location) {
-  // Evaluates a single command at the given x using the given constants.
-  switch (command.first) {
-    case 0:
-      buffer[result_location] = x.col(command.second[0]);
-      break;
-
-    case 1:
-      if (command.second[0] != -1) {
-        buffer[result_location] = Eigen::ArrayXXd::Constant(x.rows(), 1,
-                                  constants[command.second[0]]);
-
-      } else {
-        buffer[result_location] = Eigen::ArrayXXd::Zero(x.rows(), 1);
-      }
-
-      break;
-
-    case 2:
-      buffer[result_location] = buffer[command.second[0]] +
-                                buffer[command.second[1]];
-      break;
-
-    case 3:
-      buffer[result_location] = buffer[command.second[0]] -
-                                buffer[command.second[1]];
-      break;
-
-    case 4:
-      buffer[result_location] = buffer[command.second[0]] *
-                                buffer[command.second[1]];
-      break;
-
-    case 5:
-      buffer[result_location] = buffer[command.second[0]] /
-                                buffer[command.second[1]];
-      break;
-
-    default:
-      break;
-  }
+  buffer[result_location] = op_map.operator_map[command.first]->evaluate(
+                              command.second, x, constants, buffer);
 }
 
 
@@ -88,63 +41,9 @@ void ReverseSingleCommand(const CommandStack &stack,
                           const std::set<int> &dependencies) {
   // Computes reverse autodiff partial of a stack command.
   for (auto const& dependency : dependencies) {
-    switch (stack[dependency].first) {
-      case 2:  // + add
-        if (stack[dependency].second[0] == command_index) {
-          reverse_buffer[command_index] += reverse_buffer[dependency];
-        }
-
-        if (stack[dependency].second[1] == command_index) {
-          reverse_buffer[command_index] += reverse_buffer[dependency];
-        }
-
-        break;
-
-      case 3:  // - subtract
-        if (stack[dependency].second[0] == command_index) {
-          reverse_buffer[command_index] += reverse_buffer[dependency];
-        }
-
-        if (stack[dependency].second[1] == command_index) {
-          reverse_buffer[command_index] -= reverse_buffer[dependency];
-        }
-
-        break;
-
-      case 4:  // * multiply
-        if (stack[dependency].second[0] == command_index) {
-          reverse_buffer[command_index] += reverse_buffer[dependency] *
-                                           forward_buffer[stack[dependency].
-                                               second[1]];
-        }
-
-        if (stack[dependency].second[1] == command_index) {
-          reverse_buffer[command_index] += reverse_buffer[dependency] *
-                                           forward_buffer[stack[dependency].
-                                               second[0]];
-        }
-
-        break;
-
-      case 5:  // / divide
-        if (stack[dependency].second[0] == command_index) {
-          reverse_buffer[command_index] += reverse_buffer[dependency] /
-                                           forward_buffer[stack[dependency].
-                                               second[1]];
-        }
-
-        if (stack[dependency].second[1] == command_index) {
-          reverse_buffer[command_index] += reverse_buffer[dependency] *
-                                           (-forward_buffer[dependency] /
-                                            forward_buffer[stack[dependency].
-                                                second[1]]);
-        }
-
-        break;
-
-      default:
-        break;
-    }
+    op_map.operator_map[stack[dependency].first]->deriv_evaluate(
+      stack[dependency].second, command_index, forward_buffer, reverse_buffer,
+      dependency);
   }
 }
 
@@ -209,10 +108,10 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
     // TODO(gbomarito) thish could be more general based on arity, etc
     if (stack[i].first == 0) {
       x_dependencies[stack[i].second[0]].insert(i);
+    }
 
-    } else if (stack[i].first > 1) {
-      stack_dependencies[stack[i].second[0]].insert(i);
-      stack_dependencies[stack[i].second[1]].insert(i);
+    for (int j = 0; j < op_map.operator_map[stack[i].first]->get_arity(); ++j) {
+      stack_dependencies[stack[i].second[j]].insert(i);
     }
   }
 
@@ -270,10 +169,10 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
       // TODO(gbomarito) thish could be more general based on arity, etc
       if (stack[i].first == 0) {
         x_dependencies[stack[i].second[0]].insert(i);
+      }
 
-      } else if (stack[i].first > 1) {
-        stack_dependencies[stack[i].second[0]].insert(i);
-        stack_dependencies[stack[i].second[1]].insert(i);
+      for (int j = 0; j < op_map.operator_map[stack[i].first]->get_arity(); ++j) {
+        stack_dependencies[stack[i].second[j]].insert(i);
       }
     }
   }
@@ -307,7 +206,9 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
 void PrintStack(const CommandStack & stack) {
   // Prints a stack to std::cout.
   for (std::size_t i = 0; i < stack.size(); ++i) {
-    std::cout << "(" << i << ") = " << OperatorString[stack[i].first] << " : ";
+    //this is the operator
+    std::cout << "(" << i << ") = " <<
+              op_map.operator_map[stack[i].first]->get_print() << " : ";
 
     for (auto const& param : stack[i].second) {
       std::cout << " (" << param << ")";
@@ -331,7 +232,7 @@ CommandStack SimplifyStack(const CommandStack & stack) {
       new_stack.push_back(stack[i]);
 
       // TODO(gbomarito) should look up whether node is terminal or not
-      if (new_stack[j].first > 1) {
+      if (op_map.operator_map[new_stack[j].first]->get_arity() > 0) {
         for (std::size_t k = 0; k < new_stack[j].second.size(); ++k) {
           new_stack[j].second[k] = reduced_param_map[new_stack[j].second[k]];
         }
