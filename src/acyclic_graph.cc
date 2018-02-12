@@ -21,15 +21,15 @@
 #include "BingoCpp/acyclic_graph_nodes.h"
 
 // create an instance of the Operator_Interface map
-OperatorInterface op_map;
+OperatorInterface oper_interface;
 
 void ForwardSingleCommand(const SingleCommand &command,
                           const Eigen::ArrayXXd &x,
                           const std::vector<double> &constants,
                           std::vector<Eigen::ArrayXXd> &buffer,
                           std::size_t result_location) {
-  buffer[result_location] = op_map.operator_map[command.first]->evaluate(
-                              command.second, x, constants, buffer);
+  oper_interface.operator_map[command.first]->evaluate(
+    command.second, x, constants, buffer, result_location);
 }
 
 
@@ -41,7 +41,7 @@ void ReverseSingleCommand(const CommandStack &stack,
                           const std::set<int> &dependencies) {
   // Computes reverse autodiff partial of a stack command.
   for (auto const& dependency : dependencies) {
-    op_map.operator_map[stack[dependency].first]->deriv_evaluate(
+    oper_interface.operator_map[stack[dependency].first]->deriv_evaluate(
       stack[dependency].second, command_index, forward_buffer, reverse_buffer,
       dependency);
   }
@@ -110,7 +110,8 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
       x_dependencies[stack[i].second[0]].insert(i);
     }
 
-    for (int j = 0; j < op_map.operator_map[stack[i].first]->get_arity(); ++j) {
+    for (int j = 0; j < oper_interface.operator_map[stack[i].first]->get_arity();
+         ++j) {
       stack_dependencies[stack[i].second[j]].insert(i);
     }
   }
@@ -171,7 +172,8 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
         x_dependencies[stack[i].second[0]].insert(i);
       }
 
-      for (int j = 0; j < op_map.operator_map[stack[i].first]->get_arity(); ++j) {
+      for (int j = 0; j < oper_interface.operator_map[stack[i].first]->get_arity();
+           ++j) {
         stack_dependencies[stack[i].second[j]].insert(i);
       }
     }
@@ -208,7 +210,7 @@ void PrintStack(const CommandStack & stack) {
   for (std::size_t i = 0; i < stack.size(); ++i) {
     //this is the operator
     std::cout << "(" << i << ") = " <<
-              op_map.operator_map[stack[i].first]->get_print() << " : ";
+              oper_interface.operator_map[stack[i].first]->get_print() << " : ";
 
     for (auto const& param : stack[i].second) {
       std::cout << " (" << param << ")";
@@ -232,7 +234,7 @@ CommandStack SimplifyStack(const CommandStack & stack) {
       new_stack.push_back(stack[i]);
 
       // TODO(gbomarito) should look up whether node is terminal or not
-      if (op_map.operator_map[new_stack[j].first]->get_arity() > 0) {
+      if (oper_interface.operator_map[new_stack[j].first]->get_arity() > 0) {
         for (std::size_t k = 0; k < new_stack[j].second.size(); ++k) {
           new_stack[j].second[k] = reduced_param_map[new_stack[j].second[k]];
         }

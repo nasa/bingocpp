@@ -32,14 +32,15 @@ typedef Eigen::Ref<Eigen::ArrayXXd,
  *  This is the abstract class for the Operation being performed.
  *
  *  \note Operators include : X_Load, C_Load, Addition, Subtraction,
- *        Multiplication, Division.
+ *        Multiplication, Division, sin
  *
  *  \fn virtual int get_arity()
  *  \fn virtual std::string get_print()
- *  \fn Eigen::ArrayXXd evaluate(const std::vector<int> &command,
+ *  \fn void evaluate(const std::vector<int> &command,
  *                               const Eigen::ArrayXXd &x,
  *                               const std::vector<double> &constants,
- *                               std::vector<Eigen::ArrayXXd> &buffer)
+ *                               std::vector<Eigen::ArrayXXd> &buffer,
+ *                               std::size_t result_location)
  *  \fn virtual void deriv_evaluate(const std::vector<int> &command,
  *                                  const int command_index,
  *                                  const std::vector<Eigen::ArrayXXd> &forward_buffer,
@@ -54,19 +55,19 @@ class Operation {
   //! \brief Returns the string representation of the operator.
   virtual std::string get_print() = 0;
 
-  /*! \brief Evaluates single command command, returns array to be saved in buffer.
+  /*! \brief evaluates single command command, returns array to be saved in buffer.
    *
    *  \param[in] command The parameters to be input to buffer. std::vector<int>
    *  \param[in] x Input variables to the acyclic graph. Eigen::ArrayXXd
    *  \param[in] constants Constants used in the command. std::vector<double>
    *  \param[in/out] buffer Vector of Eigen arrays for the buffer.
-   *
-   *  \return Eigen array
+   *  \param[in] result_location location to use with buffer.
    */
-  virtual Eigen::ArrayXXd evaluate(const std::vector<int> &command,
-                                   const Eigen::ArrayXXd &x,
-                                   const std::vector<double> &constants,
-                                   std::vector<Eigen::ArrayXXd> &buffer) = 0;
+  virtual void evaluate(const std::vector<int> &command,
+                        const Eigen::ArrayXXd &x,
+                        const std::vector<double> &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location) = 0;
 
   /*! \brief Computes reverse autodiff partial of a command command.
    *
@@ -97,10 +98,11 @@ class X_Load: public Operation {
   std::string get_print() {
     return "X";
   }
-  virtual Eigen::ArrayXXd evaluate(const std::vector<int> &command,
-                                   const Eigen::ArrayXXd &x,
-                                   const std::vector<double> &constants,
-                                   std::vector<Eigen::ArrayXXd> &buffer);
+  virtual void evaluate(const std::vector<int> &command,
+                        const Eigen::ArrayXXd &x,
+                        const std::vector<double> &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location);
   virtual void deriv_evaluate(const std::vector<int> &command,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
@@ -121,10 +123,11 @@ class C_Load: public Operation {
   std::string get_print() {
     return "C";
   }
-  virtual Eigen::ArrayXXd evaluate(const std::vector<int> &command,
-                                   const Eigen::ArrayXXd &x,
-                                   const std::vector<double> &constants,
-                                   std::vector<Eigen::ArrayXXd> &buffer);
+  virtual void evaluate(const std::vector<int> &command,
+                        const Eigen::ArrayXXd &x,
+                        const std::vector<double> &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location);
   virtual void deriv_evaluate(const std::vector<int> &command,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
@@ -145,10 +148,11 @@ class Addition: public Operation {
   std::string get_print() {
     return "+";
   }
-  virtual Eigen::ArrayXXd evaluate(const std::vector<int> &command,
-                                   const Eigen::ArrayXXd &x,
-                                   const std::vector<double> &constants,
-                                   std::vector<Eigen::ArrayXXd> &buffer);
+  virtual void evaluate(const std::vector<int> &command,
+                        const Eigen::ArrayXXd &x,
+                        const std::vector<double> &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location);
   virtual void deriv_evaluate(const std::vector<int> &command,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
@@ -169,10 +173,11 @@ class Subtraction: public Operation {
   std::string get_print() {
     return "-";
   }
-  virtual Eigen::ArrayXXd evaluate(const std::vector<int> &command,
-                                   const Eigen::ArrayXXd &x,
-                                   const std::vector<double> &constants,
-                                   std::vector<Eigen::ArrayXXd> &buffer);
+  virtual void evaluate(const std::vector<int> &command,
+                        const Eigen::ArrayXXd &x,
+                        const std::vector<double> &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location);
   virtual void deriv_evaluate(const std::vector<int> &command,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
@@ -193,10 +198,11 @@ class Multiplication: public Operation {
   std::string get_print() {
     return "*";
   }
-  virtual Eigen::ArrayXXd evaluate(const std::vector<int> &command,
-                                   const Eigen::ArrayXXd &x,
-                                   const std::vector<double> &constants,
-                                   std::vector<Eigen::ArrayXXd> &buffer);
+  virtual void evaluate(const std::vector<int> &command,
+                        const Eigen::ArrayXXd &x,
+                        const std::vector<double> &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location);
   virtual void deriv_evaluate(const std::vector<int> &command,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
@@ -217,16 +223,192 @@ class Division: public Operation {
   std::string get_print() {
     return "/";
   }
-  virtual Eigen::ArrayXXd evaluate(const std::vector<int> &command,
-                                   const Eigen::ArrayXXd &x,
-                                   const std::vector<double> &constants,
-                                   std::vector<Eigen::ArrayXXd> &buffer);
+  virtual void evaluate(const std::vector<int> &command,
+                        const Eigen::ArrayXXd &x,
+                        const std::vector<double> &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location);
   virtual void deriv_evaluate(const std::vector<int> &command,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
                               int dependency);
   Division();
+};
+
+/*! \class Sin
+ *  \brief This class performs sine.
+ */
+
+class Sin: public Operation {
+ public:
+  int get_arity() {
+    return 1;
+  }
+  std::string get_print() {
+    return "sin";
+  }
+  virtual void evaluate(const std::vector<int> &command,
+                        const Eigen::ArrayXXd &x,
+                        const std::vector<double> &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location);
+  virtual void deriv_evaluate(const std::vector<int> &command,
+                              const int command_index,
+                              const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                              std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                              int dependency);
+  Sin();
+};
+
+/*! \class Cos
+ *  \brief This class performs cosine.
+ */
+
+class Cos: public Operation {
+ public:
+  int get_arity() {
+    return 1;
+  }
+  std::string get_print() {
+    return "cos";
+  }
+  virtual void evaluate(const std::vector<int> &command,
+                        const Eigen::ArrayXXd &x,
+                        const std::vector<double> &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location);
+  virtual void deriv_evaluate(const std::vector<int> &command,
+                              const int command_index,
+                              const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                              std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                              int dependency);
+  Cos();
+};
+
+/*! \class Exp
+ *  \brief This class performs an exponential.
+ */
+
+class Exp: public Operation {
+ public:
+  int get_arity() {
+    return 1;
+  }
+  std::string get_print() {
+    return "exp";
+  }
+  virtual void evaluate(const std::vector<int> &command,
+                        const Eigen::ArrayXXd &x,
+                        const std::vector<double> &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location);
+  virtual void deriv_evaluate(const std::vector<int> &command,
+                              const int command_index,
+                              const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                              std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                              int dependency);
+  Exp();
+};
+
+/*! \class Log
+ *  \brief This class performs a safe log.
+ */
+
+class Log: public Operation {
+ public:
+  int get_arity() {
+    return 1;
+  }
+  std::string get_print() {
+    return "log";
+  }
+  virtual void evaluate(const std::vector<int> &command,
+                        const Eigen::ArrayXXd &x,
+                        const std::vector<double> &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location);
+  virtual void deriv_evaluate(const std::vector<int> &command,
+                              const int command_index,
+                              const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                              std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                              int dependency);
+  Log();
+};
+
+/*! \class Power
+ *  \brief This class performs power.
+ */
+
+class Power: public Operation {
+ public:
+  int get_arity() {
+    return 2;
+  }
+  std::string get_print() {
+    return "pow";
+  }
+  virtual void evaluate(const std::vector<int> &command,
+                        const Eigen::ArrayXXd &x,
+                        const std::vector<double> &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location);
+  virtual void deriv_evaluate(const std::vector<int> &command,
+                              const int command_index,
+                              const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                              std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                              int dependency);
+  Power();
+};
+
+/*! \class Absolute
+ *  \brief This class performs an absolute.
+ */
+
+class Absolute: public Operation {
+ public:
+  int get_arity() {
+    return 1;
+  }
+  std::string get_print() {
+    return "abs";
+  }
+  virtual void evaluate(const std::vector<int> &command,
+                        const Eigen::ArrayXXd &x,
+                        const std::vector<double> &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location);
+  virtual void deriv_evaluate(const std::vector<int> &command,
+                              const int command_index,
+                              const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                              std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                              int dependency);
+  Absolute();
+};
+
+/*! \class Sqrt
+ *  \brief This class performs square root.
+ */
+
+class Sqrt: public Operation {
+ public:
+  int get_arity() {
+    return 1;
+  }
+  std::string get_print() {
+    return "sqrt";
+  }
+  virtual void evaluate(const std::vector<int> &command,
+                        const Eigen::ArrayXXd &x,
+                        const std::vector<double> &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location);
+  virtual void deriv_evaluate(const std::vector<int> &command,
+                              const int command_index,
+                              const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                              std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                              int dependency);
+  Sqrt();
 };
 
 /*! \class OperatorInterface
