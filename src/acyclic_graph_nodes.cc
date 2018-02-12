@@ -183,8 +183,8 @@ void Sin::deriv_evaluate(const std::vector<int> &command,
                          const std::vector<Eigen::ArrayXXd> &forward_buffer,
                          std::vector<Eigen::ArrayXXd> &reverse_buffer,
                          int dependency) {
-  // TODO deriv of sin
-  reverse_buffer[command_index] += reverse_buffer[dependency].cos();
+  reverse_buffer[command_index] += reverse_buffer[dependency] *
+                                   forward_buffer[command[0]].cos();
 }
 
 // Cos
@@ -195,7 +195,7 @@ void Cos::evaluate(const std::vector<int> &command,
                    const std::vector<double> &constants,
                    std::vector<Eigen::ArrayXXd> &buffer,
                    std::size_t result_location) {
-  buffer[result_location] = buffer[command[0]].sin();
+  buffer[result_location] = buffer[command[0]].cos();
 }
 
 void Cos::deriv_evaluate(const std::vector<int> &command,
@@ -203,8 +203,8 @@ void Cos::deriv_evaluate(const std::vector<int> &command,
                          const std::vector<Eigen::ArrayXXd> &forward_buffer,
                          std::vector<Eigen::ArrayXXd> &reverse_buffer,
                          int dependency) {
-  // TODO deriv of cos
-  reverse_buffer[command_index] += reverse_buffer[dependency].sin();
+  reverse_buffer[command_index] -= reverse_buffer[dependency] *
+                                   forward_buffer[command[0]].sin();
 }
 
 // Exp
@@ -223,7 +223,8 @@ void Exp::deriv_evaluate(const std::vector<int> &command,
                          const std::vector<Eigen::ArrayXXd> &forward_buffer,
                          std::vector<Eigen::ArrayXXd> &reverse_buffer,
                          int dependency) {
-  // TODO deriv of exp
+  reverse_buffer[command_index] += reverse_buffer[dependency] *
+                                   forward_buffer[dependency];
 }
 
 // Log
@@ -242,7 +243,8 @@ void Log::deriv_evaluate(const std::vector<int> &command,
                          const std::vector<Eigen::ArrayXXd> &forward_buffer,
                          std::vector<Eigen::ArrayXXd> &reverse_buffer,
                          int dependency) {
-  // TODO deriv of log
+  reverse_buffer[command_index] += reverse_buffer[dependency] /
+                                   forward_buffer[command[0]];
 }
 
 // Power
@@ -253,7 +255,7 @@ void Power::evaluate(const std::vector<int> &command,
                      const std::vector<double> &constants,
                      std::vector<Eigen::ArrayXXd> &buffer,
                      std::size_t result_location) {
-  buffer[result_location] = buffer[command[0]].pow(buffer[command[1]]);
+  buffer[result_location] = (buffer[command[0]].abs()).pow(buffer[command[1]]);
 }
 
 void Power::deriv_evaluate(const std::vector<int> &command,
@@ -261,7 +263,18 @@ void Power::deriv_evaluate(const std::vector<int> &command,
                            const std::vector<Eigen::ArrayXXd> &forward_buffer,
                            std::vector<Eigen::ArrayXXd> &reverse_buffer,
                            int dependency) {
-  // TODO deriv of power
+  if (command[0] == command_index) {
+    reverse_buffer[command_index] += forward_buffer[dependency] *
+                                     reverse_buffer[dependency] *
+                                     forward_buffer[command[0]] /
+                                     forward_buffer[command[1]];
+  }
+
+  if (command[1] == command_index) {
+    reverse_buffer[command_index] += forward_buffer[dependency] *
+                                     reverse_buffer[dependency] *
+                                     (forward_buffer[command[0]].abs()).log();
+  }
 }
 
 // Absolute
@@ -280,7 +293,8 @@ void Absolute::deriv_evaluate(const std::vector<int> &command,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
                               int dependency) {
-  // TODO deriv of absolute
+  reverse_buffer[command_index] += reverse_buffer[dependency] *
+                                   forward_buffer[command[0]].sign();
 }
 
 // Sqrt
@@ -299,7 +313,8 @@ void Sqrt::deriv_evaluate(const std::vector<int> &command,
                           const std::vector<Eigen::ArrayXXd> &forward_buffer,
                           std::vector<Eigen::ArrayXXd> &reverse_buffer,
                           int dependency) {
-  // TODO deriv of square root
+  reverse_buffer[command_index] += 0.5 * reverse_buffer[dependency].abs() /
+                                   forward_buffer[dependency];
 }
 
 std::map<int, Operation*> OperatorInterface::create_op_map() {
