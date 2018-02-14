@@ -266,8 +266,8 @@ void Power::deriv_evaluate(const std::vector<int> &command,
   if (command[0] == command_index) {
     reverse_buffer[command_index] += forward_buffer[dependency] *
                                      reverse_buffer[dependency] *
-                                     forward_buffer[command[0]] /
-                                     forward_buffer[command[1]];
+                                     forward_buffer[command[1]] /
+                                     forward_buffer[command[0]];
   }
 
   if (command[1] == command_index) {
