@@ -78,11 +78,647 @@ class AcyclicGraphTest : public::testing::Test {
   }
 };
 
+TEST(AcyclicGraphNodesTest, XLoad) {
+  CommandStack stack;
+  Eigen::ArrayXXd x(3, 3);
+  std::vector<double> constants;
 
+  stack.push_back(std::make_pair(0, std::vector<int>()));
+  stack[0].second.push_back(1);
 
+  x << 7., 6., 9., 5., 11., 4., 3., 2., 1.;
 
+  Eigen::ArrayXXd a_true(3, 1);
+  a_true << 6., 11., 2.;
 
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
 
+  for (size_t i = 0; i < x.rows(); ++i) {
+    ASSERT_DOUBLE_EQ(test(i), a_true(i));
+  }
+}
+
+TEST(AcyclicGraphNodesTest, CLoad) {
+  CommandStack stack;
+  Eigen::ArrayXXd x(3, 3);
+  std::vector<double> constants;
+
+  stack.push_back(std::make_pair(1, std::vector<int>()));
+  stack[0].second.push_back(1);
+
+  constants.push_back(3.);
+  constants.push_back(5.);
+
+  Eigen::ArrayXXd a_true(3, 1);
+  a_true << 5., 5., 5.;
+
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  
+  for (size_t i = 0; i < x.rows(); ++i) {
+    ASSERT_DOUBLE_EQ(test(i), a_true(i));
+  }
+}
+
+TEST(AcyclicGraphNodesTest, Addition) {
+  CommandStack stack;
+  CommandStack stack2;
+  CommandStack stack3;
+  CommandStack stack4;
+  Eigen::ArrayXXd x(3, 3);
+  std::vector<double> constants;
+
+  stack.push_back(std::make_pair(0, std::vector<int>()));
+  stack[0].second.push_back(0);
+  stack.push_back(std::make_pair(1, std::vector<int>()));
+  stack[1].second.push_back(0);
+  stack.push_back(std::make_pair(2, std::vector<int>()));
+  stack[2].second.push_back(0);
+  stack[2].second.push_back(1);
+
+  stack2.push_back(std::make_pair(0, std::vector<int>()));
+  stack2[0].second.push_back(0);
+  stack2.push_back(std::make_pair(1, std::vector<int>()));
+  stack2[1].second.push_back(0);
+  stack2.push_back(std::make_pair(2, std::vector<int>()));
+  stack2[2].second.push_back(1);
+  stack2[2].second.push_back(0);
+
+  stack3.push_back(std::make_pair(0, std::vector<int>()));
+  stack3[0].second.push_back(0);
+  stack3.push_back(std::make_pair(2, std::vector<int>()));
+  stack3[1].second.push_back(0);
+  stack3[1].second.push_back(0);
+
+  stack4.push_back(std::make_pair(1, std::vector<int>()));
+  stack4[0].second.push_back(0);
+  stack4.push_back(std::make_pair(2, std::vector<int>()));
+  stack4[1].second.push_back(0);
+  stack4[1].second.push_back(0);
+
+  x << 7., 5., 3., 6., 11., 4., 9., 8., 2.;
+  constants.push_back(3.);
+
+  Eigen::ArrayXXd a_true(3, 1);
+  a_true << 10., 9., 12.;
+  Eigen::ArrayXXd a_true_xx(3, 1);
+  a_true_xx << 14., 12., 18.;
+  Eigen::ArrayXXd a_true_cc(3, 1);
+  a_true_cc << 6., 6., 6.;
+
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test3 = Evaluate(stack3, x, constants);
+  Eigen::ArrayXXd test4 = Evaluate(stack4, x, constants);
+
+  Eigen::ArrayXXd d_true(3, 3);
+  d_true << 1., 0., 0., 1., 0., 0., 1., 0., 0.;
+  Eigen::ArrayXXd d_true_xx(3, 3);
+  d_true_xx << 2., 0., 0., 2., 0., 0., 2., 0., 0.;
+
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xc =
+    EvaluateWithDerivative(stack, x, constants);
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_cx =
+    EvaluateWithDerivative(stack2, x, constants);
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xx =
+    EvaluateWithDerivative(stack3, x, constants);
+
+  for (size_t i = 0; i < x.rows(); ++i) {
+    ASSERT_DOUBLE_EQ(test(i), a_true(i));
+    ASSERT_DOUBLE_EQ(test2(i), a_true(i));
+    ASSERT_DOUBLE_EQ(test3(i), a_true_xx(i));
+    ASSERT_DOUBLE_EQ(test4(i), a_true_cc(i));
+    ASSERT_DOUBLE_EQ(d_xc.first(i), a_true(i));
+    ASSERT_DOUBLE_EQ(d_cx.first(i), a_true(i));
+    ASSERT_DOUBLE_EQ(d_xx.first(i), a_true_xx(i));
+  }
+  for (size_t i = 0; i < x.size(); ++i) {
+    ASSERT_DOUBLE_EQ(d_xc.second(i), d_true(i));
+    ASSERT_DOUBLE_EQ(d_cx.second(i), d_true(i));
+    ASSERT_DOUBLE_EQ(d_xx.second(i), d_true_xx(i));
+  }
+}
+
+TEST(AcyclicGraphNodesTest, Subtraction) {
+  CommandStack stack;
+  CommandStack stack2;
+  CommandStack stack3;
+  CommandStack stack4;
+  Eigen::ArrayXXd x(3, 3);
+  std::vector<double> constants;
+
+  stack.push_back(std::make_pair(0, std::vector<int>()));
+  stack[0].second.push_back(0);
+  stack.push_back(std::make_pair(1, std::vector<int>()));
+  stack[1].second.push_back(0);
+  stack.push_back(std::make_pair(3, std::vector<int>()));
+  stack[2].second.push_back(0);
+  stack[2].second.push_back(1);
+
+  stack2.push_back(std::make_pair(0, std::vector<int>()));
+  stack2[0].second.push_back(0);
+  stack2.push_back(std::make_pair(1, std::vector<int>()));
+  stack2[1].second.push_back(0);
+  stack2.push_back(std::make_pair(3, std::vector<int>()));
+  stack2[2].second.push_back(1);
+  stack2[2].second.push_back(0);
+
+  stack3.push_back(std::make_pair(0, std::vector<int>()));
+  stack3[0].second.push_back(2);
+  stack3.push_back(std::make_pair(3, std::vector<int>()));
+  stack3[1].second.push_back(0);
+  stack3[1].second.push_back(0);
+
+  stack4.push_back(std::make_pair(1, std::vector<int>()));
+  stack4[0].second.push_back(0);
+  stack4.push_back(std::make_pair(3, std::vector<int>()));
+  stack4[1].second.push_back(0);
+  stack4[1].second.push_back(0);
+
+  x << 7., 5., 3., 6., 11., 4., 9., 8., 2.;
+  constants.push_back(3.);
+
+  Eigen::ArrayXXd a_true(3, 1);
+  a_true << 4., 3., 6.;
+  Eigen::ArrayXXd a_true2(3, 1);
+  a_true2 << -4., -3., -6.;
+  Eigen::ArrayXXd a_true_xx(3, 1);
+  a_true_xx << 0., 0., 0.;
+
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test3 = Evaluate(stack3, x, constants);
+  Eigen::ArrayXXd test4 = Evaluate(stack4, x, constants);
+
+  Eigen::ArrayXXd d_true(3, 3);
+  d_true << 1., 0., 0., 1., 0., 0., 1., 0., 0.;
+  Eigen::ArrayXXd d_true2(3, 3);
+  d_true2 << -1., 0., 0., -1., 0., 0., -1., 0., 0.;
+  Eigen::ArrayXXd d_true_xx(3, 3);
+  d_true_xx << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
+
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xc =
+    EvaluateWithDerivative(stack, x, constants);
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_cx =
+    EvaluateWithDerivative(stack2, x, constants);
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xx =
+    EvaluateWithDerivative(stack3, x, constants);
+
+  for (size_t i = 0; i < x.rows(); ++i) {
+    ASSERT_DOUBLE_EQ(test(i), a_true(i));
+    ASSERT_DOUBLE_EQ(test2(i), a_true2(i));
+    ASSERT_DOUBLE_EQ(test3(i), a_true_xx(i));
+    ASSERT_DOUBLE_EQ(test4(i), a_true_xx(i));
+    ASSERT_DOUBLE_EQ(d_xc.first(i), a_true(i));
+    ASSERT_DOUBLE_EQ(d_cx.first(i), a_true2(i));
+    ASSERT_DOUBLE_EQ(d_xx.first(i), a_true_xx(i));
+  }
+  for (size_t i = 0; i < x.size(); ++i) {
+    ASSERT_DOUBLE_EQ(d_xc.second(i), d_true(i));
+    ASSERT_DOUBLE_EQ(d_cx.second(i), d_true2(i));
+    ASSERT_DOUBLE_EQ(d_xx.second(i), d_true_xx(i));
+  }
+}
+
+TEST(AcyclicGraphNodesTest, Multiplication) {
+  CommandStack stack;
+  CommandStack stack2;
+  CommandStack stack3;
+  CommandStack stack4;
+  Eigen::ArrayXXd x(3, 3);
+  std::vector<double> constants;
+
+  stack.push_back(std::make_pair(0, std::vector<int>()));
+  stack[0].second.push_back(0);
+  stack.push_back(std::make_pair(1, std::vector<int>()));
+  stack[1].second.push_back(0);
+  stack.push_back(std::make_pair(4, std::vector<int>()));
+  stack[2].second.push_back(0);
+  stack[2].second.push_back(1);
+
+  stack2.push_back(std::make_pair(0, std::vector<int>()));
+  stack2[0].second.push_back(0);
+  stack2.push_back(std::make_pair(1, std::vector<int>()));
+  stack2[1].second.push_back(0);
+  stack2.push_back(std::make_pair(4, std::vector<int>()));
+  stack2[2].second.push_back(1);
+  stack2[2].second.push_back(0);
+
+  stack3.push_back(std::make_pair(0, std::vector<int>()));
+  stack3[0].second.push_back(0);
+  stack3.push_back(std::make_pair(4, std::vector<int>()));
+  stack3[1].second.push_back(0);
+  stack3[1].second.push_back(0);
+
+  stack4.push_back(std::make_pair(1, std::vector<int>()));
+  stack4[0].second.push_back(0);
+  stack4.push_back(std::make_pair(4, std::vector<int>()));
+  stack4[1].second.push_back(0);
+  stack4[1].second.push_back(0);
+
+  x << 7., 5., 3., 6., 11., 4., 9., 8., 2.;
+  constants.push_back(3.);
+
+  Eigen::ArrayXXd a_true(3, 1);
+  a_true << (7. * 3.), (6. * 3.), (9. * 3.);
+  Eigen::ArrayXXd a_true_xx(3, 1);
+  a_true_xx << (7. * 7.), (6. * 6.), (9.* 9.);
+  Eigen::ArrayXXd a_true_cc(3, 1);
+  a_true_cc << 9., 9., 9.;
+
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test3 = Evaluate(stack3, x, constants);
+  Eigen::ArrayXXd test4 = Evaluate(stack4, x, constants);
+
+  Eigen::ArrayXXd d_true(3, 3);
+  d_true << 3., 0., 0., 3., 0., 0., 3., 0., 0.;
+  Eigen::ArrayXXd d_true_xx(3, 3);
+  d_true_xx << 14., 0., 0., 12., 0., 0., 18., 0., 0.;
+
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xc =
+    EvaluateWithDerivative(stack, x, constants);
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_cx =
+    EvaluateWithDerivative(stack2, x, constants);
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xx =
+    EvaluateWithDerivative(stack3, x, constants);
+
+  for (size_t i = 0; i < x.rows(); ++i) {
+    ASSERT_DOUBLE_EQ(test(i), a_true(i));
+    ASSERT_DOUBLE_EQ(test2(i), a_true(i));
+    ASSERT_DOUBLE_EQ(test3(i), a_true_xx(i));
+    ASSERT_DOUBLE_EQ(test4(i), a_true_cc(i));
+    ASSERT_DOUBLE_EQ(d_xc.first(i), a_true(i));
+    ASSERT_DOUBLE_EQ(d_cx.first(i), a_true(i));
+    ASSERT_DOUBLE_EQ(d_xx.first(i), a_true_xx(i));
+  }
+  for (size_t i = 0; i < x.size(); ++i) {
+    ASSERT_DOUBLE_EQ(d_xc.second(i), d_true(i));
+    ASSERT_DOUBLE_EQ(d_cx.second(i), d_true(i));
+    ASSERT_DOUBLE_EQ(d_xx.second(i), d_true_xx(i));
+  }
+}
+
+TEST(AcyclicGraphNodesTest, Division) {
+  CommandStack stack;
+  CommandStack stack2;
+  CommandStack stack3;
+  CommandStack stack4;
+  Eigen::ArrayXXd x(3, 3);
+  std::vector<double> constants;
+
+  stack.push_back(std::make_pair(0, std::vector<int>()));
+  stack[0].second.push_back(0);
+  stack.push_back(std::make_pair(1, std::vector<int>()));
+  stack[1].second.push_back(0);
+  stack.push_back(std::make_pair(5, std::vector<int>()));
+  stack[2].second.push_back(0);
+  stack[2].second.push_back(1);
+
+  stack2.push_back(std::make_pair(0, std::vector<int>()));
+  stack2[0].second.push_back(0);
+  stack2.push_back(std::make_pair(1, std::vector<int>()));
+  stack2[1].second.push_back(0);
+  stack2.push_back(std::make_pair(5, std::vector<int>()));
+  stack2[2].second.push_back(1);
+  stack2[2].second.push_back(0);
+
+  stack3.push_back(std::make_pair(0, std::vector<int>()));
+  stack3[0].second.push_back(2);
+  stack3.push_back(std::make_pair(5, std::vector<int>()));
+  stack3[1].second.push_back(0);
+  stack3[1].second.push_back(0);
+
+  stack4.push_back(std::make_pair(1, std::vector<int>()));
+  stack4[0].second.push_back(0);
+  stack4.push_back(std::make_pair(5, std::vector<int>()));
+  stack4[1].second.push_back(0);
+  stack4[1].second.push_back(0);
+
+  x << 7., 5., 3., 6., 11., 12., 9., 8., 6.;
+  constants.push_back(3.);
+
+  Eigen::ArrayXXd a_true(3, 1);
+  a_true << (7. / 3.), (6. / 3.), (9. / 3.);
+  Eigen::ArrayXXd a_true2(3, 1);
+  a_true2 << (3. / 7.), (3. / 6.), (3. / 9.);
+  Eigen::ArrayXXd a_true_xx(3, 1);
+  a_true_xx << 1., 1., 1.;
+  Eigen::ArrayXXd a_true_cc(3, 1);
+  a_true_cc << 1., 1., 1.;
+
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test3 = Evaluate(stack3, x, constants);
+  Eigen::ArrayXXd test4 = Evaluate(stack4, x, constants);
+
+  Eigen::ArrayXXd d_true(3, 3);
+  d_true << (1. / 3.), 0., 0., (1. / 3.), 0., 0., (1. / 3.), 0., 0.;
+  Eigen::ArrayXXd d_true2(3, 3);
+  d_true2 << (-3./(pow(7., 2.))), 0., 0., (-3./(pow(6., 2.))),
+               0., 0., (-3./(pow(9., 2.))), 0., 0.;
+  Eigen::ArrayXXd d_true_xx(3, 3);
+  d_true_xx << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
+
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xc =
+    EvaluateWithDerivative(stack, x, constants);
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_cx =
+    EvaluateWithDerivative(stack2, x, constants);
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xx =
+    EvaluateWithDerivative(stack3, x, constants);
+
+  for (size_t i = 0; i < x.rows(); ++i) {
+    ASSERT_DOUBLE_EQ(test(i), a_true(i));
+    ASSERT_DOUBLE_EQ(test2(i), a_true2(i));
+    ASSERT_DOUBLE_EQ(test3(i), a_true_xx(i));
+    ASSERT_DOUBLE_EQ(test4(i), a_true_cc(i));
+    ASSERT_DOUBLE_EQ(d_xc.first(i), a_true(i));
+    ASSERT_DOUBLE_EQ(d_cx.first(i), a_true2(i));
+    ASSERT_DOUBLE_EQ(d_xx.first(i), a_true_xx(i));
+  }
+  for (size_t i = 0; i < x.size(); ++i) {
+    ASSERT_DOUBLE_EQ(d_xc.second(i), d_true(i));
+    ASSERT_DOUBLE_EQ(d_cx.second(i), d_true2(i));
+    ASSERT_DOUBLE_EQ(d_xx.second(i), d_true_xx(i));
+  }
+}
+
+TEST(AcyclicGraphNodesTest, Sin) {
+  CommandStack stack;
+  CommandStack stack2;
+  Eigen::ArrayXXd x(3, 3);
+  std::vector<double> constants;
+
+  stack.push_back(std::make_pair(1, std::vector<int>()));
+  stack[0].second.push_back(0);
+  stack.push_back(std::make_pair(6, std::vector<int>()));
+  stack[1].second.push_back(0);
+
+  stack2.push_back(std::make_pair(0, std::vector<int>()));
+  stack2[0].second.push_back(0);
+  stack2.push_back(std::make_pair(6, std::vector<int>()));
+  stack2[1].second.push_back(0);
+
+  x << 7., 5., 3., 6., 11., 12., 9., 8., 6.;
+  constants.push_back(3.);
+
+  Eigen::ArrayXXd a_true(3, 1);
+  a_true << (sin(3.)), (sin(3.)), (sin(3.));
+  Eigen::ArrayXXd a_true_x(3, 1);
+  a_true_x << (sin(7.)), (sin(6.)), (sin(9.));
+
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+
+  Eigen::ArrayXXd d_true(3, 3);
+  d_true << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
+  Eigen::ArrayXXd d_true_x(3, 3);
+  d_true_x << (cos(7.)), 0., 0., (cos(6.)), 0., 0., (cos(9.)), 0., 0.;
+
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_c =
+    EvaluateWithDerivative(stack, x, constants);
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_x =
+    EvaluateWithDerivative(stack2, x, constants);
+
+  std::cerr << std::endl << d_x.first << std::endl;
+  std::cerr << std::endl << d_x.second << std::endl;
+  std::cerr << std::endl << d_true_x << std::endl;
+
+  for (size_t i = 0; i < x.rows(); ++i) {
+    ASSERT_DOUBLE_EQ(test(i), a_true(i));
+    ASSERT_DOUBLE_EQ(test2(i), a_true_x(i));
+    ASSERT_DOUBLE_EQ(d_c.first(i), a_true(i));
+    ASSERT_DOUBLE_EQ(d_x.first(i), a_true_x(i));
+  }
+  for (size_t i = 0; i < x.size(); ++i) {
+    ASSERT_DOUBLE_EQ(d_c.second(i), d_true(i));
+    ASSERT_DOUBLE_EQ(d_x.second(i), d_true_x(i));
+  }
+}
+
+TEST(AcyclicGraphNodesTest, Cos) {
+  CommandStack stack;
+  CommandStack stack2;
+  Eigen::ArrayXXd x(3, 3);
+  std::vector<double> constants;
+
+  stack.push_back(std::make_pair(1, std::vector<int>()));
+  stack[0].second.push_back(0);
+  stack.push_back(std::make_pair(7, std::vector<int>()));
+  stack[1].second.push_back(0);
+
+  stack2.push_back(std::make_pair(0, std::vector<int>()));
+  stack2[0].second.push_back(0);
+  stack2.push_back(std::make_pair(7, std::vector<int>()));
+  stack2[1].second.push_back(0);
+
+  x << 7., 5., 3., 6., 11., 12., 9., 8., 6.;
+  constants.push_back(3.);
+
+  Eigen::ArrayXXd a_true(3, 1);
+  a_true << (cos(3.)), (cos(3.)), (cos(3.));
+  Eigen::ArrayXXd a_true_x(3, 1);
+  a_true_x << (cos(7.)), (cos(6.)), (cos(9.));
+
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+
+  for (size_t i = 0; i < x.rows(); ++i) {
+    ASSERT_DOUBLE_EQ(test(i), a_true(i));
+    ASSERT_DOUBLE_EQ(test2(i), a_true_x(i));
+  }
+}
+
+TEST(AcyclicGraphNodesTest, Exp) {
+  CommandStack stack;
+  CommandStack stack2;
+  Eigen::ArrayXXd x(3, 3);
+  std::vector<double> constants;
+
+  stack.push_back(std::make_pair(1, std::vector<int>()));
+  stack[0].second.push_back(0);
+  stack.push_back(std::make_pair(8, std::vector<int>()));
+  stack[1].second.push_back(0);
+
+  stack2.push_back(std::make_pair(0, std::vector<int>()));
+  stack2[0].second.push_back(0);
+  stack2.push_back(std::make_pair(8, std::vector<int>()));
+  stack2[1].second.push_back(0);
+
+  x << 7., 5., 3., 6., 11., 12., 9., 8., 6.;
+  constants.push_back(3.);
+
+  Eigen::ArrayXXd a_true(3, 1);
+  a_true << (exp(3.)), (exp(3.)), (exp(3.));
+  Eigen::ArrayXXd a_true_x(3, 1);
+  a_true_x << (exp(7.)), (exp(6.)), (exp(9.));
+
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+
+  for (size_t i = 0; i < x.rows(); ++i) {
+    ASSERT_DOUBLE_EQ(test(i), a_true(i));
+    ASSERT_DOUBLE_EQ(test2(i), a_true_x(i));
+  }
+}
+
+TEST(AcyclicGraphNodesTest, Log) {
+  CommandStack stack;
+  CommandStack stack2;
+  Eigen::ArrayXXd x(3, 3);
+  std::vector<double> constants;
+
+  stack.push_back(std::make_pair(1, std::vector<int>()));
+  stack[0].second.push_back(0);
+  stack.push_back(std::make_pair(9, std::vector<int>()));
+  stack[1].second.push_back(0);
+
+  stack2.push_back(std::make_pair(0, std::vector<int>()));
+  stack2[0].second.push_back(0);
+  stack2.push_back(std::make_pair(9, std::vector<int>()));
+  stack2[1].second.push_back(0);
+
+  x << 7., 5., 3., 6., 11., 12., 9., 8., 6.;
+  constants.push_back(3.);
+
+  Eigen::ArrayXXd a_true(3, 1);
+  a_true << (log(abs(3.))), (log(abs(3.))), (log(abs(3.)));
+  Eigen::ArrayXXd a_true_x(3, 1);
+  a_true_x << (log(abs(7.))), (log(abs(6.))), (log(abs(9.)));
+
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+
+  for (size_t i = 0; i < x.rows(); ++i) {
+    ASSERT_DOUBLE_EQ(test(i), a_true(i));
+    ASSERT_DOUBLE_EQ(test2(i), a_true_x(i));
+  }
+}
+
+TEST(AcyclicGraphNodesTest, Power) {
+  CommandStack stack;
+  CommandStack stack2;
+  CommandStack stack3;
+  CommandStack stack4;
+  Eigen::ArrayXXd x(3, 3);
+  std::vector<double> constants;
+
+  stack.push_back(std::make_pair(0, std::vector<int>()));
+  stack[0].second.push_back(2);
+  stack.push_back(std::make_pair(1, std::vector<int>()));
+  stack[1].second.push_back(0);
+  stack.push_back(std::make_pair(10, std::vector<int>()));
+  stack[2].second.push_back(0);
+  stack[2].second.push_back(1);
+
+  stack2.push_back(std::make_pair(0, std::vector<int>()));
+  stack2[0].second.push_back(2);
+  stack2.push_back(std::make_pair(1, std::vector<int>()));
+  stack2[1].second.push_back(0);
+  stack2.push_back(std::make_pair(10, std::vector<int>()));
+  stack2[2].second.push_back(1);
+  stack2[2].second.push_back(0);
+
+  stack3.push_back(std::make_pair(0, std::vector<int>()));
+  stack3[0].second.push_back(2);
+  stack3.push_back(std::make_pair(10, std::vector<int>()));
+  stack3[1].second.push_back(0);
+  stack3[1].second.push_back(0);
+
+  stack4.push_back(std::make_pair(1, std::vector<int>()));
+  stack4[0].second.push_back(0);
+  stack4.push_back(std::make_pair(10, std::vector<int>()));
+  stack4[1].second.push_back(0);
+  stack4[1].second.push_back(0);
+
+  x << 7., 5., 3., 6., 11., 4., 9., 8., 6.;
+  constants.push_back(3.);
+  Eigen::ArrayXXd a_true(3, 1);
+  a_true << (pow(3., 3.)), (pow(4., 3.)), (pow(6., 3.));
+  Eigen::ArrayXXd a_true2(3, 1);
+  a_true2 << (pow(3., 3.)), (pow(3., 4.)), (pow(3., 6.));
+  Eigen::ArrayXXd a_true_xx(3, 1);
+  a_true_xx << (pow(3., 3.)), (pow(4., 4.)), (pow(6., 6.));
+  Eigen::ArrayXXd a_true_cc(3, 1);
+  a_true_cc << (pow(3., 3.)), (pow(3., 3.)), (pow(3., 3.));
+
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test3 = Evaluate(stack3, x, constants);
+  Eigen::ArrayXXd test4 = Evaluate(stack4, x, constants);
+
+  for (size_t i = 0; i < x.rows(); ++i) {
+    ASSERT_DOUBLE_EQ(test(i), a_true(i));
+    ASSERT_DOUBLE_EQ(test2(i), a_true2(i));
+    ASSERT_DOUBLE_EQ(test3(i), a_true_xx(i));
+    ASSERT_DOUBLE_EQ(test4(i), a_true_cc(i));
+  }
+}
+
+TEST(AcyclicGraphNodesTest, Absolute) {
+  CommandStack stack;
+  CommandStack stack2;
+  Eigen::ArrayXXd x(3, 3);
+  std::vector<double> constants;
+
+  stack.push_back(std::make_pair(1, std::vector<int>()));
+  stack[0].second.push_back(0);
+  stack.push_back(std::make_pair(11, std::vector<int>()));
+  stack[1].second.push_back(0);
+
+  stack2.push_back(std::make_pair(0, std::vector<int>()));
+  stack2[0].second.push_back(0);
+  stack2.push_back(std::make_pair(11, std::vector<int>()));
+  stack2[1].second.push_back(0);
+
+  x << -7., 5., 3., 6., 11., 4., -9., 8., 6.;
+  constants.push_back(-3.);
+
+  Eigen::ArrayXXd a_true(3, 1);
+  a_true << 3., 3., 3.;
+  Eigen::ArrayXXd a_true_x(3, 1);
+  a_true_x << 7., 6., 9.;
+
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+
+  for (size_t i = 0; i < x.rows(); ++i) {
+    ASSERT_DOUBLE_EQ(test(i), a_true(i));
+    ASSERT_DOUBLE_EQ(test2(i), a_true_x(i));
+  }
+}
+
+TEST(AcyclicGraphNodesTest, Sqrt) {
+  CommandStack stack;
+  CommandStack stack2;
+  Eigen::ArrayXXd x(3, 3);
+  std::vector<double> constants;
+
+  stack.push_back(std::make_pair(1, std::vector<int>()));
+  stack[0].second.push_back(0);
+  stack.push_back(std::make_pair(12, std::vector<int>()));
+  stack[1].second.push_back(0);
+
+  stack2.push_back(std::make_pair(0, std::vector<int>()));
+  stack2[0].second.push_back(0);
+  stack2.push_back(std::make_pair(12, std::vector<int>()));
+  stack2[1].second.push_back(0);
+
+  x << -7., 5., 3., 6., 11., 4., -9., 8., 6.;
+  constants.push_back(3.);
+
+  Eigen::ArrayXXd a_true(3, 1);
+  a_true << (sqrt(abs(3.))), (sqrt(abs(3.))), (sqrt(abs(3.)));
+  Eigen::ArrayXXd a_true_x(3, 1);
+  a_true_x << (sqrt(abs(-7.))), (sqrt(abs(6.))), (sqrt(abs(-9.)));
+
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+
+  for (size_t i = 0; i < x.rows(); ++i) {
+    ASSERT_DOUBLE_EQ(test(i), a_true(i));
+    ASSERT_DOUBLE_EQ(test2(i), a_true_x(i));
+  }
+}
 
 TEST_F(AcyclicGraphTest, evaluate) {
   Eigen::ArrayXXd y = Evaluate(stack, x, constants);

@@ -21,7 +21,7 @@
 #include <vector>
 #include <string>
 
-typedef std::vector< std::pair<int, std::vector<int> > > Commandcommand;
+typedef std::vector< std::pair<int, std::vector<int> > > CommandStack;
 typedef std::pair<int, std::vector<int> > SingleCommand;
 typedef Eigen::Ref<Eigen::ArrayXXd,
         0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ArrayByRef;
@@ -32,7 +32,7 @@ typedef Eigen::Ref<Eigen::ArrayXXd,
  *  This is the abstract class for the Operation being performed.
  *
  *  \note Operators include : X_Load, C_Load, Addition, Subtraction,
- *        Multiplication, Division, sin
+ *        Multiplication, Division, sin, cos, exp, log, pow, abs, sqrt
  *
  *  \fn virtual int get_arity()
  *  \fn virtual std::string get_print()
@@ -55,7 +55,7 @@ class Operation {
   //! \brief Returns the string representation of the operator.
   virtual std::string get_print() = 0;
 
-  /*! \brief evaluates single command command, returns array to be saved in buffer.
+  /*! \brief evaluates single command stack, returns array to be saved in buffer.
    *
    *  \param[in] command The parameters to be input to buffer. std::vector<int>
    *  \param[in] x Input variables to the acyclic graph. Eigen::ArrayXXd
@@ -69,7 +69,7 @@ class Operation {
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location) = 0;
 
-  /*! \brief Computes reverse autodiff partial of a command command.
+  /*! \brief Computes reverse autodiff partial of a command stack.
    *
    *  \param[in] command The parameters to be input to buffer. std::vector<int>
    *  \param[in] command_index Index of command in the command; also the location of

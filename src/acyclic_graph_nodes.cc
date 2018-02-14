@@ -195,7 +195,7 @@ void Cos::evaluate(const std::vector<int> &command,
                    const std::vector<double> &constants,
                    std::vector<Eigen::ArrayXXd> &buffer,
                    std::size_t result_location) {
-  buffer[result_location] = buffer[command[0]].sin();
+  buffer[result_location] = buffer[command[0]].cos();
 }
 
 void Cos::deriv_evaluate(const std::vector<int> &command,
