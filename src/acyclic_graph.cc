@@ -257,11 +257,9 @@ std::vector<bool> FindUsedCommands(const CommandStack & stack) {
 
   for (int i = stack.size() - 1; i >= 0; --i) {
     if (used_command[i]) {
-      // TODO(gbomarito) should look up whether node is terminal or not
-      if (stack[i].first > 1) {
-        for (auto const& param : stack[i].second) {
-          used_command[param] = true;
-        }
+      for (std::size_t j = 0; j < oper_interface.operator_map[stack[i].first]
+                                  ->get_arity(); ++j) {
+          used_command[stack[i].second[j]] = true;
       }
     }
   }
