@@ -23,17 +23,6 @@
 // create an instance of the Operator_Interface map
 OperatorInterface oper_interface;
 
-void ForwardSingleCommand(const SingleCommand &command,
-                          const Eigen::ArrayXXd &x,
-                          const std::vector<double> &constants,
-                          std::vector<Eigen::ArrayXXd> &buffer,
-                          std::size_t result_location) {
-  oper_interface.operator_map[command.first]->evaluate(
-    command.second, x, constants, buffer, result_location);
-}
-
-
-
 void ReverseSingleCommand(const CommandStack &stack,
                           const int command_index,
                           const std::vector<Eigen::ArrayXXd> &forward_buffer,
@@ -41,8 +30,8 @@ void ReverseSingleCommand(const CommandStack &stack,
                           const std::set<int> &dependencies) {
   // Computes reverse autodiff partial of a stack command.
   for (auto const& dependency : dependencies) {
-    oper_interface.operator_map[stack[dependency].first]->deriv_evaluate(
-      stack[dependency].second, command_index, forward_buffer, reverse_buffer,
+    oper_interface.operator_map[stack(dependency, 0)]->deriv_evaluate(
+      stack, command_index, forward_buffer, reverse_buffer,
       dependency);
   }
 }
@@ -53,10 +42,11 @@ Eigen::ArrayXXd Evaluate(const CommandStack & stack,
                          const Eigen::ArrayXXd &x,
                          const std::vector<double> &constants) {
   // Evaluates a stack at the given x using the given constants.
-  std::vector<Eigen::ArrayXXd> forward_eval(stack.size());
+  std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
 
-  for (std::size_t i = 0; i < stack.size(); ++i) {
-    ForwardSingleCommand(stack[i], x, constants, forward_eval, i);
+  for (std::size_t i = 0; i < stack.rows(); ++i) {
+    oper_interface.operator_map[stack(i, 0)]->evaluate(
+    stack, x, constants, forward_eval, i);
   }
 
   return forward_eval.back();
@@ -79,11 +69,12 @@ Eigen::ArrayXXd EvaluateWithMask(const CommandStack & stack,
                                  const std::vector<double> &constants,
                                  const std::vector<bool> &mask) {
   // Evaluates a stack at the given x using the given constants.
-  std::vector<Eigen::ArrayXXd> forward_eval(stack.size());
+  std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
 
-  for (std::size_t i = 0; i < stack.size(); ++i) {
+  for (std::size_t i = 0; i < stack.rows(); ++i) {
     if (mask[i]) {
-      ForwardSingleCommand(stack[i], x, constants, forward_eval, i);
+      oper_interface.operator_map[stack(i, 0)]->evaluate(
+      stack, x, constants, forward_eval, i);
     }
   }
 
@@ -97,31 +88,31 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
   const Eigen::ArrayXXd &x,
   const std::vector<double> &constants) {
   // Evaluates a stack and its derivative with the given x and constants.
-  std::vector<Eigen::ArrayXXd> forward_eval(stack.size());
+  std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
   std::vector<std::set<int>> x_dependencies(x.cols(), std::set<int>());
-  std::vector<std::set<int>> stack_dependencies(stack.size(), std::set<int>());
+  std::vector<std::set<int>> stack_dependencies(stack.rows(), std::set<int>());
 
   // forward eval with dependencies
-  for (std::size_t i = 0; i < stack.size(); ++i) {
-    ForwardSingleCommand(stack[i], x, constants, forward_eval, i);
+  for (std::size_t i = 0; i < stack.rows(); ++i) {
+    oper_interface.operator_map[stack(i, 0)]->evaluate(
+    stack, x, constants, forward_eval, i);
 
-    // TODO(gbomarito) thish could be more general based on arity, etc
-    if (stack[i].first == 0) {
-      x_dependencies[stack[i].second[0]].insert(i);
+    if (stack(i, 0) == 0) {
+      x_dependencies[stack(i, 1)].insert(i);
     }
 
-    for (int j = 0; j < oper_interface.operator_map[stack[i].first]->get_arity();
+    for (int j = 0; j < oper_interface.operator_map[stack(i, 0)]->get_arity();
          ++j) {
-      stack_dependencies[stack[i].second[j]].insert(i);
+      stack_dependencies[stack(i, j + 1)].insert(i);
     }
   }
 
   // reverse pass through stack
-  std::vector<Eigen::ArrayXXd> reverse_eval(stack.size(),
+  std::vector<Eigen::ArrayXXd> reverse_eval(stack.rows(),
       Eigen::ArrayXXd::Zero(x.rows(), 1));
-  reverse_eval[stack.size() - 1] = Eigen::ArrayXXd::Ones(x.rows(), 1);
+  reverse_eval[stack.rows() - 1] = Eigen::ArrayXXd::Ones(x.rows(), 1);
 
-  for (int i = stack.size() - 2; i >= 0; --i) {
+  for (int i = stack.rows() - 2; i >= 0; --i) {
     ReverseSingleCommand(stack, i, forward_eval, reverse_eval,
                          stack_dependencies[i]);
   }
@@ -157,33 +148,33 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
   const std::vector<double> &constants,
   const std::vector<bool> &mask) {
   // Evaluates a stack and its derivative with the given x and constants.
-  std::vector<Eigen::ArrayXXd> forward_eval(stack.size());
+  std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
   std::vector<std::set<int>> x_dependencies(x.cols(), std::set<int>());
-  std::vector<std::set<int>> stack_dependencies(stack.size(),
+  std::vector<std::set<int>> stack_dependencies(stack.rows(),
                           std::set<int>());
 
   // forward eval with dependencies
-  for (std::size_t i = 0; i < stack.size(); ++i) {
+  for (std::size_t i = 0; i < stack.rows(); ++i) {
     if (mask[i]) {
-      ForwardSingleCommand(stack[i], x, constants, forward_eval, i);
+      oper_interface.operator_map[stack(i, 0)]->evaluate(
+      stack, x, constants, forward_eval, i);
 
-      // TODO(gbomarito) thish could be more general based on arity, etc
-      if (stack[i].first == 0) {
-        x_dependencies[stack[i].second[0]].insert(i);
+      if (stack(i, 0) == 0) {
+        x_dependencies[stack(i, 1)].insert(i);
       }
 
-      for (int j = 0; j < oper_interface.operator_map[stack[i].first]->get_arity();
+      for (int j = 0; j < oper_interface.operator_map[stack(i, 0)]->get_arity();
            ++j) {
-        stack_dependencies[stack[i].second[j]].insert(i);
+        stack_dependencies[stack(i, j + 1)].insert(i);
       }
     }
   }
 
   // reverse pass through stack
-  std::vector<Eigen::ArrayXXd> reverse_eval(stack.size());
-  reverse_eval[stack.size() - 1] = Eigen::ArrayXXd::Ones(x.rows(), 1);
+  std::vector<Eigen::ArrayXXd> reverse_eval(stack.rows());
+  reverse_eval[stack.rows() - 1] = Eigen::ArrayXXd::Ones(x.rows(), 1);
 
-  for (int i = stack.size() - 2; i >= 0; --i) {
+  for (int i = stack.rows() - 2; i >= 0; --i) {
     if (mask[i]) {
       reverse_eval[i] = Eigen::ArrayXXd::Zero(x.rows(), 1);
       ReverseSingleCommand(stack, i, forward_eval, reverse_eval,
@@ -207,15 +198,25 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
 
 void PrintStack(const CommandStack & stack) {
   // Prints a stack to std::cout.
-  for (std::size_t i = 0; i < stack.size(); ++i) {
+  for (std::size_t i = 0; i < stack.rows(); ++i) {
     //this is the operator
     std::cout << "(" << i << ") = " <<
-              oper_interface.operator_map[stack[i].first]->get_print() << " : ";
+              oper_interface.operator_map[stack(i, 0)]->get_print() << " : ";
 
-    for (auto const& param : stack[i].second) {
-      std::cout << " (" << param << ")";
+    // NOTE: Hard code any that have an arity of 0
+    if (oper_interface.operator_map[stack(i, 0)]->get_arity() == 0) {
+      std::cout << " (" << stack(i, 1) << ")";
     }
 
+    // loop through the rest dependent on their arity
+    for (int j = 0; j < oper_interface.operator_map[stack(i, 0)]->get_arity();
+         ++j) {
+      std::cout << " (" << stack(i, j) << ")";
+    }
+
+//    for (auto const& param : stack[i].second) {
+//      std::cout << " (" << param << ")";
+//    }
     std::cout << std::endl;
   }
 }
@@ -226,40 +227,37 @@ CommandStack SimplifyStack(const CommandStack & stack) {
   // Simplifies a stack.
   std::vector<bool> used_command = FindUsedCommands(stack);
   std::map<int, int> reduced_param_map;
-  CommandStack new_stack;
+  CommandStack new_stack(used_command.size(), 3);
 
   // TODO(gbomarito)  would size_t be faster?
-  for (int i = 0, j = 0; i < stack.size(); ++i) {
+  for (int i = 0, j = 0; i < stack.rows(); ++i) {
     if (used_command[i]) {
-      new_stack.push_back(stack[i]);
 
-      // TODO(gbomarito) should look up whether node is terminal or not
-      if (oper_interface.operator_map[new_stack[j].first]->get_arity() > 0) {
-        for (std::size_t k = 0; k < new_stack[j].second.size(); ++k) {
-          new_stack[j].second[k] = reduced_param_map[new_stack[j].second[k]];
-        }
+      for (std::size_t k = 0; k < oper_interface.operator_map[new_stack(j, 0)]
+      ->get_arity(); ++k) {
+        new_stack(j, k + 1) = reduced_param_map[new_stack(j, k + 1)];
       }
 
-      reduced_param_map[i] = j;
-      ++j;
-    }
+    reduced_param_map[i] = j;
+    ++j;
   }
+}
 
-  return new_stack;
+return new_stack;
 }
 
 
 
 std::vector<bool> FindUsedCommands(const CommandStack & stack) {
   // Finds which commands are utilized in a stack.
-  std::vector<bool> used_command(stack.size());
+  std::vector<bool> used_command(stack.rows());
   used_command.back() = true;
 
-  for (int i = stack.size() - 1; i >= 0; --i) {
+  for (int i = stack.rows() - 1; i >= 0; --i) {
     if (used_command[i]) {
-      for (std::size_t j = 0; j < oper_interface.operator_map[stack[i].first]
-                                  ->get_arity(); ++j) {
-          used_command[stack[i].second[j]] = true;
+      for (std::size_t j = 0; j < oper_interface.operator_map[stack(i, 0)]
+           ->get_arity(); ++j) {
+        used_command[stack(i, j + 1)] = true;
       }
     }
   }

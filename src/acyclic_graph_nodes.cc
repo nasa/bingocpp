@@ -23,15 +23,15 @@
 // X_Load
 X_Load::X_Load() {}
 
-void X_Load::evaluate(const std::vector<int> &command,
+void X_Load::evaluate(const CommandStack &stack,
                       const Eigen::ArrayXXd &x,
                       const std::vector<double> &constants,
                       std::vector<Eigen::ArrayXXd> &buffer,
                       std::size_t result_location) {
-  buffer[result_location] = x.col(command[0]);
+  buffer[result_location] = x.col(stack(result_location, 1));
 }
 
-void X_Load::deriv_evaluate(const std::vector<int> &command,
+void X_Load::deriv_evaluate(const CommandStack &stack,
                             const int command_index,
                             const std::vector<Eigen::ArrayXXd> &forward_buffer,
                             std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -41,21 +41,21 @@ void X_Load::deriv_evaluate(const std::vector<int> &command,
 // C_Load
 C_Load::C_Load() {}
 
-void C_Load::evaluate(const std::vector<int> &command,
+void C_Load::evaluate(const CommandStack &stack,
                       const Eigen::ArrayXXd &x,
                       const std::vector<double> &constants,
                       std::vector<Eigen::ArrayXXd> &buffer,
                       std::size_t result_location) {
-  if (command[0] != -1) {
+  if (stack(result_location, 0) != -1) {
     buffer[result_location] = Eigen::ArrayXXd::Constant(x.rows(), 1,
-                              constants[command[0]]);
+                              constants[stack(result_location, 1)]);
 
   } else {
     buffer[result_location] = Eigen::ArrayXXd::Zero(x.rows(), 1);
   }
 }
 
-void C_Load::deriv_evaluate(const std::vector<int> &command,
+void C_Load::deriv_evaluate(const CommandStack &stack,
                             const int command_index,
                             const std::vector<Eigen::ArrayXXd> &forward_buffer,
                             std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -65,24 +65,25 @@ void C_Load::deriv_evaluate(const std::vector<int> &command,
 // Addition
 Addition::Addition() {}
 
-void Addition::evaluate(const std::vector<int> &command,
+void Addition::evaluate(const CommandStack &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location) {
-  buffer[result_location] = buffer[command[0]] + buffer[command[1]];
+  buffer[result_location] = buffer[stack(result_location, 1)] + 
+                            buffer[stack(result_location, 2)];
 }
 
-void Addition::deriv_evaluate(const std::vector<int> &command,
+void Addition::deriv_evaluate(const CommandStack &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
                               int dependency) {
-  if (command[0] == command_index) {
+  if (stack(dependency, 1) == command_index) {
     reverse_buffer[command_index] += reverse_buffer[dependency];
   }
 
-  if (command[1] == command_index) {
+  if (stack(dependency, 2) == command_index) {
     reverse_buffer[command_index] += reverse_buffer[dependency];
   }
 }
@@ -90,24 +91,25 @@ void Addition::deriv_evaluate(const std::vector<int> &command,
 // Subtraction
 Subtraction::Subtraction() {}
 
-void Subtraction::evaluate(const std::vector<int> &command,
+void Subtraction::evaluate(const CommandStack &stack,
                            const Eigen::ArrayXXd &x,
                            const std::vector<double> &constants,
                            std::vector<Eigen::ArrayXXd> &buffer,
                            std::size_t result_location) {
-  buffer[result_location] = buffer[command[0]] - buffer[command[1]];
+  buffer[result_location] = buffer[stack(result_location, 1)] - 
+                            buffer[stack(result_location, 2)];
 }
 
-void Subtraction::deriv_evaluate(const std::vector<int> &command,
+void Subtraction::deriv_evaluate(const CommandStack &stack,
                                  const int command_index,
                                  const std::vector<Eigen::ArrayXXd> &forward_buffer,
                                  std::vector<Eigen::ArrayXXd> &reverse_buffer,
                                  int dependency) {
-  if (command[0] == command_index) {
+  if (stack(dependency, 1) == command_index) {
     reverse_buffer[command_index] += reverse_buffer[dependency];
   }
 
-  if (command[1] == command_index) {
+  if (stack(dependency, 2) == command_index) {
     reverse_buffer[command_index] -= reverse_buffer[dependency];
   }
 }
@@ -115,110 +117,112 @@ void Subtraction::deriv_evaluate(const std::vector<int> &command,
 // Multiplication
 Multiplication::Multiplication() {}
 
-void Multiplication::evaluate(const std::vector<int> &command,
+void Multiplication::evaluate(const CommandStack &stack,
                               const Eigen::ArrayXXd &x,
                               const std::vector<double> &constants,
                               std::vector<Eigen::ArrayXXd> &buffer,
                               std::size_t result_location) {
-  buffer[result_location] = buffer[command[0]] * buffer[command[1]];
+  buffer[result_location] = buffer[stack(result_location, 1)] * 
+                            buffer[stack(result_location, 2)];
 }
 
-void Multiplication::deriv_evaluate(const std::vector<int> &command,
+void Multiplication::deriv_evaluate(const CommandStack &stack,
                                     const int command_index,
                                     const std::vector<Eigen::ArrayXXd> &forward_buffer,
                                     std::vector<Eigen::ArrayXXd> &reverse_buffer,
                                     int dependency) {
-  if (command[0] == command_index) {
+  if (stack(dependency, 1) == command_index) {
     reverse_buffer[command_index] += reverse_buffer[dependency] *
-                                     forward_buffer[command[1]];
+                                     forward_buffer[stack(dependency, 2)];
   }
 
-  if (command[1] == command_index) {
+  if (stack(dependency, 2) == command_index) {
     reverse_buffer[command_index] += reverse_buffer[dependency] *
-                                     forward_buffer[command[0]];
+                                     forward_buffer[stack(dependency, 1)];
   }
 }
 
 // Division
 Division::Division() {}
 
-void Division::evaluate(const std::vector<int> &command,
+void Division::evaluate(const CommandStack &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location) {
-  buffer[result_location] = buffer[command[0]] / buffer[command[1]];
+  buffer[result_location] = buffer[stack(result_location, 1)] / 
+                            buffer[stack(result_location, 2)];
 }
 
-void Division::deriv_evaluate(const std::vector<int> &command,
+void Division::deriv_evaluate(const CommandStack &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
                               int dependency) {
-  if (command[0] == command_index) {
+  if (stack(dependency, 1) == command_index) {
     reverse_buffer[command_index] += reverse_buffer[dependency] /
-                                     forward_buffer[command[1]];
+                                     forward_buffer[stack(dependency, 2)];
   }
 
-  if (command[1] == command_index) {
+  if (stack(dependency, 2) == command_index) {
     reverse_buffer[command_index] += reverse_buffer[dependency] *
                                      (-forward_buffer[dependency] /
-                                      forward_buffer[command[1]]);
+                                      forward_buffer[stack(dependency, 2)]);
   }
 }
 
 // Sin
 Sin::Sin() {}
 
-void Sin::evaluate(const std::vector<int> &command,
+void Sin::evaluate(const CommandStack &stack,
                    const Eigen::ArrayXXd &x,
                    const std::vector<double> &constants,
                    std::vector<Eigen::ArrayXXd> &buffer,
                    std::size_t result_location) {
-  buffer[result_location] = buffer[command[0]].sin();
+  buffer[result_location] = buffer[stack(result_location, 1)].sin();
 }
 
-void Sin::deriv_evaluate(const std::vector<int> &command,
+void Sin::deriv_evaluate(const CommandStack &stack,
                          const int command_index,
                          const std::vector<Eigen::ArrayXXd> &forward_buffer,
                          std::vector<Eigen::ArrayXXd> &reverse_buffer,
                          int dependency) {
   reverse_buffer[command_index] += reverse_buffer[dependency] *
-                                   forward_buffer[command[0]].cos();
+                                   forward_buffer[stack(dependency, 1)].cos();
 }
 
 // Cos
 Cos::Cos() {}
 
-void Cos::evaluate(const std::vector<int> &command,
+void Cos::evaluate(const CommandStack &stack,
                    const Eigen::ArrayXXd &x,
                    const std::vector<double> &constants,
                    std::vector<Eigen::ArrayXXd> &buffer,
                    std::size_t result_location) {
-  buffer[result_location] = buffer[command[0]].cos();
+  buffer[result_location] = buffer[stack(result_location, 1)].cos();
 }
 
-void Cos::deriv_evaluate(const std::vector<int> &command,
+void Cos::deriv_evaluate(const CommandStack &stack,
                          const int command_index,
                          const std::vector<Eigen::ArrayXXd> &forward_buffer,
                          std::vector<Eigen::ArrayXXd> &reverse_buffer,
                          int dependency) {
   reverse_buffer[command_index] -= reverse_buffer[dependency] *
-                                   forward_buffer[command[0]].sin();
+                                   forward_buffer[stack(dependency, 1)].sin();
 }
 
 // Exp
 Exp::Exp() {}
 
-void Exp::evaluate(const std::vector<int> &command,
+void Exp::evaluate(const CommandStack &stack,
                    const Eigen::ArrayXXd &x,
                    const std::vector<double> &constants,
                    std::vector<Eigen::ArrayXXd> &buffer,
                    std::size_t result_location) {
-  buffer[result_location] = buffer[command[0]].exp();
+  buffer[result_location] = buffer[stack(result_location, 1)].exp();
 }
 
-void Exp::deriv_evaluate(const std::vector<int> &command,
+void Exp::deriv_evaluate(const CommandStack &stack,
                          const int command_index,
                          const std::vector<Eigen::ArrayXXd> &forward_buffer,
                          std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -230,85 +234,86 @@ void Exp::deriv_evaluate(const std::vector<int> &command,
 // Log
 Log::Log() {}
 
-void Log::evaluate(const std::vector<int> &command,
+void Log::evaluate(const CommandStack &stack,
                    const Eigen::ArrayXXd &x,
                    const std::vector<double> &constants,
                    std::vector<Eigen::ArrayXXd> &buffer,
                    std::size_t result_location) {
-  buffer[result_location] = (buffer[command[0]].abs()).log();
+  buffer[result_location] = (buffer[stack(result_location, 1)].abs()).log();
 }
 
-void Log::deriv_evaluate(const std::vector<int> &command,
+void Log::deriv_evaluate(const CommandStack &stack,
                          const int command_index,
                          const std::vector<Eigen::ArrayXXd> &forward_buffer,
                          std::vector<Eigen::ArrayXXd> &reverse_buffer,
                          int dependency) {
   reverse_buffer[command_index] += reverse_buffer[dependency] /
-                                   forward_buffer[command[0]];
+                                   forward_buffer[stack(dependency, 1)];
 }
 
 // Power
 Power::Power() {}
 
-void Power::evaluate(const std::vector<int> &command,
+void Power::evaluate(const CommandStack &stack,
                      const Eigen::ArrayXXd &x,
                      const std::vector<double> &constants,
                      std::vector<Eigen::ArrayXXd> &buffer,
                      std::size_t result_location) {
-  buffer[result_location] = (buffer[command[0]].abs()).pow(buffer[command[1]]);
+  buffer[result_location] = (buffer[stack(result_location, 1)].abs()).pow(
+                             buffer[stack(result_location, 2)]);
 }
 
-void Power::deriv_evaluate(const std::vector<int> &command,
+void Power::deriv_evaluate(const CommandStack &stack,
                            const int command_index,
                            const std::vector<Eigen::ArrayXXd> &forward_buffer,
                            std::vector<Eigen::ArrayXXd> &reverse_buffer,
                            int dependency) {
-  if (command[0] == command_index) {
+  if (stack(dependency, 1) == command_index) {
     reverse_buffer[command_index] += forward_buffer[dependency] *
                                      reverse_buffer[dependency] *
-                                     forward_buffer[command[1]] /
-                                     forward_buffer[command[0]];
+                                     forward_buffer[stack(dependency, 2)] /
+                                     forward_buffer[stack(dependency, 1)];
   }
 
-  if (command[1] == command_index) {
+  if (stack(dependency, 2) == command_index) {
     reverse_buffer[command_index] += forward_buffer[dependency] *
                                      reverse_buffer[dependency] *
-                                     (forward_buffer[command[0]].abs()).log();
+                                     (forward_buffer[stack(dependency, 1)].abs()).log();
   }
 }
 
 // Absolute
 Absolute::Absolute() {}
 
-void Absolute::evaluate(const std::vector<int> &command,
+void Absolute::evaluate(const CommandStack &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location) {
-  buffer[result_location] = buffer[command[0]].abs();
+  buffer[result_location] = buffer[stack(result_location, 1)].abs();
 }
 
-void Absolute::deriv_evaluate(const std::vector<int> &command,
+void Absolute::deriv_evaluate(const CommandStack &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
                               int dependency) {
   reverse_buffer[command_index] += reverse_buffer[dependency] *
-                                   forward_buffer[command[0]].sign();
+                                   forward_buffer[stack(dependency, 1)].sign();
 }
 
 // Sqrt
 Sqrt::Sqrt() {}
 
-void Sqrt::evaluate(const std::vector<int> &command,
+void Sqrt::evaluate(const CommandStack &stack,
                     const Eigen::ArrayXXd &x,
                     const std::vector<double> &constants,
                     std::vector<Eigen::ArrayXXd> &buffer,
                     std::size_t result_location) {
-  buffer[result_location] = (buffer[command[0]].abs()).sqrt();
+  buffer[result_location] = (buffer[stack(result_location, 1)].abs()).sqrt();
 }
 
-void Sqrt::deriv_evaluate(const std::vector<int> &command,
+void Sqrt::deriv_evaluate(const CommandStack &stack,
                           const int command_index,
                           const std::vector<Eigen::ArrayXXd> &forward_buffer,
                           std::vector<Eigen::ArrayXXd> &reverse_buffer,

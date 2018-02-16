@@ -25,49 +25,26 @@ class AcyclicGraphTest : public::testing::Test {
   Eigen::ArrayXXd x;
   std::vector<double> constants;
 
-  AcyclicGraphTest(): stack(), x(3, 3), constants() {
+  AcyclicGraphTest(): stack(12, 3), x(3, 3), stack2(2, 3), constants() {
   }
 
   void SetUp() {
     // y = x_0 * ( C_0 + C_1/x_1 ) - x_0
-    stack.push_back(std::make_pair(0, std::vector<int>()));
-    stack[0].second.push_back(0);
-    stack.push_back(std::make_pair(0, std::vector<int>()));
-    stack[1].second.push_back(1);
-    stack.push_back(std::make_pair(1, std::vector<int>()));
-    stack[2].second.push_back(0);
-    stack.push_back(std::make_pair(1, std::vector<int>()));
-    stack[3].second.push_back(1);
-    stack.push_back(std::make_pair(5, std::vector<int>()));
-    stack[4].second.push_back(3);
-    stack[4].second.push_back(1);
-    stack.push_back(std::make_pair(5, std::vector<int>()));
-    stack[5].second.push_back(3);
-    stack[5].second.push_back(1);
-    stack.push_back(std::make_pair(2, std::vector<int>()));
-    stack[6].second.push_back(4);
-    stack[6].second.push_back(2);
-    stack.push_back(std::make_pair(2, std::vector<int>()));
-    stack[7].second.push_back(4);
-    stack[7].second.push_back(2);
-    stack.push_back(std::make_pair(4, std::vector<int>()));
-    stack[8].second.push_back(6);
-    stack[8].second.push_back(0);
-    stack.push_back(std::make_pair(4, std::vector<int>()));
-    stack[9].second.push_back(5);
-    stack[9].second.push_back(6);
-    stack.push_back(std::make_pair(3, std::vector<int>()));
-    stack[10].second.push_back(7);
-    stack[10].second.push_back(6);
-    stack.push_back(std::make_pair(3, std::vector<int>()));
-    stack[11].second.push_back(8);
-    stack[11].second.push_back(0);
+    stack << 0, 0, 0,
+             0, 1, 1,
+             1, 0, 0,
+             1, 1, 1,
+             5, 3, 1,
+             5, 3, 1,
+             2, 4, 2,
+             2, 4, 2,
+             4, 6, 0,
+             4, 5, 6,
+             3, 7, 6,
+             3, 8, 0;
     // y = x_0 * x_0
-    stack2.push_back(std::make_pair(0, std::vector<int>()));
-    stack2[0].second.push_back(0);
-    stack2.push_back(std::make_pair(4, std::vector<int>()));
-    stack2[1].second.push_back(0);
-    stack2[1].second.push_back(0);
+    stack2 << 0, 0, 0,
+              4, 0, 0;
     x << 1., 4., 7., 2., 5., 8., 3., 6., 9.;
     constants.push_back(3.14);
     constants.push_back(10.0);
@@ -79,11 +56,10 @@ class AcyclicGraphTest : public::testing::Test {
 };
 
 TEST(AcyclicGraphNodesTest, XLoad) {
-  CommandStack stack;
+  CommandStack stack(1, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
-  stack.push_back(std::make_pair(0, std::vector<int>()));
-  stack[0].second.push_back(1);
+  stack << 0, 1, 1;
   x << 7., 6., 9., 5., 11., 4., 3., 2., 1.;
   Eigen::ArrayXXd a_true(3, 1);
   a_true << 6., 11., 2.;
@@ -95,11 +71,10 @@ TEST(AcyclicGraphNodesTest, XLoad) {
 }
 
 TEST(AcyclicGraphNodesTest, CLoad) {
-  CommandStack stack;
+  CommandStack stack(1, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
-  stack.push_back(std::make_pair(1, std::vector<int>()));
-  stack[0].second.push_back(1);
+  stack << 1, 1, 1;
   constants.push_back(3.);
   constants.push_back(5.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -112,36 +87,22 @@ TEST(AcyclicGraphNodesTest, CLoad) {
 }
 
 TEST(AcyclicGraphNodesTest, Addition) {
-  CommandStack stack;
-  CommandStack stack2;
-  CommandStack stack3;
-  CommandStack stack4;
+  CommandStack stack(3, 3);
+  CommandStack stack2(3, 3);
+  CommandStack stack3(2, 3);
+  CommandStack stack4(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
-  stack.push_back(std::make_pair(0, std::vector<int>()));
-  stack[0].second.push_back(0);
-  stack.push_back(std::make_pair(1, std::vector<int>()));
-  stack[1].second.push_back(0);
-  stack.push_back(std::make_pair(2, std::vector<int>()));
-  stack[2].second.push_back(0);
-  stack[2].second.push_back(1);
-  stack2.push_back(std::make_pair(0, std::vector<int>()));
-  stack2[0].second.push_back(0);
-  stack2.push_back(std::make_pair(1, std::vector<int>()));
-  stack2[1].second.push_back(0);
-  stack2.push_back(std::make_pair(2, std::vector<int>()));
-  stack2[2].second.push_back(1);
-  stack2[2].second.push_back(0);
-  stack3.push_back(std::make_pair(0, std::vector<int>()));
-  stack3[0].second.push_back(0);
-  stack3.push_back(std::make_pair(2, std::vector<int>()));
-  stack3[1].second.push_back(0);
-  stack3[1].second.push_back(0);
-  stack4.push_back(std::make_pair(1, std::vector<int>()));
-  stack4[0].second.push_back(0);
-  stack4.push_back(std::make_pair(2, std::vector<int>()));
-  stack4[1].second.push_back(0);
-  stack4[1].second.push_back(0);
+  stack << 0, 0, 0,
+           1, 0, 0,
+           2, 0, 1;
+  stack2 << 0, 0, 0,
+           1, 0, 0,
+           2, 1, 0;
+  stack3 << 0, 0, 0,
+           2, 0, 0;
+  stack4 << 1, 0, 0,
+           2, 0, 0;
   x << 7., 5., 3., 6., 11., 4., 9., 8., 2.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -183,36 +144,22 @@ TEST(AcyclicGraphNodesTest, Addition) {
 }
 
 TEST(AcyclicGraphNodesTest, Subtraction) {
-  CommandStack stack;
-  CommandStack stack2;
-  CommandStack stack3;
-  CommandStack stack4;
+  CommandStack stack(3, 3);
+  CommandStack stack2(3, 3);
+  CommandStack stack3(2, 3);
+  CommandStack stack4(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
-  stack.push_back(std::make_pair(0, std::vector<int>()));
-  stack[0].second.push_back(0);
-  stack.push_back(std::make_pair(1, std::vector<int>()));
-  stack[1].second.push_back(0);
-  stack.push_back(std::make_pair(3, std::vector<int>()));
-  stack[2].second.push_back(0);
-  stack[2].second.push_back(1);
-  stack2.push_back(std::make_pair(0, std::vector<int>()));
-  stack2[0].second.push_back(0);
-  stack2.push_back(std::make_pair(1, std::vector<int>()));
-  stack2[1].second.push_back(0);
-  stack2.push_back(std::make_pair(3, std::vector<int>()));
-  stack2[2].second.push_back(1);
-  stack2[2].second.push_back(0);
-  stack3.push_back(std::make_pair(0, std::vector<int>()));
-  stack3[0].second.push_back(2);
-  stack3.push_back(std::make_pair(3, std::vector<int>()));
-  stack3[1].second.push_back(0);
-  stack3[1].second.push_back(0);
-  stack4.push_back(std::make_pair(1, std::vector<int>()));
-  stack4[0].second.push_back(0);
-  stack4.push_back(std::make_pair(3, std::vector<int>()));
-  stack4[1].second.push_back(0);
-  stack4[1].second.push_back(0);
+  stack << 0, 0, 0,
+           1, 0, 0,
+           3, 0, 1;
+  stack2 << 0, 0, 0,
+           1, 0, 0,
+           3, 1, 0;
+  stack3 << 0, 2, 2,
+           3, 0, 0;
+  stack4 << 1, 0, 0,
+           3, 0, 0;
   x << 7., 5., 3., 6., 11., 4., 9., 8., 2.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -256,36 +203,22 @@ TEST(AcyclicGraphNodesTest, Subtraction) {
 }
 
 TEST(AcyclicGraphNodesTest, Multiplication) {
-  CommandStack stack;
-  CommandStack stack2;
-  CommandStack stack3;
-  CommandStack stack4;
+  CommandStack stack(3, 3);
+  CommandStack stack2(3, 3);
+  CommandStack stack3(2, 3);
+  CommandStack stack4(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
-  stack.push_back(std::make_pair(0, std::vector<int>()));
-  stack[0].second.push_back(0);
-  stack.push_back(std::make_pair(1, std::vector<int>()));
-  stack[1].second.push_back(0);
-  stack.push_back(std::make_pair(4, std::vector<int>()));
-  stack[2].second.push_back(0);
-  stack[2].second.push_back(1);
-  stack2.push_back(std::make_pair(0, std::vector<int>()));
-  stack2[0].second.push_back(0);
-  stack2.push_back(std::make_pair(1, std::vector<int>()));
-  stack2[1].second.push_back(0);
-  stack2.push_back(std::make_pair(4, std::vector<int>()));
-  stack2[2].second.push_back(1);
-  stack2[2].second.push_back(0);
-  stack3.push_back(std::make_pair(0, std::vector<int>()));
-  stack3[0].second.push_back(0);
-  stack3.push_back(std::make_pair(4, std::vector<int>()));
-  stack3[1].second.push_back(0);
-  stack3[1].second.push_back(0);
-  stack4.push_back(std::make_pair(1, std::vector<int>()));
-  stack4[0].second.push_back(0);
-  stack4.push_back(std::make_pair(4, std::vector<int>()));
-  stack4[1].second.push_back(0);
-  stack4[1].second.push_back(0);
+  stack << 0, 0, 0,
+           1, 0, 0,
+           4, 0, 1;
+  stack2 << 0, 0, 0,
+           1, 0, 0,
+           4, 1, 0;
+  stack3 << 0, 0, 0,
+           4, 0, 0;
+  stack4 << 1, 0, 0,
+           4, 0, 0;
   x << 7., 5., 3., 6., 11., 4., 9., 8., 2.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -327,36 +260,22 @@ TEST(AcyclicGraphNodesTest, Multiplication) {
 }
 
 TEST(AcyclicGraphNodesTest, Division) {
-  CommandStack stack;
-  CommandStack stack2;
-  CommandStack stack3;
-  CommandStack stack4;
+  CommandStack stack(3, 3);
+  CommandStack stack2(3, 3);
+  CommandStack stack3(2, 3);
+  CommandStack stack4(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
-  stack.push_back(std::make_pair(0, std::vector<int>()));
-  stack[0].second.push_back(0);
-  stack.push_back(std::make_pair(1, std::vector<int>()));
-  stack[1].second.push_back(0);
-  stack.push_back(std::make_pair(5, std::vector<int>()));
-  stack[2].second.push_back(0);
-  stack[2].second.push_back(1);
-  stack2.push_back(std::make_pair(0, std::vector<int>()));
-  stack2[0].second.push_back(0);
-  stack2.push_back(std::make_pair(1, std::vector<int>()));
-  stack2[1].second.push_back(0);
-  stack2.push_back(std::make_pair(5, std::vector<int>()));
-  stack2[2].second.push_back(1);
-  stack2[2].second.push_back(0);
-  stack3.push_back(std::make_pair(0, std::vector<int>()));
-  stack3[0].second.push_back(2);
-  stack3.push_back(std::make_pair(5, std::vector<int>()));
-  stack3[1].second.push_back(0);
-  stack3[1].second.push_back(0);
-  stack4.push_back(std::make_pair(1, std::vector<int>()));
-  stack4[0].second.push_back(0);
-  stack4.push_back(std::make_pair(5, std::vector<int>()));
-  stack4[1].second.push_back(0);
-  stack4[1].second.push_back(0);
+  stack << 0, 0, 0,
+           1, 0, 0,
+           5, 0, 1;
+  stack2 << 0, 0, 0,
+           1, 0, 0,
+           5, 1, 0;
+  stack3 << 0, 2, 2,
+           5, 0, 0;
+  stack4 << 1, 0, 0,
+           5, 0, 0;
   x << 7., 5., 3., 6., 11., 12., 9., 8., 6.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -404,18 +323,14 @@ TEST(AcyclicGraphNodesTest, Division) {
 }
 
 TEST(AcyclicGraphNodesTest, Sin) {
-  CommandStack stack;
-  CommandStack stack2;
+  CommandStack stack(2, 3);
+  CommandStack stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
-  stack.push_back(std::make_pair(1, std::vector<int>()));
-  stack[0].second.push_back(0);
-  stack.push_back(std::make_pair(6, std::vector<int>()));
-  stack[1].second.push_back(0);
-  stack2.push_back(std::make_pair(0, std::vector<int>()));
-  stack2[0].second.push_back(0);
-  stack2.push_back(std::make_pair(6, std::vector<int>()));
-  stack2[1].second.push_back(0);
+  stack << 1, 0, 0,
+           6, 0, 0;
+  stack2 << 0, 0, 0,
+           6, 0, 0;
   x << 7., 5., 3., 6., 11., 12., 9., 8., 6.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -449,18 +364,14 @@ TEST(AcyclicGraphNodesTest, Sin) {
 }
 
 TEST(AcyclicGraphNodesTest, Cos) {
-  CommandStack stack;
-  CommandStack stack2;
+  CommandStack stack(2, 3);
+  CommandStack stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
-  stack.push_back(std::make_pair(1, std::vector<int>()));
-  stack[0].second.push_back(0);
-  stack.push_back(std::make_pair(7, std::vector<int>()));
-  stack[1].second.push_back(0);
-  stack2.push_back(std::make_pair(0, std::vector<int>()));
-  stack2[0].second.push_back(0);
-  stack2.push_back(std::make_pair(7, std::vector<int>()));
-  stack2[1].second.push_back(0);
+  stack << 1, 0, 0,
+           7, 0, 0;
+  stack2 << 0, 0, 0,
+           7, 0, 0;
   x << 7., 5., 3., 6., 11., 12., 9., 8., 6.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -494,18 +405,14 @@ TEST(AcyclicGraphNodesTest, Cos) {
 }
 
 TEST(AcyclicGraphNodesTest, Exp) {
-  CommandStack stack;
-  CommandStack stack2;
+  CommandStack stack(2, 3);
+  CommandStack stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
-  stack.push_back(std::make_pair(1, std::vector<int>()));
-  stack[0].second.push_back(0);
-  stack.push_back(std::make_pair(8, std::vector<int>()));
-  stack[1].second.push_back(0);
-  stack2.push_back(std::make_pair(0, std::vector<int>()));
-  stack2[0].second.push_back(0);
-  stack2.push_back(std::make_pair(8, std::vector<int>()));
-  stack2[1].second.push_back(0);
+  stack << 1, 0, 0,
+           8, 0, 0;
+  stack2 << 0, 0, 0,
+           8, 0, 0;
   x << 7., 5., 3., 6., 11., 12., 9., 8., 6.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -539,18 +446,14 @@ TEST(AcyclicGraphNodesTest, Exp) {
 }
 
 TEST(AcyclicGraphNodesTest, Log) {
-  CommandStack stack;
-  CommandStack stack2;
+  CommandStack stack(2, 3);
+  CommandStack stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
-  stack.push_back(std::make_pair(1, std::vector<int>()));
-  stack[0].second.push_back(0);
-  stack.push_back(std::make_pair(9, std::vector<int>()));
-  stack[1].second.push_back(0);
-  stack2.push_back(std::make_pair(0, std::vector<int>()));
-  stack2[0].second.push_back(0);
-  stack2.push_back(std::make_pair(9, std::vector<int>()));
-  stack2[1].second.push_back(0);
+  stack << 1, 0, 0,
+           9, 0, 0;
+  stack2 << 0, 0, 0,
+           9, 0, 0;
   x << 7., 5., 3., 6., 11., 12., 9., 8., 6.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -584,36 +487,22 @@ TEST(AcyclicGraphNodesTest, Log) {
 }
 
 TEST(AcyclicGraphNodesTest, Power) {
-  CommandStack stack;
-  CommandStack stack2;
-  CommandStack stack3;
-  CommandStack stack4;
+  CommandStack stack(3, 3);
+  CommandStack stack2(3, 3);
+  CommandStack stack3(2, 3);
+  CommandStack stack4(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
-  stack.push_back(std::make_pair(0, std::vector<int>()));
-  stack[0].second.push_back(0);
-  stack.push_back(std::make_pair(1, std::vector<int>()));
-  stack[1].second.push_back(0);
-  stack.push_back(std::make_pair(10, std::vector<int>()));
-  stack[2].second.push_back(0);
-  stack[2].second.push_back(1);
-  stack2.push_back(std::make_pair(0, std::vector<int>()));
-  stack2[0].second.push_back(0);
-  stack2.push_back(std::make_pair(1, std::vector<int>()));
-  stack2[1].second.push_back(0);
-  stack2.push_back(std::make_pair(10, std::vector<int>()));
-  stack2[2].second.push_back(1);
-  stack2[2].second.push_back(0);
-  stack3.push_back(std::make_pair(0, std::vector<int>()));
-  stack3[0].second.push_back(0);
-  stack3.push_back(std::make_pair(10, std::vector<int>()));
-  stack3[1].second.push_back(0);
-  stack3[1].second.push_back(0);
-  stack4.push_back(std::make_pair(1, std::vector<int>()));
-  stack4[0].second.push_back(0);
-  stack4.push_back(std::make_pair(10, std::vector<int>()));
-  stack4[1].second.push_back(0);
-  stack4[1].second.push_back(0);
+  stack << 0, 0, 0,
+           1, 0, 0,
+           10, 0, 1;
+  stack2 << 0, 0, 0,
+           1, 0, 0,
+           10, 1, 0;
+  stack3 << 0, 0, 0,
+            10, 0, 0;
+  stack4 << 1, 0, 0,
+            10, 0, 0;
   x << 7., 5., 3., 6., 11., 4., 9., 8., 6.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -665,18 +554,14 @@ TEST(AcyclicGraphNodesTest, Power) {
 }
 
 TEST(AcyclicGraphNodesTest, Absolute) {
-  CommandStack stack;
-  CommandStack stack2;
+  CommandStack stack(2, 3);
+  CommandStack stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
-  stack.push_back(std::make_pair(1, std::vector<int>()));
-  stack[0].second.push_back(0);
-  stack.push_back(std::make_pair(11, std::vector<int>()));
-  stack[1].second.push_back(0);
-  stack2.push_back(std::make_pair(0, std::vector<int>()));
-  stack2[0].second.push_back(0);
-  stack2.push_back(std::make_pair(11, std::vector<int>()));
-  stack2[1].second.push_back(0);
+  stack << 1, 0, 0,
+           11, 0, 0;
+  stack2 << 0, 0, 0,
+           11, 0, 0;
   x << -7., 5., 3., 6., 11., 4., -9., 8., 6.;
   constants.push_back(-3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -708,18 +593,14 @@ TEST(AcyclicGraphNodesTest, Absolute) {
 }
 
 TEST(AcyclicGraphNodesTest, Sqrt) {
-  CommandStack stack;
-  CommandStack stack2;
+  CommandStack stack(2, 3);
+  CommandStack stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
-  stack.push_back(std::make_pair(1, std::vector<int>()));
-  stack[0].second.push_back(0);
-  stack.push_back(std::make_pair(12, std::vector<int>()));
-  stack[1].second.push_back(0);
-  stack2.push_back(std::make_pair(0, std::vector<int>()));
-  stack2[0].second.push_back(0);
-  stack2.push_back(std::make_pair(12, std::vector<int>()));
-  stack2[1].second.push_back(0);
+  stack << 1, 0, 0,
+           12, 0, 0;
+  stack2 << 0, 0, 0,
+           12, 0, 0;
   x << -7., 5., 3., 6., 11., 4., -9., 8., 6.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -811,7 +692,7 @@ TEST_F(AcyclicGraphTest, maskderivative) {
 TEST_F(AcyclicGraphTest, simplify) {
   // shorter stack
   CommandStack short_stack = SimplifyStack(stack);
-  ASSERT_LE(short_stack.size(), stack.size());
+  ASSERT_LE(short_stack.rows(), stack.rows());
   // equivalent evatuation
   Eigen::ArrayXXd y = Evaluate(stack, x, constants);
   Eigen::ArrayXXd simplified_y = Evaluate(short_stack, x, constants);

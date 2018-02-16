@@ -20,8 +20,7 @@
 
 
 
-typedef std::vector< std::pair<int, std::vector<int> > > CommandStack;
-typedef std::pair<int, std::vector<int> > SingleCommand;
+typedef Eigen::ArrayX3d CommandStack;
 typedef Eigen::Ref<Eigen::ArrayXXd,
                    0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ArrayByRef;
 
@@ -29,32 +28,6 @@ typedef Eigen::Ref<Eigen::ArrayXXd,
 // using EigenDStride = Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>;
 // template <typename MatrixType> using EigenDRef =
 //    Eigen::Ref<MatrixType, 0, EigenDStride>;
-
-
-
-/*!
- * \brief Evaluates single stack command given x and constants.
- *
- * The stack command is evaluated using a the hard coded directives for the
- * operators.  The result of each command is saved into a local buffer.
- * References can be made in the command to previous buffer values, columns of
- * the x input, and constants; all are referenced by index.
- *
- * \note Addition of new operators must edit this segment.
- *
- * \param[in] command Description of a command. std::pair<operator, params>.
- * \param[in] x The input variables to the acyclic graph. (Eigen::ArrayXXd)
- * \param[in] constants Vector of the constants used in the stack.
- * \param[in/out] buffer Vector of Eigen arrays for the buffer.
- * \param[in] result_location Location in buffer to save result of command.
- *
- */
-void ForwardSingleCommand(const SingleCommand &command,
-                                   const Eigen::ArrayXXd &x,
-                                   const std::vector<double> &constants,
-                                   std::vector<Eigen::ArrayXXd> &buffer,
-                                   std::size_t result_location);
-
 
 
 /*!

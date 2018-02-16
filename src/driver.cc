@@ -29,42 +29,22 @@ int test_eig() {
 }
 
 void TestAcyclicGraph(int num_loops, int num_evals) {
-  CommandStack stack = CommandStack();
+  CommandStack stack(12, 3);
   Eigen::ArrayXXd x(60, 3);
   std::vector<double> constants = std::vector<double>();
   // y = x_0 * ( C_0 + C_1/x_1 ) - x_0
-  stack.push_back(std::make_pair(0, std::vector<int>()));
-  stack[0].second.push_back(0);
-  stack.push_back(std::make_pair(0, std::vector<int>()));
-  stack[1].second.push_back(1);
-  stack.push_back(std::make_pair(1, std::vector<int>()));
-  stack[2].second.push_back(0);
-  stack.push_back(std::make_pair(1, std::vector<int>()));
-  stack[3].second.push_back(1);
-  stack.push_back(std::make_pair(5, std::vector<int>()));
-  stack[4].second.push_back(3);
-  stack[4].second.push_back(1);
-  stack.push_back(std::make_pair(5, std::vector<int>()));
-  stack[5].second.push_back(3);
-  stack[5].second.push_back(1);
-  stack.push_back(std::make_pair(2, std::vector<int>()));
-  stack[6].second.push_back(4);
-  stack[6].second.push_back(2);
-  stack.push_back(std::make_pair(2, std::vector<int>()));
-  stack[7].second.push_back(4);
-  stack[7].second.push_back(2);
-  stack.push_back(std::make_pair(4, std::vector<int>()));
-  stack[8].second.push_back(6);
-  stack[8].second.push_back(0);
-  stack.push_back(std::make_pair(4, std::vector<int>()));
-  stack[9].second.push_back(5);
-  stack[9].second.push_back(6);
-  stack.push_back(std::make_pair(3, std::vector<int>()));
-  stack[10].second.push_back(7);
-  stack[10].second.push_back(6);
-  stack.push_back(std::make_pair(3, std::vector<int>()));
-  stack[11].second.push_back(8);
-  stack[11].second.push_back(0);
+  stack << 0, 0, 0,
+           0, 1, 1,
+           1, 0, 0,
+           1, 1, 1,
+           5, 3, 1,
+           5, 3, 1,
+           2, 4, 2,
+           2, 4, 2,
+           4, 6, 0,
+           4, 5, 6,
+           3, 7, 6,
+           3, 8, 0;
   x << 1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9., 
        1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9., 
        1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9., 
