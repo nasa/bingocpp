@@ -70,7 +70,7 @@ void Addition::evaluate(const CommandStack &stack,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location) {
-  buffer[result_location] = buffer[stack(result_location, 1)] + 
+  buffer[result_location] = buffer[stack(result_location, 1)] +
                             buffer[stack(result_location, 2)];
 }
 
@@ -96,7 +96,7 @@ void Subtraction::evaluate(const CommandStack &stack,
                            const std::vector<double> &constants,
                            std::vector<Eigen::ArrayXXd> &buffer,
                            std::size_t result_location) {
-  buffer[result_location] = buffer[stack(result_location, 1)] - 
+  buffer[result_location] = buffer[stack(result_location, 1)] -
                             buffer[stack(result_location, 2)];
 }
 
@@ -122,7 +122,7 @@ void Multiplication::evaluate(const CommandStack &stack,
                               const std::vector<double> &constants,
                               std::vector<Eigen::ArrayXXd> &buffer,
                               std::size_t result_location) {
-  buffer[result_location] = buffer[stack(result_location, 1)] * 
+  buffer[result_location] = buffer[stack(result_location, 1)] *
                             buffer[stack(result_location, 2)];
 }
 
@@ -150,7 +150,7 @@ void Division::evaluate(const CommandStack &stack,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location) {
-  buffer[result_location] = buffer[stack(result_location, 1)] / 
+  buffer[result_location] = buffer[stack(result_location, 1)] /
                             buffer[stack(result_location, 2)];
 }
 
@@ -260,7 +260,7 @@ void Power::evaluate(const CommandStack &stack,
                      std::vector<Eigen::ArrayXXd> &buffer,
                      std::size_t result_location) {
   buffer[result_location] = (buffer[stack(result_location, 1)].abs()).pow(
-                             buffer[stack(result_location, 2)]);
+                              buffer[stack(result_location, 2)]);
 }
 
 void Power::deriv_evaluate(const CommandStack &stack,

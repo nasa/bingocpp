@@ -22,7 +22,7 @@
 
 typedef Eigen::ArrayX3d CommandStack;
 typedef Eigen::Ref<Eigen::ArrayXXd,
-                   0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ArrayByRef;
+        0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ArrayByRef;
 
 
 // using EigenDStride = Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>;

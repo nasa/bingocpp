@@ -31,20 +31,20 @@ class AcyclicGraphTest : public::testing::Test {
   void SetUp() {
     // y = x_0 * ( C_0 + C_1/x_1 ) - x_0
     stack << 0, 0, 0,
-             0, 1, 1,
-             1, 0, 0,
-             1, 1, 1,
-             5, 3, 1,
-             5, 3, 1,
-             2, 4, 2,
-             2, 4, 2,
-             4, 6, 0,
-             4, 5, 6,
-             3, 7, 6,
-             3, 8, 0;
+          0, 1, 1,
+          1, 0, 0,
+          1, 1, 1,
+          5, 3, 1,
+          5, 3, 1,
+          2, 4, 2,
+          2, 4, 2,
+          4, 6, 0,
+          4, 5, 6,
+          3, 7, 6,
+          3, 8, 0;
     // y = x_0 * x_0
     stack2 << 0, 0, 0,
-              4, 0, 0;
+           4, 0, 0;
     x << 1., 4., 7., 2., 5., 8., 3., 6., 9.;
     constants.push_back(3.14);
     constants.push_back(10.0);
@@ -94,15 +94,15 @@ TEST(AcyclicGraphNodesTest, Addition) {
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 0, 0, 0,
-           1, 0, 0,
-           2, 0, 1;
+        1, 0, 0,
+        2, 0, 1;
   stack2 << 0, 0, 0,
-           1, 0, 0,
-           2, 1, 0;
+         1, 0, 0,
+         2, 1, 0;
   stack3 << 0, 0, 0,
-           2, 0, 0;
+         2, 0, 0;
   stack4 << 1, 0, 0,
-           2, 0, 0;
+         2, 0, 0;
   x << 7., 5., 3., 6., 11., 4., 9., 8., 2.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -151,15 +151,15 @@ TEST(AcyclicGraphNodesTest, Subtraction) {
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 0, 0, 0,
-           1, 0, 0,
-           3, 0, 1;
+        1, 0, 0,
+        3, 0, 1;
   stack2 << 0, 0, 0,
-           1, 0, 0,
-           3, 1, 0;
+         1, 0, 0,
+         3, 1, 0;
   stack3 << 0, 2, 2,
-           3, 0, 0;
+         3, 0, 0;
   stack4 << 1, 0, 0,
-           3, 0, 0;
+         3, 0, 0;
   x << 7., 5., 3., 6., 11., 4., 9., 8., 2.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -210,15 +210,15 @@ TEST(AcyclicGraphNodesTest, Multiplication) {
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 0, 0, 0,
-           1, 0, 0,
-           4, 0, 1;
+        1, 0, 0,
+        4, 0, 1;
   stack2 << 0, 0, 0,
-           1, 0, 0,
-           4, 1, 0;
+         1, 0, 0,
+         4, 1, 0;
   stack3 << 0, 0, 0,
-           4, 0, 0;
+         4, 0, 0;
   stack4 << 1, 0, 0,
-           4, 0, 0;
+         4, 0, 0;
   x << 7., 5., 3., 6., 11., 4., 9., 8., 2.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -267,15 +267,15 @@ TEST(AcyclicGraphNodesTest, Division) {
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 0, 0, 0,
-           1, 0, 0,
-           5, 0, 1;
+        1, 0, 0,
+        5, 0, 1;
   stack2 << 0, 0, 0,
-           1, 0, 0,
-           5, 1, 0;
+         1, 0, 0,
+         5, 1, 0;
   stack3 << 0, 2, 2,
-           5, 0, 0;
+         5, 0, 0;
   stack4 << 1, 0, 0,
-           5, 0, 0;
+         5, 0, 0;
   x << 7., 5., 3., 6., 11., 12., 9., 8., 6.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -328,9 +328,9 @@ TEST(AcyclicGraphNodesTest, Sin) {
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 1, 0, 0,
-           6, 0, 0;
+        6, 0, 0;
   stack2 << 0, 0, 0,
-           6, 0, 0;
+         6, 0, 0;
   x << 7., 5., 3., 6., 11., 12., 9., 8., 6.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -369,9 +369,9 @@ TEST(AcyclicGraphNodesTest, Cos) {
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 1, 0, 0,
-           7, 0, 0;
+        7, 0, 0;
   stack2 << 0, 0, 0,
-           7, 0, 0;
+         7, 0, 0;
   x << 7., 5., 3., 6., 11., 12., 9., 8., 6.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -410,9 +410,9 @@ TEST(AcyclicGraphNodesTest, Exp) {
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 1, 0, 0,
-           8, 0, 0;
+        8, 0, 0;
   stack2 << 0, 0, 0,
-           8, 0, 0;
+         8, 0, 0;
   x << 7., 5., 3., 6., 11., 12., 9., 8., 6.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -451,9 +451,9 @@ TEST(AcyclicGraphNodesTest, Log) {
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 1, 0, 0,
-           9, 0, 0;
+        9, 0, 0;
   stack2 << 0, 0, 0,
-           9, 0, 0;
+         9, 0, 0;
   x << 7., 5., 3., 6., 11., 12., 9., 8., 6.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -494,15 +494,15 @@ TEST(AcyclicGraphNodesTest, Power) {
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 0, 0, 0,
-           1, 0, 0,
-           10, 0, 1;
+        1, 0, 0,
+        10, 0, 1;
   stack2 << 0, 0, 0,
-           1, 0, 0,
-           10, 1, 0;
+         1, 0, 0,
+         10, 1, 0;
   stack3 << 0, 0, 0,
-            10, 0, 0;
+         10, 0, 0;
   stack4 << 1, 0, 0,
-            10, 0, 0;
+         10, 0, 0;
   x << 7., 5., 3., 6., 11., 4., 9., 8., 6.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -559,9 +559,9 @@ TEST(AcyclicGraphNodesTest, Absolute) {
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 1, 0, 0,
-           11, 0, 0;
+        11, 0, 0;
   stack2 << 0, 0, 0,
-           11, 0, 0;
+         11, 0, 0;
   x << -7., 5., 3., 6., 11., 4., -9., 8., 6.;
   constants.push_back(-3.);
   Eigen::ArrayXXd a_true(3, 1);
@@ -598,9 +598,9 @@ TEST(AcyclicGraphNodesTest, Sqrt) {
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 1, 0, 0,
-           12, 0, 0;
+        12, 0, 0;
   stack2 << 0, 0, 0,
-           12, 0, 0;
+         12, 0, 0;
   x << -7., 5., 3., 6., 11., 4., -9., 8., 6.;
   constants.push_back(3.);
   Eigen::ArrayXXd a_true(3, 1);

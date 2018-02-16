@@ -46,7 +46,7 @@ Eigen::ArrayXXd Evaluate(const CommandStack & stack,
 
   for (std::size_t i = 0; i < stack.rows(); ++i) {
     oper_interface.operator_map[stack(i, 0)]->evaluate(
-    stack, x, constants, forward_eval, i);
+      stack, x, constants, forward_eval, i);
   }
 
   return forward_eval.back();
@@ -74,7 +74,7 @@ Eigen::ArrayXXd EvaluateWithMask(const CommandStack & stack,
   for (std::size_t i = 0; i < stack.rows(); ++i) {
     if (mask[i]) {
       oper_interface.operator_map[stack(i, 0)]->evaluate(
-      stack, x, constants, forward_eval, i);
+        stack, x, constants, forward_eval, i);
     }
   }
 
@@ -95,7 +95,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
   // forward eval with dependencies
   for (std::size_t i = 0; i < stack.rows(); ++i) {
     oper_interface.operator_map[stack(i, 0)]->evaluate(
-    stack, x, constants, forward_eval, i);
+      stack, x, constants, forward_eval, i);
 
     if (stack(i, 0) == 0) {
       x_dependencies[stack(i, 1)].insert(i);
@@ -157,7 +157,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
   for (std::size_t i = 0; i < stack.rows(); ++i) {
     if (mask[i]) {
       oper_interface.operator_map[stack(i, 0)]->evaluate(
-      stack, x, constants, forward_eval, i);
+        stack, x, constants, forward_eval, i);
 
       if (stack(i, 0) == 0) {
         x_dependencies[stack(i, 1)].insert(i);
@@ -203,7 +203,7 @@ void PrintStack(const CommandStack & stack) {
     std::cout << "(" << i << ") = " <<
               oper_interface.operator_map[stack(i, 0)]->get_print() << " : ";
 
-    // NOTE: Hard code any that have an arity of 0
+    // Hard code for those with arity == 0
     if (oper_interface.operator_map[stack(i, 0)]->get_arity() == 0) {
       std::cout << " (" << stack(i, 1) << ")";
     }
@@ -214,9 +214,6 @@ void PrintStack(const CommandStack & stack) {
       std::cout << " (" << stack(i, j) << ")";
     }
 
-//    for (auto const& param : stack[i].second) {
-//      std::cout << " (" << param << ")";
-//    }
     std::cout << std::endl;
   }
 }
@@ -232,18 +229,17 @@ CommandStack SimplifyStack(const CommandStack & stack) {
   // TODO(gbomarito)  would size_t be faster?
   for (int i = 0, j = 0; i < stack.rows(); ++i) {
     if (used_command[i]) {
-
       for (std::size_t k = 0; k < oper_interface.operator_map[new_stack(j, 0)]
-      ->get_arity(); ++k) {
+           ->get_arity(); ++k) {
         new_stack(j, k + 1) = reduced_param_map[new_stack(j, k + 1)];
       }
 
-    reduced_param_map[i] = j;
-    ++j;
+      reduced_param_map[i] = j;
+      ++j;
+    }
   }
-}
 
-return new_stack;
+  return new_stack;
 }
 
 

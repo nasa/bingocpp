@@ -6,7 +6,7 @@
  *
  * This is the header file to hold the Operation abstract class
  * and all implementations of that class. Also holds the OperatorInterface
- * class, which includes a map to keep the Operation in
+ * class, which includes a map to keep the Operations in
  */
 
 #ifndef INCLUDE_BINGOCPP_ACYCLIC_GRAPH_NODES_H_
@@ -54,13 +54,13 @@ class Operation {
   //! \brief Returns the string representation of the operator.
   virtual std::string get_print() = 0;
 
-  /*! \brief evaluates single command stack, returns array to be saved in buffer.
+  /*! \brief evaluates a single command at the location passed in
    *
-   *  \param[in] command The parameters to be input to buffer. SingleCommand
+   *  \param[in] stack The stack that contains each command. CommandStack
    *  \param[in] x Input variables to the acyclic graph. Eigen::ArrayXXd
    *  \param[in] constants Constants used in the command. std::vector<double>
    *  \param[in/out] buffer Vector of Eigen arrays for the buffer.
-   *  \param[in] result_location location to use with buffer.
+   *  \param[in] result_location location of single command.
    */
   virtual void evaluate(const CommandStack &stack,
                         const Eigen::ArrayXXd &x,
@@ -70,12 +70,13 @@ class Operation {
 
   /*! \brief Computes reverse autodiff partial of a command stack.
    *
-   *  \param[in] command The parameters to be input to buffer. SingleCommand
+   *  \param[in] stack The stack that contains each command. CommandStack
    *  \param[in] command_index Index of command in the command; also the location of
    *                          the result to be placed in the reverse buffer.
    *  \param[in] forward_buffer Vector of Eigen arrays for the forward buffer.
    *  \param[in\out] forward_buffer Vector of Eigen arrays for the forward buffer.
-   *  \param[in] dependency Int for location of where dependency is located in buffer.
+   *  \param[in] dependency Int for location of where dependency is located in buffer,
+   *                            and which location on stack to evaluate.
    */
   virtual void deriv_evaluate(const CommandStack &stack,
                               const int command_index,
