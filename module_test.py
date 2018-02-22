@@ -18,18 +18,18 @@ def TestAcyclicGraph(num_loops, num_evals):
        1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9.],
       dtype=float)
     x = x.reshape([60,3]);
-    stack = [(0, (0,)), 
-             (0, (1,)), 
-             (1, (0,)), 
-             (1, (1,)), 
-             (5, (3, 1)),
-             (5, (3, 1)),
-             (2, (4, 2)),
-             (2, (4, 2)),
-             (4, (6, 0)),
-             (4, (5, 6)),
-             (3, (7, 6)),
-             (3, (8, 0))]
+    stack = [(0, 0, 0), 
+             (0, 1, 1), 
+             (1, 0, 0), 
+             (1, 1, 1), 
+             (5, 3, 1),
+             (5, 3, 1),
+             (2, 4, 2),
+             (2, 4, 2),
+             (4, 6, 0),
+             (4, 5, 6),
+             (3, 7, 6),
+             (3, 8, 0)]
     # stack = bingocpp.CommandStack(pystk)
     consts = np.array([3.14, 10.])
     
@@ -40,25 +40,25 @@ def TestAcyclicGraph(num_loops, num_evals):
     for _ in range(num_loops):
         t0 = time.time()
         for _ in range(num_evals): 
-            y = bingocpp.evauluate(stack, x, consts)
+            y = bingocpp.evaluate(stack, x, consts)
         t1 = time.time()
         avg_time_per_eval += (t1 -t0)/num_evals
         
         t0 = time.time()
         for _ in range(num_evals): 
-            y = bingocpp.simplify_and_evauluate(stack, x, consts)
+            y = bingocpp.simplify_and_evaluate(stack, x, consts)
         t1 = time.time()
         avg_time_per_seval += (t1 -t0)/num_evals
         
         t0 = time.time()
         for _ in range(num_evals): 
-            y = bingocpp.evauluate_with_derivative(stack, x, consts)
+            y = bingocpp.evaluate_with_derivative(stack, x, consts)
         t1 = time.time()
         avg_time_per_deval += (t1 -t0)/num_evals
         
         t0 = time.time()
         for _ in range(num_evals): 
-            y = bingocpp.simplify_and_evauluate_with_derivative(stack, x, consts)
+            y = bingocpp.simplify_and_evaluate_with_derivative(stack, x, consts)
         t1 = time.time()
         avg_time_per_sdeval += (t1 -t0)/num_evals
     avg_time_per_eval /= num_loops

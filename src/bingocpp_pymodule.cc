@@ -21,12 +21,12 @@ double add(double i, double j) {
 
 PYBIND11_MODULE(bingocpp, m) {
   m.doc() = "pybind11 example plugin";  // optional module docstring
-  m.def("evauluate", &Evaluate, "evaluate");
-  m.def("simplify_and_evauluate", &SimplifyAndEvaluate,
+  m.def("evaluate", &Evaluate, "evaluate");
+  m.def("simplify_and_evaluate", &SimplifyAndEvaluate,
         "evaluate after simplification");
-  m.def("evauluate_with_derivative", &EvaluateWithDerivative,
+  m.def("evaluate_with_derivative", &EvaluateWithDerivative,
         "evaluate with derivative");
-  m.def("simplify_and_evauluate_with_derivative",
+  m.def("simplify_and_evaluate_with_derivative",
         &SimplifyAndEvaluateWithDerivative,
         "evaluate with derivative after simplification");
   
