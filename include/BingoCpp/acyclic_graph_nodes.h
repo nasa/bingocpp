@@ -21,7 +21,6 @@
 #include <vector>
 #include <string>
 
-typedef Eigen::ArrayX3d CommandStack;
 typedef Eigen::Ref<Eigen::ArrayXXd,
         0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ArrayByRef;
 
@@ -35,12 +34,12 @@ typedef Eigen::Ref<Eigen::ArrayXXd,
  *
  *  \fn virtual int get_arity()
  *  \fn virtual std::string get_print()
- *  \fn void evaluate(const CommandStack &stack,
+ *  \fn void evaluate(const Eigen::ArrayX3d &stack,
  *                               const Eigen::ArrayXXd &x,
  *                               const std::vector<double> &constants,
  *                               std::vector<Eigen::ArrayXXd> &buffer,
  *                               std::size_t result_location)
- *  \fn virtual void deriv_evaluate(CommandStack &stack,
+ *  \fn virtual void deriv_evaluate(Eigen::ArrayX3d &stack,
  *                                  const int command_index,
  *                                  const std::vector<Eigen::ArrayXXd> &forward_buffer,
  *                                  std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -56,13 +55,13 @@ class Operation {
 
   /*! \brief evaluates a single command at the location passed in
    *
-   *  \param[in] stack The stack that contains each command. CommandStack
+   *  \param[in] stack The stack that contains each command. Eigen::ArrayX3d
    *  \param[in] x Input variables to the acyclic graph. Eigen::ArrayXXd
    *  \param[in] constants Constants used in the command. std::vector<double>
    *  \param[in/out] buffer Vector of Eigen arrays for the buffer.
    *  \param[in] result_location location of single command.
    */
-  virtual void evaluate(const CommandStack &stack,
+  virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
@@ -70,7 +69,7 @@ class Operation {
 
   /*! \brief Computes reverse autodiff partial of a command stack.
    *
-   *  \param[in] stack The stack that contains each command. CommandStack
+   *  \param[in] stack The stack that contains each command. Eigen::ArrayX3d
    *  \param[in] command_index Index of command in the command; also the location of
    *                          the result to be placed in the reverse buffer.
    *  \param[in] forward_buffer Vector of Eigen arrays for the forward buffer.
@@ -78,7 +77,8 @@ class Operation {
    *  \param[in] dependency Int for location of where dependency is located in buffer,
    *                            and which location on stack to evaluate.
    */
-  virtual void deriv_evaluate(const CommandStack &stack,
+  // TODO - Pass in 2 int params instead of Eigen::ArrayX3d
+  virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -98,12 +98,12 @@ class X_Load: public Operation {
   std::string get_print() {
     return "X";
   }
-  virtual void evaluate(const CommandStack &stack,
+  virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
-  virtual void deriv_evaluate(const CommandStack &stack,
+  virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -123,12 +123,12 @@ class C_Load: public Operation {
   std::string get_print() {
     return "C";
   }
-  virtual void evaluate(const CommandStack &stack,
+  virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
-  virtual void deriv_evaluate(const CommandStack &stack,
+  virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -148,12 +148,12 @@ class Addition: public Operation {
   std::string get_print() {
     return "+";
   }
-  virtual void evaluate(const CommandStack &stack,
+  virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
-  virtual void deriv_evaluate(const CommandStack &stack,
+  virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -173,12 +173,12 @@ class Subtraction: public Operation {
   std::string get_print() {
     return "-";
   }
-  virtual void evaluate(const CommandStack &stack,
+  virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
-  virtual void deriv_evaluate(const CommandStack &stack,
+  virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -198,12 +198,12 @@ class Multiplication: public Operation {
   std::string get_print() {
     return "*";
   }
-  virtual void evaluate(const CommandStack &stack,
+  virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
-  virtual void deriv_evaluate(const CommandStack &stack,
+  virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -223,12 +223,12 @@ class Division: public Operation {
   std::string get_print() {
     return "/";
   }
-  virtual void evaluate(const CommandStack &stack,
+  virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
-  virtual void deriv_evaluate(const CommandStack &stack,
+  virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -248,12 +248,12 @@ class Sin: public Operation {
   std::string get_print() {
     return "sin";
   }
-  virtual void evaluate(const CommandStack &stack,
+  virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
-  virtual void deriv_evaluate(const CommandStack &stack,
+  virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -273,12 +273,12 @@ class Cos: public Operation {
   std::string get_print() {
     return "cos";
   }
-  virtual void evaluate(const CommandStack &stack,
+  virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
-  virtual void deriv_evaluate(const CommandStack &stack,
+  virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -298,12 +298,12 @@ class Exp: public Operation {
   std::string get_print() {
     return "exp";
   }
-  virtual void evaluate(const CommandStack &stack,
+  virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
-  virtual void deriv_evaluate(const CommandStack &stack,
+  virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -323,12 +323,12 @@ class Log: public Operation {
   std::string get_print() {
     return "log";
   }
-  virtual void evaluate(const CommandStack &stack,
+  virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
-  virtual void deriv_evaluate(const CommandStack &stack,
+  virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -348,12 +348,12 @@ class Power: public Operation {
   std::string get_print() {
     return "pow";
   }
-  virtual void evaluate(const CommandStack &stack,
+  virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
-  virtual void deriv_evaluate(const CommandStack &stack,
+  virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -373,12 +373,12 @@ class Absolute: public Operation {
   std::string get_print() {
     return "abs";
   }
-  virtual void evaluate(const CommandStack &stack,
+  virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
-  virtual void deriv_evaluate(const CommandStack &stack,
+  virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -398,12 +398,12 @@ class Sqrt: public Operation {
   std::string get_print() {
     return "sqrt";
   }
-  virtual void evaluate(const CommandStack &stack,
+  virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
                         const std::vector<double> &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
-  virtual void deriv_evaluate(const CommandStack &stack,
+  virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
