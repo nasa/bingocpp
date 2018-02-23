@@ -18,7 +18,7 @@ def TestAcyclicGraph(num_loops, num_evals):
        1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9.],
       dtype=float)
     x = x.reshape([60,3]);
-    stack = [(0, 0, 0), 
+    stack = np.array([(0, 0, 0), 
              (0, 1, 1), 
              (1, 0, 0), 
              (1, 1, 1), 
@@ -29,7 +29,7 @@ def TestAcyclicGraph(num_loops, num_evals):
              (4, 6, 0),
              (4, 5, 6),
              (3, 7, 6),
-             (3, 8, 0)]
+             (3, 8, 0)], dtype=int)
     # stack = bingocpp.CommandStack(pystk)
     consts = np.array([3.14, 10.])
     

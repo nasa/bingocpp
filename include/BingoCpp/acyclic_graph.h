@@ -19,8 +19,6 @@
 #include <vector>
 
 
-
-typedef Eigen::ArrayX3d CommandStack;
 typedef Eigen::Ref<Eigen::ArrayXXd,
         0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ArrayByRef;
 
@@ -50,7 +48,7 @@ typedef Eigen::Ref<Eigen::ArrayXXd,
                            specified command.
  *
  */
-void ReverseSingleCommand(const CommandStack &stack,
+void ReverseSingleCommand(const Eigen::ArrayX3d &stack,
                           const int command_index,
                           const std::vector<Eigen::ArrayXXd> &forward_buffer,
                           std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -71,7 +69,7 @@ void ReverseSingleCommand(const CommandStack &stack,
  *
  * \return The value of the last command in the stack. (Eigen::ArrayXXd)
  */
-Eigen::ArrayXXd Evaluate(const CommandStack &stack,
+Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3d &stack,
                          const Eigen::ArrayXXd &x,
                          const std::vector<double> &constants);
 
@@ -88,7 +86,7 @@ Eigen::ArrayXXd Evaluate(const CommandStack &stack,
  *
  * \return The value of the last command in the stack. (Eigen::ArrayXXd)
  */
-Eigen::ArrayXXd SimplifyAndEvaluate(const CommandStack &stack,
+Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3d &stack,
                                     const Eigen::ArrayXXd &x,
                                     const std::vector<double> &constants);
 
@@ -108,7 +106,7 @@ Eigen::ArrayXXd SimplifyAndEvaluate(const CommandStack &stack,
  *
  * \return The value of the last command in the stack. (Eigen::ArrayXXd)
  */
-Eigen::ArrayXXd EvaluateWithMask(const CommandStack &stack,
+Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3d &stack,
                                  const Eigen::ArrayXXd &x,
                                  const std::vector<double> &constants,
                                  const std::vector<bool> &mask);
@@ -133,7 +131,7 @@ Eigen::ArrayXXd EvaluateWithMask(const CommandStack &stack,
  *         (std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>)
  */
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
-  const CommandStack &stack,
+  const Eigen::ArrayX3d &stack,
   const Eigen::ArrayXXd &x,
   const std::vector<double> &constants);
 
@@ -153,7 +151,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
  *         (std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>)
  */
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
-  const CommandStack &stack,
+  const Eigen::ArrayX3d &stack,
   const Eigen::ArrayXXd &x,
   const std::vector<double> &constants);
 
@@ -179,7 +177,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
  *         (std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>)
  */
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
-  const CommandStack &stack,
+  const Eigen::ArrayX3d &stack,
   const Eigen::ArrayXXd &x,
   const std::vector<double> &constants,
   const std::vector<bool> &mask);
@@ -195,7 +193,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
  *
  * \param[in] stack Description of an acyclic graph in stack format.
  */
-void PrintStack(const CommandStack &stack);
+void PrintStack(const Eigen::ArrayX3d &stack);
 
 
 
@@ -209,7 +207,7 @@ void PrintStack(const CommandStack &stack);
  *
  * \return Simplified stack.
  */
-CommandStack SimplifyStack(const CommandStack &stack);
+Eigen::ArrayX3d SimplifyStack(const Eigen::ArrayX3d &stack);
 
 
 
@@ -223,7 +221,7 @@ CommandStack SimplifyStack(const CommandStack &stack);
  *
  * \return Vector describing which commands in the stack are used.
  */
-std::vector<bool> FindUsedCommands(const CommandStack &stack);
+std::vector<bool> FindUsedCommands(const Eigen::ArrayX3d &stack);
 
 #endif  // INCLUDE_BINGOCPP_ACYCLIC_GRAPH_H_
 

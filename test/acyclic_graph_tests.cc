@@ -20,8 +20,8 @@ namespace {
 
 class AcyclicGraphTest : public::testing::Test {
  public:
-  CommandStack stack;
-  CommandStack stack2;
+  Eigen::ArrayX3d stack;
+  Eigen::ArrayX3d stack2;
   Eigen::ArrayXXd x;
   std::vector<double> constants;
 
@@ -56,7 +56,7 @@ class AcyclicGraphTest : public::testing::Test {
 };
 
 TEST(AcyclicGraphNodesTest, XLoad) {
-  CommandStack stack(1, 3);
+  Eigen::ArrayX3d stack(1, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 0, 1, 1;
@@ -71,7 +71,7 @@ TEST(AcyclicGraphNodesTest, XLoad) {
 }
 
 TEST(AcyclicGraphNodesTest, CLoad) {
-  CommandStack stack(1, 3);
+  Eigen::ArrayX3d stack(1, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 1, 1, 1;
@@ -87,10 +87,10 @@ TEST(AcyclicGraphNodesTest, CLoad) {
 }
 
 TEST(AcyclicGraphNodesTest, Addition) {
-  CommandStack stack(3, 3);
-  CommandStack stack2(3, 3);
-  CommandStack stack3(2, 3);
-  CommandStack stack4(2, 3);
+  Eigen::ArrayX3d stack(3, 3);
+  Eigen::ArrayX3d stack2(3, 3);
+  Eigen::ArrayX3d stack3(2, 3);
+  Eigen::ArrayX3d stack4(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 0, 0, 0,
@@ -144,10 +144,10 @@ TEST(AcyclicGraphNodesTest, Addition) {
 }
 
 TEST(AcyclicGraphNodesTest, Subtraction) {
-  CommandStack stack(3, 3);
-  CommandStack stack2(3, 3);
-  CommandStack stack3(2, 3);
-  CommandStack stack4(2, 3);
+  Eigen::ArrayX3d stack(3, 3);
+  Eigen::ArrayX3d stack2(3, 3);
+  Eigen::ArrayX3d stack3(2, 3);
+  Eigen::ArrayX3d stack4(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 0, 0, 0,
@@ -203,10 +203,10 @@ TEST(AcyclicGraphNodesTest, Subtraction) {
 }
 
 TEST(AcyclicGraphNodesTest, Multiplication) {
-  CommandStack stack(3, 3);
-  CommandStack stack2(3, 3);
-  CommandStack stack3(2, 3);
-  CommandStack stack4(2, 3);
+  Eigen::ArrayX3d stack(3, 3);
+  Eigen::ArrayX3d stack2(3, 3);
+  Eigen::ArrayX3d stack3(2, 3);
+  Eigen::ArrayX3d stack4(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 0, 0, 0,
@@ -260,10 +260,10 @@ TEST(AcyclicGraphNodesTest, Multiplication) {
 }
 
 TEST(AcyclicGraphNodesTest, Division) {
-  CommandStack stack(3, 3);
-  CommandStack stack2(3, 3);
-  CommandStack stack3(2, 3);
-  CommandStack stack4(2, 3);
+  Eigen::ArrayX3d stack(3, 3);
+  Eigen::ArrayX3d stack2(3, 3);
+  Eigen::ArrayX3d stack3(2, 3);
+  Eigen::ArrayX3d stack4(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 0, 0, 0,
@@ -323,8 +323,8 @@ TEST(AcyclicGraphNodesTest, Division) {
 }
 
 TEST(AcyclicGraphNodesTest, Sin) {
-  CommandStack stack(2, 3);
-  CommandStack stack2(2, 3);
+  Eigen::ArrayX3d stack(2, 3);
+  Eigen::ArrayX3d stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 1, 0, 0,
@@ -364,8 +364,8 @@ TEST(AcyclicGraphNodesTest, Sin) {
 }
 
 TEST(AcyclicGraphNodesTest, Cos) {
-  CommandStack stack(2, 3);
-  CommandStack stack2(2, 3);
+  Eigen::ArrayX3d stack(2, 3);
+  Eigen::ArrayX3d stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 1, 0, 0,
@@ -405,8 +405,8 @@ TEST(AcyclicGraphNodesTest, Cos) {
 }
 
 TEST(AcyclicGraphNodesTest, Exp) {
-  CommandStack stack(2, 3);
-  CommandStack stack2(2, 3);
+  Eigen::ArrayX3d stack(2, 3);
+  Eigen::ArrayX3d stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 1, 0, 0,
@@ -446,8 +446,8 @@ TEST(AcyclicGraphNodesTest, Exp) {
 }
 
 TEST(AcyclicGraphNodesTest, Log) {
-  CommandStack stack(2, 3);
-  CommandStack stack2(2, 3);
+  Eigen::ArrayX3d stack(2, 3);
+  Eigen::ArrayX3d stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 1, 0, 0,
@@ -487,10 +487,10 @@ TEST(AcyclicGraphNodesTest, Log) {
 }
 
 TEST(AcyclicGraphNodesTest, Power) {
-  CommandStack stack(3, 3);
-  CommandStack stack2(3, 3);
-  CommandStack stack3(2, 3);
-  CommandStack stack4(2, 3);
+  Eigen::ArrayX3d stack(3, 3);
+  Eigen::ArrayX3d stack2(3, 3);
+  Eigen::ArrayX3d stack3(2, 3);
+  Eigen::ArrayX3d stack4(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 0, 0, 0,
@@ -554,8 +554,8 @@ TEST(AcyclicGraphNodesTest, Power) {
 }
 
 TEST(AcyclicGraphNodesTest, Absolute) {
-  CommandStack stack(2, 3);
-  CommandStack stack2(2, 3);
+  Eigen::ArrayX3d stack(2, 3);
+  Eigen::ArrayX3d stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 1, 0, 0,
@@ -593,8 +593,8 @@ TEST(AcyclicGraphNodesTest, Absolute) {
 }
 
 TEST(AcyclicGraphNodesTest, Sqrt) {
-  CommandStack stack(2, 3);
-  CommandStack stack2(2, 3);
+  Eigen::ArrayX3d stack(2, 3);
+  Eigen::ArrayX3d stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
   std::vector<double> constants;
   stack << 1, 0, 0,
@@ -691,7 +691,7 @@ TEST_F(AcyclicGraphTest, maskderivative) {
 
 TEST_F(AcyclicGraphTest, simplify) {
   // shorter stack
-  CommandStack short_stack = SimplifyStack(stack);
+  Eigen::ArrayX3d short_stack = SimplifyStack(stack);
   ASSERT_LE(short_stack.rows(), stack.rows());
   // equivalent evatuation
   Eigen::ArrayXXd y = Evaluate(stack, x, constants);
