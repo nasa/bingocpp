@@ -693,6 +693,7 @@ TEST_F(AcyclicGraphTest, simplify) {
   // shorter stack
   Eigen::ArrayX3d short_stack = SimplifyStack(stack);
   ASSERT_LE(short_stack.rows(), stack.rows());
+  
   // equivalent evatuation
   Eigen::ArrayXXd y = Evaluate(stack, x, constants);
   Eigen::ArrayXXd simplified_y = Evaluate(short_stack, x, constants);
