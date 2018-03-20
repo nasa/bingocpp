@@ -69,7 +69,7 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 include_directories("${CMAKE_SOURCE_DIR}/include/")
 
 # add libraries
-add_library(bingo STATIC src/acyclic_graph.cc src/acyclic_graph_nodes.cc)
+add_library(bingo STATIC src/acyclic_graph.cc src/acyclic_graph_nodes.cc src/graph_manip.cc src/fitness_metric.cc)
 target_link_libraries(bingo Eigen3::Eigen)
 set_target_properties(bingo PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
  
@@ -85,7 +85,7 @@ target_link_libraries(bingocpp bingo)
 
 
 # ---------Testing executable-------------
-add_executable(run_tests test/test_main.cc test/acyclic_graph_tests.cc)
+add_executable(run_tests test/test_main.cc test/acyclic_graph_tests.cc test/agcpp_test.cc test/fitness_tests.cc)
 target_link_libraries(run_tests gtest bingo)
 
 

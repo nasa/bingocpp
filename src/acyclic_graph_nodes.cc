@@ -25,7 +25,7 @@ X_Load::X_Load() {}
 
 void X_Load::evaluate(const Eigen::ArrayX3d &stack,
                       const Eigen::ArrayXXd &x,
-                      const std::vector<double> &constants,
+                      const Eigen::VectorXf &constants,
                       std::vector<Eigen::ArrayXXd> &buffer,
                       std::size_t result_location) {
   buffer[result_location] = x.col(stack(result_location, 1));
@@ -43,7 +43,7 @@ C_Load::C_Load() {}
 
 void C_Load::evaluate(const Eigen::ArrayX3d &stack,
                       const Eigen::ArrayXXd &x,
-                      const std::vector<double> &constants,
+                      const Eigen::VectorXf &constants,
                       std::vector<Eigen::ArrayXXd> &buffer,
                       std::size_t result_location) {
   if (stack(result_location, 0) != -1) {
@@ -67,7 +67,7 @@ Addition::Addition() {}
 
 void Addition::evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const std::vector<double> &constants,
+                        const Eigen::VectorXf &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location) {
   buffer[result_location] = buffer[stack(result_location, 1)] +
@@ -93,7 +93,7 @@ Subtraction::Subtraction() {}
 
 void Subtraction::evaluate(const Eigen::ArrayX3d &stack,
                            const Eigen::ArrayXXd &x,
-                           const std::vector<double> &constants,
+                           const Eigen::VectorXf &constants,
                            std::vector<Eigen::ArrayXXd> &buffer,
                            std::size_t result_location) {
   buffer[result_location] = buffer[stack(result_location, 1)] -
@@ -119,7 +119,7 @@ Multiplication::Multiplication() {}
 
 void Multiplication::evaluate(const Eigen::ArrayX3d &stack,
                               const Eigen::ArrayXXd &x,
-                              const std::vector<double> &constants,
+                              const Eigen::VectorXf &constants,
                               std::vector<Eigen::ArrayXXd> &buffer,
                               std::size_t result_location) {
   buffer[result_location] = buffer[stack(result_location, 1)] *
@@ -147,7 +147,7 @@ Division::Division() {}
 
 void Division::evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const std::vector<double> &constants,
+                        const Eigen::VectorXf &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location) {
   buffer[result_location] = buffer[stack(result_location, 1)] /
@@ -176,7 +176,7 @@ Sin::Sin() {}
 
 void Sin::evaluate(const Eigen::ArrayX3d &stack,
                    const Eigen::ArrayXXd &x,
-                   const std::vector<double> &constants,
+                   const Eigen::VectorXf &constants,
                    std::vector<Eigen::ArrayXXd> &buffer,
                    std::size_t result_location) {
   buffer[result_location] = buffer[stack(result_location, 1)].sin();
@@ -196,7 +196,7 @@ Cos::Cos() {}
 
 void Cos::evaluate(const Eigen::ArrayX3d &stack,
                    const Eigen::ArrayXXd &x,
-                   const std::vector<double> &constants,
+                   const Eigen::VectorXf &constants,
                    std::vector<Eigen::ArrayXXd> &buffer,
                    std::size_t result_location) {
   buffer[result_location] = buffer[stack(result_location, 1)].cos();
@@ -216,7 +216,7 @@ Exp::Exp() {}
 
 void Exp::evaluate(const Eigen::ArrayX3d &stack,
                    const Eigen::ArrayXXd &x,
-                   const std::vector<double> &constants,
+                   const Eigen::VectorXf &constants,
                    std::vector<Eigen::ArrayXXd> &buffer,
                    std::size_t result_location) {
   buffer[result_location] = buffer[stack(result_location, 1)].exp();
@@ -236,7 +236,7 @@ Log::Log() {}
 
 void Log::evaluate(const Eigen::ArrayX3d &stack,
                    const Eigen::ArrayXXd &x,
-                   const std::vector<double> &constants,
+                   const Eigen::VectorXf &constants,
                    std::vector<Eigen::ArrayXXd> &buffer,
                    std::size_t result_location) {
   buffer[result_location] = (buffer[stack(result_location, 1)].abs()).log();
@@ -256,7 +256,7 @@ Power::Power() {}
 
 void Power::evaluate(const Eigen::ArrayX3d &stack,
                      const Eigen::ArrayXXd &x,
-                     const std::vector<double> &constants,
+                     const Eigen::VectorXf &constants,
                      std::vector<Eigen::ArrayXXd> &buffer,
                      std::size_t result_location) {
   buffer[result_location] = (buffer[stack(result_location, 1)].abs()).pow(
@@ -287,7 +287,7 @@ Absolute::Absolute() {}
 
 void Absolute::evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const std::vector<double> &constants,
+                        const Eigen::VectorXf &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location) {
   buffer[result_location] = buffer[stack(result_location, 1)].abs();
@@ -307,7 +307,7 @@ Sqrt::Sqrt() {}
 
 void Sqrt::evaluate(const Eigen::ArrayX3d &stack,
                     const Eigen::ArrayXXd &x,
-                    const std::vector<double> &constants,
+                    const Eigen::VectorXf &constants,
                     std::vector<Eigen::ArrayXXd> &buffer,
                     std::size_t result_location) {
   buffer[result_location] = (buffer[stack(result_location, 1)].abs()).sqrt();

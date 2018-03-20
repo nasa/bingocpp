@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <math.h>
 #include <Eigen/Dense>
 
@@ -31,7 +32,7 @@ int test_eig() {
 void TestAcyclicGraph(int num_loops, int num_evals) {
   Eigen::ArrayX3d stack(12, 3);
   Eigen::ArrayXXd x(60, 3);
-  std::vector<double> constants = std::vector<double>();
+  Eigen::VectorXf constants;
   // y = x_0 * ( C_0 + C_1/x_1 ) - x_0
   stack << 0, 0, 0,
            0, 1, 1,
@@ -55,8 +56,7 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
        1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9., 
        1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9., 
        1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9.;
-  constants.push_back(3.14);
-  constants.push_back(10.0);
+  constants << 3.14, 10.0;
   //PrintStack(stack);
   Eigen::ArrayXXd y;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy;
@@ -114,6 +114,7 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
 
 
 int main(int argc, char *argv[]) {
+  srand (time(NULL));
   if (argc < 3) {
     fprintf(stdout, "%s Version %d.%d\n", argv[0], Tutorial_VERSION_MAJOR,
             Tutorial_VERSION_MINOR);
