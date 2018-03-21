@@ -57,6 +57,16 @@ TEST(TrainingDataTest, ExplicitGetItem) {
     }
 }
 
+TEST(TrainingDataTest, ExplicitSize) {
+    Eigen::ArrayXXd x(4, 3);
+    Eigen::ArrayXXd y(4, 2);
+    x << 1, 2, 3, 4, 5, 6, 7, 8, 9, 7, 4, 7;
+    y << 6, 7, 1, 2, 4, 5, 8, 9;
+
+    ExplicitTrainingData ex = ExplicitTrainingData(x, y);
+    ASSERT_EQ(4, ex.size());
+}
+
 TEST(TrainingDataTest, ImplicitConstruct) {
     Eigen::ArrayXXd x(4, 3);
     Eigen::ArrayXXd dx_dt(4, 2);
@@ -98,4 +108,15 @@ TEST(TrainingDataTest, ImplicitGetItem) {
         ASSERT_DOUBLE_EQ(truth_dx_dt(i, 0), slice->dx_dt(i, 0));
         ASSERT_DOUBLE_EQ(truth_dx_dt(i, 1), slice->dx_dt(i, 1));
     }
+}
+
+TEST(TrainingDataTest, ImplicitSize) {
+    Eigen::ArrayXXd x(4, 3);
+    Eigen::ArrayXXd dx_dt(4, 2);
+    x << 1, 2, 3, 4, 5, 6, 7, 8, 9, 7, 4, 7;
+    dx_dt << 6, 7, 1, 2, 4, 5, 8, 9;
+
+    ImplicitTrainingData im = ImplicitTrainingData(x, dx_dt);
+
+    ASSERT_EQ(4, im.size());
 }
