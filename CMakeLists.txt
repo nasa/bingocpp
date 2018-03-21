@@ -85,7 +85,7 @@ target_link_libraries(bingocpp bingo)
 
 
 # ---------Testing executable-------------
-add_executable(run_tests test/test_main.cc test/acyclic_graph_tests.cc test/agcpp_test.cc test/fitness_tests.cc test/training_data)
+add_executable(run_tests test/test_main.cc test/acyclic_graph_tests.cc test/agcpp_tests.cc test/fitness_tests.cc test/training_data_tests)
 target_link_libraries(run_tests gtest bingo)
 
 
