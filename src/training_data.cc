@@ -23,10 +23,8 @@ ExplicitTrainingData* ExplicitTrainingData:: get_item(std::list<int> items) {
     Eigen::ArrayXXd temp_x(items.size(), x.cols());
     Eigen::ArrayXXd temp_y(items.size(), y.cols());
     for (std::list<int>::iterator it=items.begin(); it != items.end(); ++it) {
-        temp_x.block<1, 3>(i, 0) = x.block<1, 3>(*it, 0); 
-        temp_y.block<1, 3>(i, 0) = y.block<1, 3>(*it, 0);
-        // temp_x.block<1, x.cols()>(i, 0) = x.block<1, x.cols()>(*it, 0); 
-        // temp_y.block<1, y.cols()>(i, 0) = y.block<1, y.cols()>(*it, 0);
+        temp_x.block(i, 0, 1, x.cols()) = x.block(*it, 0, 1, x.cols()); 
+        temp_y.block(i, 0, 1, y.cols()) = y.block(*it, 0, 1, y.cols());
         ++i;
     }
     ExplicitTrainingData* temp = new ExplicitTrainingData(temp_x, temp_y);
@@ -43,8 +41,8 @@ ImplicitTrainingData* ImplicitTrainingData:: get_item(std::list<int> items) {
     Eigen::ArrayXXd temp_x(items.size(), x.cols());
     Eigen::ArrayXXd temp_dx_dt(items.size(), dx_dt.cols());
     for (std::list<int>::iterator it=items.begin(); it != items.end(); ++it) {
-        temp_x.block<1, 3>(i, 0) = x.block<1, 3>(*it, 0); 
-        temp_dx_dt.block<1, 3>(i, 0) = dx_dt.block<1, 3>(*it, 0);
+        temp_x.block(i, 0, 1, x.cols()) = x.block(*it, 0, 1, x.cols());
+        temp_dx_dt.block(i, 0, 1, dx_dt.cols()) = dx_dt.block(*it, 0, 1, dx_dt.cols());
         ++i;
     }
     ImplicitTrainingData* temp = new ImplicitTrainingData(temp_x, temp_dx_dt);
