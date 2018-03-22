@@ -71,7 +71,7 @@ void ReverseSingleCommand(const Eigen::ArrayX3d &stack,
  */
 Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3d &stack,
                          const Eigen::ArrayXXd &x,
-                         const Eigen::VectorXf &constants);
+                         const Eigen::VectorXd &constants);
 
 
 /*!
@@ -88,7 +88,7 @@ Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3d &stack,
  */
 Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3d &stack,
                                     const Eigen::ArrayXXd &x,
-                                    const Eigen::VectorXf &constants);
+                                    const Eigen::VectorXd &constants);
 
 
 /*!
@@ -108,7 +108,7 @@ Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3d &stack,
  */
 Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3d &stack,
                                  const Eigen::ArrayXXd &x,
-                                 const Eigen::VectorXf &constants,
+                                 const Eigen::VectorXd &constants,
                                  const std::vector<bool> &mask);
 
 
@@ -133,7 +133,7 @@ Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3d &stack,
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
   const Eigen::ArrayX3d &stack,
   const Eigen::ArrayXXd &x,
-  const Eigen::VectorXf &constants);
+  const Eigen::VectorXd &constants);
 
 
 
@@ -153,7 +153,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
   const Eigen::ArrayX3d &stack,
   const Eigen::ArrayXXd &x,
-  const Eigen::VectorXf &constants);
+  const Eigen::VectorXd &constants);
 
 
 
@@ -179,7 +179,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
   const Eigen::ArrayX3d &stack,
   const Eigen::ArrayXXd &x,
-  const Eigen::VectorXf &constants,
+  const Eigen::VectorXd &constants,
   const std::vector<bool> &mask);
 
 

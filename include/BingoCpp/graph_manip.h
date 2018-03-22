@@ -33,7 +33,7 @@
  *        Multiplication, Division, sin, cos, exp, log, pow, abs, sqrt
  *
  *  \fn bool needs_optimization()
- *  \fn void set_constants(Eigen::VectorXf con)
+ *  \fn void set_constants(Eigen::VectorXd con)
  *  \fn int count_constants()
  *  \fn Eigen::ArrayXXd evaluate(Eigen::ArrayXXd &eval_x)
  *  \fn std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> evaluate_deriv(Eigen::ArrayXXd &eval_x)
@@ -47,9 +47,9 @@ class AcyclicGraph {
     //! Eigen::ArrayX3d stack
     /*! stack representation of equation */
     Eigen::ArrayX3d stack;
-    //! Eigen::VectorXf constants
+    //! Eigen::VectorXd constants
     /*! vector to hold constants */
-    Eigen::VectorXf constants;
+    Eigen::VectorXd constants;
     //! OperatorInterface oper_interface
     /*! map that holds operators with arity / strings */
     OperatorInterface oper_interface;
@@ -65,9 +65,9 @@ class AcyclicGraph {
     bool needs_optimization();
     /*! \brief set the constants
      *
-     *  \param[in] con The constants to set. Eigen::VectorXf
+     *  \param[in] con The constants to set. Eigen::VectorXd
      */
-    void set_constants(Eigen::VectorXf con);
+    void set_constants(Eigen::VectorXd con);
     /*! \brief count the utilized constants in stack
      *
      *  \return int the number of utilized constants in stack

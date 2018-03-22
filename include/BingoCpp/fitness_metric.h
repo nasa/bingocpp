@@ -21,8 +21,8 @@ struct FitnessMetric;
  *
  *  Used for Levenberg-Marquardt Optimization
  *
- *  \fn int operator()(const Eigen::VectorXf &x, Eigen::VectorXf &fvec)
- *  \fn int df(const Eigen::VectorXf &x, Eigen::MatrixXf &fjac)
+ *  \fn int operator()(const Eigen::VectorXd &x, Eigen::VectorXd &fvec)
+ *  \fn int df(const Eigen::VectorXd &x, Eigen::MatrixXf &fjac)
  *  \fn int values() const
  *  \fn int inputs() const
  */
@@ -44,18 +44,18 @@ struct LMFunctor {
     FitnessMetric* fit;
     /*! \brief Compute 'm' errors, one for each data point, for the given paramter values in 'x'
      *
-     *  \param[in] x contains current estimates for parameters. Eigen::VectorXf (dimensions nx1)
-     *  \param[in] fvec contain error for each data point. Eigen::VectorXf (dimensions mx1)
+     *  \param[in] x contains current estimates for parameters. Eigen::VectorXd (dimensions nx1)
+     *  \param[in] fvec contain error for each data point. Eigen::VectorXd (dimensions mx1)
      *  \return 0
      */
-    int operator()(const Eigen::VectorXf &x, Eigen::VectorXf &fvec);
+    int operator()(const Eigen::VectorXd &x, Eigen::VectorXd &fvec);
     /*! \brief Compute jacobian of the errors
      *
-     *  \param[in] x contains current estimates for parameters. Eigen::VectorXf (dimensions nx1)
+     *  \param[in] x contains current estimates for parameters. Eigen::VectorXd (dimensions nx1)
      *  \param[in] fjac contain jacobian of the errors, calculated numerically. Eigen::MatrixXf (dimensions mxn)
      *  \return 0
      */
-    int df(const Eigen::VectorXf &x, Eigen::MatrixXf &fjac);
+    int df(const Eigen::VectorXd &x, Eigen::MatrixXd &fjac);
     /*! \brief gets the values
      *
      *  \return m - values
@@ -98,7 +98,7 @@ struct FitnessMetric {
     *  \param[in] train The TrainingData to evaluate the fitness. TrainingData
     *  \return float the fitness metric
     */
-    float evaluate_fitness(AcyclicGraph &indv, TrainingData &train);
+    double evaluate_fitness(AcyclicGraph &indv, TrainingData &train);
     /*! \brief perform levenberg-marquardt optimization on embedded constants
     *
     *  \param[in] indv agcpp indv to be evaluated. AcyclicGraph

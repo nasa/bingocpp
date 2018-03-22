@@ -18,7 +18,7 @@
 
 AcyclicGraph::AcyclicGraph() {
     stack = Eigen::ArrayX3d(0, 3);
-    constants = Eigen::VectorXf(0);
+    constants = Eigen::VectorXd(0);
 }
 
 AcyclicGraph::AcyclicGraph(const AcyclicGraph &ag) {
@@ -37,7 +37,7 @@ bool AcyclicGraph::needs_optimization() {
     return false;
 }
 
-void AcyclicGraph::set_constants(Eigen::VectorXf con) {
+void AcyclicGraph::set_constants(Eigen::VectorXd con) {
     constants = con;
 }
 

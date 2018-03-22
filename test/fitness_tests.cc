@@ -41,7 +41,7 @@ TEST(FitnessTest, optimize_constants) {
     y << 4.64, 8.28, 11.42;
 
 
-    Eigen::VectorXf temp_con(2);
+    Eigen::VectorXd temp_con(2);
     temp_con << 15.0, 2.0;
     indv.set_constants(temp_con);
     ExplicitTrainingData train(x, y);
@@ -71,7 +71,7 @@ TEST(FitnessTest, evaluate_fitness_vector) {
               3, 7, 6,
               3, 8, 0;
     indv.stack = stack2;
-    Eigen::VectorXf temp_con(2);
+    Eigen::VectorXd temp_con(2);
     temp_con << 3.14, 10.0;
     indv.set_constants(temp_con); 
     x << 1., 4., 7., 2., 5., 8., 3., 6., 9.;
@@ -108,7 +108,7 @@ TEST(FitnessTest, evaluate_fitness) {
     x << 1., 4., 7., 2., 5., 8., 3., 6., 9.;
     Eigen::ArrayXXd y(3, 1);
     y << 4.64, 8.28, 11.42;
-    // Eigen::VectorXf temp_con(2);
+    // Eigen::VectorXd temp_con(2);
     // temp_con << 3.14, 10.0;
 
     ExplicitTrainingData ex = ExplicitTrainingData(x, y);

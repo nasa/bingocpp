@@ -23,7 +23,7 @@ class AcyclicGraphTest : public::testing::Test {
   Eigen::ArrayX3d stack;
   Eigen::ArrayX3d stack2;
   Eigen::ArrayXXd x;
-  Eigen::VectorXf constants;
+  Eigen::VectorXd constants;
 
   AcyclicGraphTest(): stack(12, 3), x(3, 3), stack2(2, 3), constants(2) {
   }
@@ -57,7 +57,7 @@ class AcyclicGraphTest : public::testing::Test {
 TEST(AcyclicGraphNodesTest, XLoad) {
   Eigen::ArrayX3d stack(1, 3);
   Eigen::ArrayXXd x(3, 3);
-  Eigen::VectorXf constants(2);
+  Eigen::VectorXd constants(2);
   stack << 0, 1, 1;
   constants << 3.0, 5.0;
   x << 7., 6., 9., 5., 11., 4., 3., 2., 1.;
@@ -73,7 +73,7 @@ TEST(AcyclicGraphNodesTest, XLoad) {
 TEST(AcyclicGraphNodesTest, CLoad) {
   Eigen::ArrayX3d stack(1, 3);
   Eigen::ArrayXXd x(3, 3);
-  Eigen::VectorXf constants(2);
+  Eigen::VectorXd constants(2);
   stack << 1, 1, 1;
   constants << 3.0, 5.0;
   Eigen::ArrayXXd a_true(3, 1);
@@ -91,7 +91,7 @@ TEST(AcyclicGraphNodesTest, Addition) {
   Eigen::ArrayX3d stack3(2, 3);
   Eigen::ArrayX3d stack4(2, 3);
   Eigen::ArrayXXd x(3, 3);
-  Eigen::VectorXf constants(1);
+  Eigen::VectorXd constants(1);
   stack << 0, 0, 0,
         1, 0, 0,
         2, 0, 1;
@@ -148,7 +148,7 @@ TEST(AcyclicGraphNodesTest, Subtraction) {
   Eigen::ArrayX3d stack3(2, 3);
   Eigen::ArrayX3d stack4(2, 3);
   Eigen::ArrayXXd x(3, 3);
-  Eigen::VectorXf constants(1);
+  Eigen::VectorXd constants(1);
   stack << 0, 0, 0,
         1, 0, 0,
         3, 0, 1;
@@ -207,7 +207,7 @@ TEST(AcyclicGraphNodesTest, Multiplication) {
   Eigen::ArrayX3d stack3(2, 3);
   Eigen::ArrayX3d stack4(2, 3);
   Eigen::ArrayXXd x(3, 3);
-  Eigen::VectorXf constants(1);
+  Eigen::VectorXd constants(1);
   stack << 0, 0, 0,
         1, 0, 0,
         4, 0, 1;
@@ -264,7 +264,7 @@ TEST(AcyclicGraphNodesTest, Division) {
   Eigen::ArrayX3d stack3(2, 3);
   Eigen::ArrayX3d stack4(2, 3);
   Eigen::ArrayXXd x(3, 3);
-  Eigen::VectorXf constants(1);
+  Eigen::VectorXd constants(1);
   stack << 0, 0, 0,
         1, 0, 0,
         5, 0, 1;
@@ -325,7 +325,7 @@ TEST(AcyclicGraphNodesTest, Sin) {
   Eigen::ArrayX3d stack(2, 3);
   Eigen::ArrayX3d stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
-  Eigen::VectorXf constants(1);
+  Eigen::VectorXd constants(1);
   stack << 1, 0, 0,
         6, 0, 0;
   stack2 << 0, 0, 0,
@@ -366,7 +366,7 @@ TEST(AcyclicGraphNodesTest, Cos) {
   Eigen::ArrayX3d stack(2, 3);
   Eigen::ArrayX3d stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
-  Eigen::VectorXf constants(1);
+  Eigen::VectorXd constants(1);
   stack << 1, 0, 0,
         7, 0, 0;
   stack2 << 0, 0, 0,
@@ -407,7 +407,7 @@ TEST(AcyclicGraphNodesTest, Exp) {
   Eigen::ArrayX3d stack(2, 3);
   Eigen::ArrayX3d stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
-  Eigen::VectorXf constants(1);
+  Eigen::VectorXd constants(1);
   stack << 1, 0, 0,
         8, 0, 0;
   stack2 << 0, 0, 0,
@@ -448,7 +448,7 @@ TEST(AcyclicGraphNodesTest, Log) {
   Eigen::ArrayX3d stack(2, 3);
   Eigen::ArrayX3d stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
-  Eigen::VectorXf constants(1);
+  Eigen::VectorXd constants(1);
   stack << 1, 0, 0,
         9, 0, 0;
   stack2 << 0, 0, 0,
@@ -491,7 +491,7 @@ TEST(AcyclicGraphNodesTest, Power) {
   Eigen::ArrayX3d stack3(2, 3);
   Eigen::ArrayX3d stack4(2, 3);
   Eigen::ArrayXXd x(3, 3);
-  Eigen::VectorXf constants(1);
+  Eigen::VectorXd constants(1);
   stack << 0, 0, 0,
         1, 0, 0,
         10, 0, 1;
@@ -556,7 +556,7 @@ TEST(AcyclicGraphNodesTest, Absolute) {
   Eigen::ArrayX3d stack(2, 3);
   Eigen::ArrayX3d stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
-  Eigen::VectorXf constants(1);
+  Eigen::VectorXd constants(1);
   stack << 1, 0, 0,
         11, 0, 0;
   stack2 << 0, 0, 0,
@@ -595,7 +595,7 @@ TEST(AcyclicGraphNodesTest, Sqrt) {
   Eigen::ArrayX3d stack(2, 3);
   Eigen::ArrayX3d stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
-  Eigen::VectorXf constants(1);
+  Eigen::VectorXd constants(1);
   stack << 1, 0, 0,
         12, 0, 0;
   stack2 << 0, 0, 0,

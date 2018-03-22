@@ -14,10 +14,10 @@
 #include <Eigen/Core>
 #include <unsupported/Eigen/NonLinearOptimization>
 
-int LMFunctor::operator()(const Eigen::VectorXf &x, Eigen::VectorXf &fvec) {
+int LMFunctor::operator()(const Eigen::VectorXd &x, Eigen::VectorXd &fvec) {
     agraphIndv.set_constants(x);
     Eigen::ArrayXXd temp = fit->evaluate_fitness_vector(agraphIndv, *train);
-    Eigen::VectorXf vec(temp.rows());
+    Eigen::VectorXd vec(temp.rows());
     for (int i = 0; i < temp.rows(); ++i) {
         vec[i] = temp(i);
     }
@@ -25,31 +25,31 @@ int LMFunctor::operator()(const Eigen::VectorXf &x, Eigen::VectorXf &fvec) {
     return 0;
 }
 
-int LMFunctor::df(const Eigen::VectorXf &x, Eigen::MatrixXf &fjac) {
-    float epsilon;
+int LMFunctor::df(const Eigen::VectorXd &x, Eigen::MatrixXd &fjac) {
+    double epsilon;
     epsilon = 1e-5f;
 
     for (int i = 0; i < x.size(); i++) {
-        Eigen::VectorXf xPlus(x);
+        Eigen::VectorXd xPlus(x);
         xPlus(i) += epsilon;
-        Eigen::VectorXf xMinus(x);
+        Eigen::VectorXd xMinus(x);
         xMinus(i) -= epsilon;
 
-        Eigen::VectorXf fvecPlus(values());
+        Eigen::VectorXd fvecPlus(values());
         operator()(xPlus, fvecPlus);
 
-        Eigen::VectorXf fvecMinus(values());
+        Eigen::VectorXd fvecMinus(values());
         operator()(xMinus, fvecMinus);
 
-        Eigen::VectorXf fvecDiff(values());
-        fvecDiff = (fvecPlus - fvecMinus) / (2.0f * epsilon);
+        Eigen::VectorXd fvecDiff(values());
+        fvecDiff = (fvecPlus - fvecMinus) / (2.0 * epsilon);
 
         fjac.block(0, i, values(), 1) = fvecDiff;
     }
     return 0;
 }
 
-float FitnessMetric::evaluate_fitness(AcyclicGraph &indv, TrainingData &train) {
+double FitnessMetric::evaluate_fitness(AcyclicGraph &indv, TrainingData &train) {
     if (indv.needs_optimization()) {
         optimize_constants(indv, train);
     }
@@ -63,8 +63,8 @@ void FitnessMetric::optimize_constants(AcyclicGraph &indv, TrainingData &train) 
     functor.m = functor.train->size();
     functor.n = indv.count_constants();
     functor.agraphIndv = indv;
-    Eigen::VectorXf vec = Eigen::VectorXf::Random(functor.n);
-    Eigen::LevenbergMarquardt<LMFunctor, float> lm(functor);
+    Eigen::VectorXd vec = Eigen::VectorXd::Random(functor.n);
+    Eigen::LevenbergMarquardt<LMFunctor, double> lm(functor);
     lm.minimize(vec);
     indv.set_constants(vec);
 }

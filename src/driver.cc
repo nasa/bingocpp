@@ -32,7 +32,7 @@ int test_eig() {
 void TestAcyclicGraph(int num_loops, int num_evals) {
   Eigen::ArrayX3d stack(12, 3);
   Eigen::ArrayXXd x(60, 3);
-  Eigen::VectorXf constants;
+  Eigen::VectorXd constants;
   // y = x_0 * ( C_0 + C_1/x_1 ) - x_0
   stack << 0, 0, 0,
            0, 1, 1,

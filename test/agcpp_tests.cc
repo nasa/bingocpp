@@ -44,7 +44,7 @@ class AgcppTest : public::testing::Test {
               3, 8, 0;
     x << 1., 4., 7., 2., 5., 8., 3., 6., 9.;
     indv.stack = stack2;
-    Eigen::VectorXf temp_con(2);
+    Eigen::VectorXd temp_con(2);
     temp_con << 3.14, 10.0;
     indv.set_constants(temp_con); 
   }
@@ -82,7 +82,7 @@ class AgcppManipTest : public::testing::Test {
              3, 8, 0;
     x << 1., 4., 7., 2., 5., 8., 3., 6., 9.;
     indv.stack = stack;
-    Eigen::VectorXf temp_con(2);
+    Eigen::VectorXd temp_con(2);
     temp_con << 3.14, 10.0;
     indv.set_constants(temp_con); 
   }
@@ -117,7 +117,7 @@ TEST_F(AgcppTest, needs_optimization) {
 }
 
 TEST_F(AgcppTest, set_constants) {
-    Eigen::VectorXf con(2);
+    Eigen::VectorXd con(2);
     con << 12.0, 5.0;
     indv.set_constants(con);
     for (int i = 0; i < 2; ++i) {
@@ -240,7 +240,7 @@ TEST_F(AgcppManipTest, crossover) {
               4, 5, 6,
               3, 7, 6,
               3, 8, 0;
-    Eigen::VectorXf temp_con(2);
+    Eigen::VectorXd temp_con(2);
     temp_con << 3.14, 10.0;
     indv.set_constants(temp_con); 
     indv2.stack = stack3;

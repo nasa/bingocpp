@@ -40,7 +40,7 @@ void ReverseSingleCommand(const Eigen::ArrayX3d &stack,
 
 Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3d & stack,
                          const Eigen::ArrayXXd &x,
-                         const Eigen::VectorXf &constants) {
+                         const Eigen::VectorXd &constants) {
   // Evaluates a stack at the given x using the given constants.
   std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
 
@@ -56,7 +56,7 @@ Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3d & stack,
 
 Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3d & stack,
                                     const Eigen::ArrayXXd & x,
-                                    const Eigen::VectorXf &constants) {
+                                    const Eigen::VectorXd &constants) {
   // Evaluates a stack, but only the commands that are utilized.
   std::vector<bool> mask = FindUsedCommands(stack);
   return EvaluateWithMask(stack, x, constants, mask);
@@ -66,7 +66,7 @@ Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3d & stack,
 
 Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3d & stack,
                                  const Eigen::ArrayXXd & x,
-                                 const Eigen::VectorXf &constants,
+                                 const Eigen::VectorXd &constants,
                                  const std::vector<bool> &mask) {
   // Evaluates a stack at the given x using the given constants.
   std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
@@ -86,7 +86,7 @@ Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3d & stack,
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
   const Eigen::ArrayX3d &stack,
   const Eigen::ArrayXXd &x,
-  const Eigen::VectorXf &constants) {
+  const Eigen::VectorXd &constants) {
   // Evaluates a stack and its derivative with the given x and constants.
   std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
   std::vector<std::set<int>> x_dependencies(x.cols(), std::set<int>());
@@ -134,7 +134,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
   const Eigen::ArrayX3d &stack,
   const Eigen::ArrayXXd &x,
-  const Eigen::VectorXf &constants) {
+  const Eigen::VectorXd &constants) {
   // Evaluates a stack and its derivative, but only the utilized commands.
   std::vector<bool> mask = FindUsedCommands(stack);
   return EvaluateWithDerivativeAndMask(stack, x, constants, mask);
@@ -145,7 +145,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
   const Eigen::ArrayX3d &stack,
   const Eigen::ArrayXXd &x,
-  const Eigen::VectorXf &constants,
+  const Eigen::VectorXd &constants,
   const std::vector<bool> &mask) {
   // Evaluates a stack and its derivative with the given x and constants.
   std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());

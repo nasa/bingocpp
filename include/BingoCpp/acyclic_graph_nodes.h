@@ -36,7 +36,7 @@ typedef Eigen::Ref<Eigen::ArrayXXd,
  *  \fn virtual std::string get_print()
  *  \fn void evaluate(const Eigen::ArrayX3d &stack,
  *                               const Eigen::ArrayXXd &x,
- *                               const Eigen::VectorXf &constants,
+ *                               const Eigen::VectorXd &constants,
  *                               std::vector<Eigen::ArrayXXd> &buffer,
  *                               std::size_t result_location)
  *  \fn virtual void deriv_evaluate(Eigen::ArrayX3d &stack,
@@ -57,13 +57,13 @@ class Operation {
    *
    *  \param[in] stack The stack that contains each command. Eigen::ArrayX3d
    *  \param[in] x Input variables to the acyclic graph. Eigen::ArrayXXd
-   *  \param[in] constants Constants used in the command. Eigen::VectorXf
+   *  \param[in] constants Constants used in the command. Eigen::VectorXd
    *  \param[in/out] buffer Vector of Eigen arrays for the buffer.
    *  \param[in] result_location location of single command.
    */
   virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const Eigen::VectorXf &constants,
+                        const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location) = 0;
 
@@ -100,7 +100,7 @@ class X_Load: public Operation {
   }
   virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const Eigen::VectorXf &constants,
+                        const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
   virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
@@ -125,7 +125,7 @@ class C_Load: public Operation {
   }
   virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const Eigen::VectorXf &constants,
+                        const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
   virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
@@ -150,7 +150,7 @@ class Addition: public Operation {
   }
   virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const Eigen::VectorXf &constants,
+                        const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
   virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
@@ -175,7 +175,7 @@ class Subtraction: public Operation {
   }
   virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const Eigen::VectorXf &constants,
+                        const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
   virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
@@ -200,7 +200,7 @@ class Multiplication: public Operation {
   }
   virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const Eigen::VectorXf &constants,
+                        const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
   virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
@@ -225,7 +225,7 @@ class Division: public Operation {
   }
   virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const Eigen::VectorXf &constants,
+                        const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
   virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
@@ -250,7 +250,7 @@ class Sin: public Operation {
   }
   virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const Eigen::VectorXf &constants,
+                        const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
   virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
@@ -275,7 +275,7 @@ class Cos: public Operation {
   }
   virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const Eigen::VectorXf &constants,
+                        const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
   virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
@@ -300,7 +300,7 @@ class Exp: public Operation {
   }
   virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const Eigen::VectorXf &constants,
+                        const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
   virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
@@ -325,7 +325,7 @@ class Log: public Operation {
   }
   virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const Eigen::VectorXf &constants,
+                        const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
   virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
@@ -350,7 +350,7 @@ class Power: public Operation {
   }
   virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const Eigen::VectorXf &constants,
+                        const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
   virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
@@ -375,7 +375,7 @@ class Absolute: public Operation {
   }
   virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const Eigen::VectorXf &constants,
+                        const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
   virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,
@@ -400,7 +400,7 @@ class Sqrt: public Operation {
   }
   virtual void evaluate(const Eigen::ArrayX3d &stack,
                         const Eigen::ArrayXXd &x,
-                        const Eigen::VectorXf &constants,
+                        const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
                         std::size_t result_location);
   virtual void deriv_evaluate(const Eigen::ArrayX3d &stack,

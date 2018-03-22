@@ -13,6 +13,7 @@
 #include "BingoCpp/acyclic_graph.h"
 #include "graph_manip.cc"
 #include "fitness_metric.cc"
+#include "training_data.cc"
 
 double add(double i, double j) {
   return i + j;
@@ -63,26 +64,26 @@ PYBIND11_MODULE(bingocpp, m) {
     .def("mutate_terminal_param", &AcyclicGraphManipulator::rand_operator_type)
     .def("rand_terminal", &AcyclicGraphManipulator::rand_operator); 
 
-  py::class_<FitnessMetric>(m, "FitnessMetric")
-    //  .def(py::init<>())
-     .def("evaluate_fitness", &FitnessMetric::evaluate_fitness)
-     .def("optimize_constants", &FitnessMetric::optimize_constants);
+  // py::class_<FitnessMetric>(m, "FitnessMetric")
+  //   //  .def(py::init<>())
+  //    .def("evaluate_fitness", &FitnessMetric::evaluate_fitness)
+  //    .def("optimize_constants", &FitnessMetric::optimize_constants);
 
-  py::class_<StandardRegression, FitnessMetric>(m, "StandardRegression")
-     .def(py::init<>())
-     .def("evaluate_fitness_vector", &StandardRegression::evaluate_fitness_vector);
+  // py::class_<StandardRegression, FitnessMetric>(m, "StandardRegression")
+  //    .def(py::init<>())
+  //    .def("evaluate_fitness_vector", &StandardRegression::evaluate_fitness_vector);
 
-  py::class_<TrainingData>(m, "TrainingData");
+  // py::class_<TrainingData>(m, "TrainingData");
 
-  py::class_<ExplicitTrainingData, TrainingData>(m, "ExplicitTrainingData")
-     .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
-     .def("get_item", &ExplicitTrainingData::get_item)
-     .def("size", &ExplicitTrainingData::size);
+  // py::class_<ExplicitTrainingData, TrainingData>(m, "ExplicitTrainingData")
+  //    .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
+  //    .def("get_item", &ExplicitTrainingData::get_item)
+  //    .def("size", &ExplicitTrainingData::size);
 
-  py::class_<ImplicitTrainingData, TrainingData>(m, "ImplicitTrainingData")
-     .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
-     .def("get_item", &ImplicitTrainingData::get_item)
-     .def("size", &ImplicitTrainingData::size);    
+  // py::class_<ImplicitTrainingData, TrainingData>(m, "ImplicitTrainingData")
+  //    .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
+  //    .def("get_item", &ImplicitTrainingData::get_item)
+  //    .def("size", &ImplicitTrainingData::size);    
 }
 
 
