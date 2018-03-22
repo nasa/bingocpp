@@ -33,9 +33,9 @@ struct LMFunctor {
     //! int n
     /*! Number of parameters, i.e. inputs */
     int n;
-    //! AGraphCpp indv
+    //! AcyclicGraph indv
     /*! The Agraph individual */
-    AGraphCpp agraphIndv;
+    AcyclicGraph agraphIndv;
     //! TrainingData* train
     /*! object that holds data needed */
     TrainingData* train;
@@ -75,9 +75,9 @@ struct LMFunctor {
  *
  *  \note FitnessMetric includes : StandardRegression 
  *
- *  \fn virtual Eigen::ArrayXXd evaluate_fitness_vector(AGraphCpp &indv, TrainingData &train) = 0
- *  \fn float evaluate_fitness(AGraphCpp &indv, TrainingData &train)
- *  \fn void optimize_constants(AGraphCpp &indv, TrainingData &train)
+ *  \fn virtual Eigen::ArrayXXd evaluate_fitness_vector(AcyclicGraph &indv, TrainingData &train) = 0
+ *  \fn float evaluate_fitness(AcyclicGraph &indv, TrainingData &train)
+ *  \fn void optimize_constants(AcyclicGraph &indv, TrainingData &train)
  */
 struct FitnessMetric {
     public:
@@ -87,24 +87,24 @@ struct FitnessMetric {
     *  \note Each implementation will need to hard code casting TrainingData
     *        to a specific type in this function.
     *
-    *  \param[in] indv agcpp indv to be evaluated. AGraphCpp
+    *  \param[in] indv agcpp indv to be evaluated. AcyclicGraph
     *  \param[in] train The TrainingData to evaluate the fitness. TrainingData
     *  \return Eigen::ArrayXXd the fitness vector
     */
-    virtual Eigen::ArrayXXd evaluate_fitness_vector(AGraphCpp &indv, TrainingData &train) = 0;
+    virtual Eigen::ArrayXXd evaluate_fitness_vector(AcyclicGraph &indv, TrainingData &train) = 0;
     /*! \brief Finds the fitness metric
     *
-    *  \param[in] indv agcpp indv to be evaluated. AGraphCpp
+    *  \param[in] indv agcpp indv to be evaluated. AcyclicGraph
     *  \param[in] train The TrainingData to evaluate the fitness. TrainingData
     *  \return float the fitness metric
     */
-    float evaluate_fitness(AGraphCpp &indv, TrainingData &train);
+    float evaluate_fitness(AcyclicGraph &indv, TrainingData &train);
     /*! \brief perform levenberg-marquardt optimization on embedded constants
     *
-    *  \param[in] indv agcpp indv to be evaluated. AGraphCpp
+    *  \param[in] indv agcpp indv to be evaluated. AcyclicGraph
     *  \param[in] train The TrainingData used by fitness metric. TrainingData
     */
-    void optimize_constants(AGraphCpp &indv, TrainingData &train);    
+    void optimize_constants(AcyclicGraph &indv, TrainingData &train);    
 };
 
 /*! \struct StandardRegression
@@ -113,7 +113,7 @@ struct FitnessMetric {
 struct StandardRegression : FitnessMetric {
     public:
     StandardRegression() : FitnessMetric() {}
-    Eigen::ArrayXXd evaluate_fitness_vector(AGraphCpp &indv, TrainingData &train);
+    Eigen::ArrayXXd evaluate_fitness_vector(AcyclicGraph &indv, TrainingData &train);
 };
 
 /*! \struct ImplicitRegression
@@ -122,7 +122,7 @@ struct StandardRegression : FitnessMetric {
 // struct ImplicitRegression : FitnessMetric {
 //     public:
 //     ImplicitRegression() : FitnessMetric() {}
-//     Eigen::ArrayXXd evaluate_fitness_vector(AGraphCpp &indv, TrainingData &train);
+//     Eigen::ArrayXXd evaluate_fitness_vector(AcyclicGraph &indv, TrainingData &train);
 // };
 
 #endif

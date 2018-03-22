@@ -20,7 +20,7 @@
 
 TEST(FitnessTest, optimize_constants) {
     StandardRegression sr;
-    AGraphCpp indv;
+    AcyclicGraph indv;
     Eigen::ArrayX3d stack2(12, 3);
     Eigen::ArrayXXd x(3, 3);
     stack2 << 0, 0, 0,
@@ -55,7 +55,7 @@ TEST(FitnessTest, optimize_constants) {
 
 TEST(FitnessTest, evaluate_fitness_vector) {
     StandardRegression sr;
-    AGraphCpp indv;
+    AcyclicGraph indv;
     Eigen::ArrayX3d stack2(12, 3);
     Eigen::ArrayXXd x(3, 3);
     stack2 << 0, 0, 0,
@@ -89,7 +89,7 @@ TEST(FitnessTest, evaluate_fitness_vector) {
 
 TEST(FitnessTest, evaluate_fitness) {
     StandardRegression sr;
-    AGraphCpp indv;
+    AcyclicGraph indv;
     Eigen::ArrayX3d stack2(12, 3);
     Eigen::ArrayXXd x(3, 3);
     stack2 << 0, 0, 0,

@@ -16,17 +16,17 @@
 
 
 
-AGraphCpp::AGraphCpp() {
+AcyclicGraph::AcyclicGraph() {
     stack = Eigen::ArrayX3d(0, 3);
     constants = Eigen::VectorXf(0);
 }
 
-AGraphCpp::AGraphCpp(const AGraphCpp &ag) {
+AcyclicGraph::AcyclicGraph(const AcyclicGraph &ag) {
     stack = ag.stack;
     constants = ag.constants;
 }
 
-bool AGraphCpp::needs_optimization() {
+bool AcyclicGraph::needs_optimization() {
     std::set<int> util = utilized_commands();
     std::set<int>::iterator it;
     for (it = util.begin(); it != util.end(); ++it) {
@@ -37,11 +37,11 @@ bool AGraphCpp::needs_optimization() {
     return false;
 }
 
-void AGraphCpp::set_constants(Eigen::VectorXf con) {
+void AcyclicGraph::set_constants(Eigen::VectorXf con) {
     constants = con;
 }
 
-int AGraphCpp::count_constants() {
+int AcyclicGraph::count_constants() {
     std::set<int> util = utilized_commands();
     std::set<int>::iterator it;
     int const_num = 0;
@@ -55,15 +55,15 @@ int AGraphCpp::count_constants() {
     return const_num;  
 }
 
-Eigen::ArrayXXd AGraphCpp::evaluate(Eigen::ArrayXXd &eval_x) {
+Eigen::ArrayXXd AcyclicGraph::evaluate(Eigen::ArrayXXd &eval_x) {
     return SimplifyAndEvaluate(stack, eval_x, constants);
 }
 
-std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> AGraphCpp::evaluate_deriv(Eigen::ArrayXXd &eval_x) {
+std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> AcyclicGraph::evaluate_deriv(Eigen::ArrayXXd &eval_x) {
     return SimplifyAndEvaluateWithDerivative(stack, eval_x, constants);
 }
 
-std::string AGraphCpp::latexstring() {
+std::string AcyclicGraph::latexstring() {
     std::set<int> util = utilized_commands();
     std::set<int>::iterator it = util.begin();
     std::vector<std::string> strings;
@@ -114,7 +114,7 @@ std::string AGraphCpp::latexstring() {
     return strings.back();
 }
 
-std::set<int> AGraphCpp::utilized_commands() {
+std::set<int> AcyclicGraph::utilized_commands() {
     std::set<int> util;
     util.insert(stack.rows() - 1);
     for (int i = stack.rows() - 1; i >= 0; --i) {
@@ -127,11 +127,11 @@ std::set<int> AGraphCpp::utilized_commands() {
     return util;
 }
 
-int AGraphCpp::complexity() {
+int AcyclicGraph::complexity() {
     return utilized_commands().size();
 }
 
-std::string AGraphCpp::print_stack() {
+std::string AcyclicGraph::print_stack() {
     std::ostringstream out;
     out << "---full stack---\n";
     for (int i = 0; i < stack.rows(); ++i) {
@@ -179,7 +179,7 @@ std::string AGraphCpp::print_stack() {
     return out.str();
 }
 
-AGraphCppManipulator::AGraphCppManipulator(int nvars, int ag_size, int nloads,
+AcyclicGraphManipulator::AcyclicGraphManipulator(int nvars, int ag_size, int nloads,
                                            float float_lim, float terminal_prob) {
   this->nvars = nvars;
   this->ag_size = ag_size;
@@ -193,7 +193,7 @@ AGraphCppManipulator::AGraphCppManipulator(int nvars, int ag_size, int nloads,
       term_vec.push_back(0);
 }
 
-void AGraphCppManipulator::add_node_type(int node_type) {
+void AcyclicGraphManipulator::add_node_type(int node_type) {
   bool exists = false;
   for (int i = 0; i < node_type_vec.size(); ++i) {
       if (node_type == node_type_vec[i])
@@ -208,8 +208,8 @@ void AGraphCppManipulator::add_node_type(int node_type) {
   }
 }
 
-AGraphCpp AGraphCppManipulator::generate() {
-  AGraphCpp indv = AGraphCpp();
+AcyclicGraph AcyclicGraphManipulator::generate() {
+  AcyclicGraph indv = AcyclicGraph();
   Eigen::ArrayX3d array(ag_size, 3);
   
   for (int i = 0; i < ag_size; ++i) {
@@ -231,12 +231,12 @@ AGraphCpp AGraphCppManipulator::generate() {
   return indv;
 }
 
-std::vector<AGraphCpp> AGraphCppManipulator::crossover(AGraphCpp &parent1, AGraphCpp &parent2) {
+std::vector<AcyclicGraph> AcyclicGraphManipulator::crossover(AcyclicGraph &parent1, AcyclicGraph &parent2) {
   int c_point = rand() % ag_size;
-  std::vector<AGraphCpp> temp;
+  std::vector<AcyclicGraph> temp;
   
-  AGraphCpp c1 = AGraphCpp(parent1);
-  AGraphCpp c2 = AGraphCpp(parent2);
+  AcyclicGraph c1 = AcyclicGraph(parent1);
+  AcyclicGraph c2 = AcyclicGraph(parent2);
   c1.stack(c_point, 0) = parent2.stack(c_point, 0);
   c1.stack(c_point, 1) = parent2.stack(c_point, 1);
   c1.stack(c_point, 2) = parent2.stack(c_point, 2);
@@ -249,7 +249,7 @@ std::vector<AGraphCpp> AGraphCppManipulator::crossover(AGraphCpp &parent1, AGrap
   return temp;
 }
 
-void AGraphCppManipulator::mutation(AGraphCpp &indv) {
+void AcyclicGraphManipulator::mutation(AcyclicGraph &indv) {
     
   std::set<int> util = indv.utilized_commands();
   int loc = rand() % util.size();
@@ -328,11 +328,11 @@ void AGraphCppManipulator::mutation(AGraphCpp &indv) {
   }  
 }
 
-int AGraphCppManipulator::distance(AGraphCpp &indv1, AGraphCpp &indv2) {
+int AcyclicGraphManipulator::distance(AcyclicGraph &indv1, AcyclicGraph &indv2) {
   return (indv1.stack - indv2.stack).sum();
 }
 
-std::vector<int> AGraphCppManipulator::rand_operator_params(int arity, int stack_location) {
+std::vector<int> AcyclicGraphManipulator::rand_operator_params(int arity, int stack_location) {
   std::vector<int> temp;
   if (stack_location > 1) {
     for (int i = 0; i < arity; ++i)
@@ -345,11 +345,11 @@ std::vector<int> AGraphCppManipulator::rand_operator_params(int arity, int stack
   return temp;
 }
 
-int AGraphCppManipulator::rand_operator_type() {
+int AcyclicGraphManipulator::rand_operator_type() {
   return node_type_vec[rand() % op_vec.size() + 2];
 }
 
-std::vector<int> AGraphCppManipulator::rand_operator(int stack_location) {
+std::vector<int> AcyclicGraphManipulator::rand_operator(int stack_location) {
   std::vector<int> temp;
   int node_type = rand_operator_type();
   std::vector<int> temp2 = rand_operator_params(2, stack_location);
@@ -359,21 +359,21 @@ std::vector<int> AGraphCppManipulator::rand_operator(int stack_location) {
   return temp;
 }
 
-int AGraphCppManipulator::rand_terminal_param(int terminal) {
+int AcyclicGraphManipulator::rand_terminal_param(int terminal) {
   if (terminal == 0)
       return (rand() % nvars);
   else
       return -1;
 }
 
-int AGraphCppManipulator::mutate_terminal_param(int terminal) {
+int AcyclicGraphManipulator::mutate_terminal_param(int terminal) {
   if (terminal == 0)
       return (rand() % nvars);
   else
       return -1;
 }
 
-std::vector<int> AGraphCppManipulator::rand_terminal() {
+std::vector<int> AcyclicGraphManipulator::rand_terminal() {
   std::vector<int> temp;
   int node = node_type_vec[rand() % term_vec.size()];
   int param = rand_terminal_param(node);

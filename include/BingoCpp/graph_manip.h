@@ -25,7 +25,7 @@
 
 #include "BingoCpp/acyclic_graph_nodes.h"
 
-/*! \class AGraphCpp
+/*! \class AcyclicGraph
  *
  *  Acyclic Graph representation of an equation.
  *
@@ -42,7 +42,7 @@
  *  \fn int complexity()
  *  \fn std::string print_stack()
  */
-class AGraphCpp {
+class AcyclicGraph {
   public:
     //! Eigen::ArrayX3d stack
     /*! stack representation of equation */
@@ -55,9 +55,9 @@ class AGraphCpp {
     OperatorInterface oper_interface;
 
     //! \brief Default constructor
-    AGraphCpp();
+    AcyclicGraph();
     //! \brief Copy constructor
-    AGraphCpp(const AGraphCpp &ag);
+    AcyclicGraph(const AcyclicGraph &ag);
     /*! \brief find out whether constants need optimization
      *
      *  \return true if stack needs optimization
@@ -107,15 +107,15 @@ class AGraphCpp {
     std::string print_stack();
 };
 
-/*! \class AGraphCppManipulator
+/*! \class AcyclicGraphManipulator
  *
  *  Manipulates AGraph objects for generation, crossover, mutation, and distance
  *
  *  \fn void add_node_type(int node_type)
- *  \fn AGraphCpp generate()
- *  \fn std::vector<AGraphCpp> crossover(AGraphCpp &parent1, AGraphCpp &parent2)
- *  \fn void mutation(AGraphCpp &indv)
- *  \fn int distance(AGraphCpp &indv1, AGraphCpp &indv2)
+ *  \fn AcyclicGraph generate()
+ *  \fn std::vector<AcyclicGraph> crossover(AcyclicGraph &parent1, AcyclicGraph &parent2)
+ *  \fn void mutation(AcyclicGraph &indv)
+ *  \fn int distance(AcyclicGraph &indv1, AcyclicGraph &indv2)
  *  \fn std::vector<int> rand_operator_params(int arity, int stack_location)
  *  \fn int rand_operator_type()
  *  \fn std::vector<int> rand_operator(int stack_location)
@@ -123,7 +123,7 @@ class AGraphCpp {
  *  \fn int mutate_terminal_param(int terminal)
  *  \fn std::vector<int> rand_terminal()
  */
-class AGraphCppManipulator {
+class AcyclicGraphManipulator {
   public:
     //! int nvars
     /*! number of variables */
@@ -151,7 +151,7 @@ class AGraphCppManipulator {
     std::vector<int> term_vec;
 
     //! \brief Constructor
-    AGraphCppManipulator(int nvars = 3, int ag_size = 15, int nloads = 1,
+    AcyclicGraphManipulator(int nvars = 3, int ag_size = 15, int nloads = 1,
                          float float_lim = 10.0, float terminal_prob = 0.1);
     /*! \brief Add a type of node to the set of allowed types
      *
@@ -161,28 +161,28 @@ class AGraphCppManipulator {
     /*! \brief Generates random individual. Fills stack based on random
      *         nodes/terminals and random parameters
      *
-     *  \returns new AGraphCpp individual
+     *  \returns new AcyclicGraph individual
      */
-    AGraphCpp generate();
+    AcyclicGraph generate();
     /*! \brief Single point crossover
      *
-     *  \param[in] parent1 the first parent. AGraphCpp
-     *  \param[in] parent2 the second parent. AGraphCpp
-     *  \return vector with two AGraphCpp children (new copies)
+     *  \param[in] parent1 the first parent. AcyclicGraph
+     *  \param[in] parent2 the second parent. AcyclicGraph
+     *  \return vector with two AcyclicGraph children (new copies)
      */
-    std::vector<AGraphCpp> crossover(AGraphCpp &parent1, AGraphCpp &parent2);
+    std::vector<AcyclicGraph> crossover(AcyclicGraph &parent1, AcyclicGraph &parent2);
     /*! \brief performs 1pt mutation, does not create copy of individual
      *
-     *  \param[in] indv The individual to be mutated. AGraphCpp
+     *  \param[in] indv The individual to be mutated. AcyclicGraph
      */
-    void mutation(AGraphCpp &indv);
+    void mutation(AcyclicGraph &indv);
     /*! \brief Computes the distance (a measure of similarity) between two individuals
      *
-     *  \param[in] indv1 first individual. AGraphCpp
-     *  \param[in] indv2 second individual. AGraphCpp
+     *  \param[in] indv1 first individual. AcyclicGraph
+     *  \param[in] indv2 second individual. AcyclicGraph
      *  \return int the distance
      */
-    int distance(AGraphCpp &indv1, AGraphCpp &indv2);
+    int distance(AcyclicGraph &indv1, AcyclicGraph &indv2);
     /*! \brief Produces random ints for use as operator parameters
      *
      *  \param[in] arity the number of parameters needed. int

@@ -5,7 +5,7 @@
  * \date
  *
  * This file contains the unit tests for the functions associated with the
- * agraphcpp and agraphcppmanipulator class.
+ * AcyclicGraph and AcyclicGraphmanipulator class.
  */
 
 #include <stdio.h>
@@ -21,7 +21,7 @@
 
 class AgcppTest : public::testing::Test {
  public:
-  AGraphCpp indv;
+  AcyclicGraph indv;
   Eigen::ArrayX3d stack2;
   Eigen::ArrayXXd x;
 
@@ -29,7 +29,7 @@ class AgcppTest : public::testing::Test {
   }
 
   void SetUp() {
-    indv = AGraphCpp();
+    indv = AcyclicGraph();
     stack2 << 0, 0, 0,
               0, 1, 1,
               1, 0, 0,
@@ -60,14 +60,14 @@ class AgcppManipTest : public::testing::Test {
   AgcppManipTest() {}
   virtual ~AgcppManipTest() {}
 
-  AGraphCpp indv;
-  AGraphCppManipulator manip;
+  AcyclicGraph indv;
+  AcyclicGraphManipulator manip;
 
   void SetUp() {
-    manip = AGraphCppManipulator(3, 12, 1);
+    manip = AcyclicGraphManipulator(3, 12, 1);
     Eigen::ArrayX3d stack(12, 3);
     Eigen::ArrayXXd x(3, 3);
-    indv = AGraphCpp();
+    indv = AcyclicGraph();
     stack << 0, 0, 0,
              0, 1, 1,
              1, 0, 0,
@@ -103,7 +103,7 @@ TEST_F(AgcppTest, utilized_commands) {
 }
 
 TEST_F(AgcppTest, copy) {
-  AGraphCpp indv2 = AGraphCpp(indv);
+  AcyclicGraph indv2 = AcyclicGraph(indv);
 
   for (size_t i = 0; i < indv.stack.rows(); ++i) {
     ASSERT_DOUBLE_EQ(indv.stack(i, 0), indv2.stack(i, 0));
@@ -213,7 +213,7 @@ TEST_F(AgcppManipTest, generate) {
     manip.add_node_type(3);
     manip.add_node_type(4);
     manip.add_node_type(5);
-    AGraphCpp indv2 = manip.generate();
+    AcyclicGraph indv2 = manip.generate();
     ASSERT_DOUBLE_EQ(indv2.stack.rows(), 12);
 }
 
@@ -224,7 +224,7 @@ TEST_F(AgcppManipTest, crossover) {
     manip.add_node_type(4);
     manip.add_node_type(5);
 
-    AGraphCpp indv2 = AGraphCpp();
+    AcyclicGraph indv2 = AcyclicGraph();
     Eigen::ArrayX3d stack3(14, 3);
     stack3 << 4, 4, 4,
               4, 4, 4,
@@ -244,9 +244,9 @@ TEST_F(AgcppManipTest, crossover) {
     temp_con << 3.14, 10.0;
     indv.set_constants(temp_con); 
     indv2.stack = stack3;
-    std::vector<AGraphCpp> children = manip.crossover(indv, indv2);
-    AGraphCpp c1 = children[0];
-    AGraphCpp c2 = children[1];
+    std::vector<AcyclicGraph> children = manip.crossover(indv, indv2);
+    AcyclicGraph c1 = children[0];
+    AcyclicGraph c2 = children[1];
     bool all_match = true;
     for (int i = 0; i < indv.stack.rows(); ++i) {
         if ((c1.stack(i + 2, 0) != c2.stack(i, 0)) ||
@@ -264,7 +264,7 @@ TEST_F(AgcppManipTest, mutation) {
     manip.add_node_type(4);
     manip.add_node_type(5);
 
-    AGraphCpp indv2 = AGraphCpp(indv);
+    AcyclicGraph indv2 = AcyclicGraph(indv);
     // for (int i = 0; i < 10; ++i)
     manip.mutation(indv2);
     bool all_match = true;
@@ -280,7 +280,7 @@ TEST_F(AgcppManipTest, mutation) {
 
 TEST_F(AgcppManipTest, distance) {
     SetUp();
-    AGraphCpp indv2 = AGraphCpp(indv);
+    AcyclicGraph indv2 = AcyclicGraph(indv);
     ASSERT_DOUBLE_EQ(manip.distance(indv, indv2), 0);
 }
 

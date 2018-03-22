@@ -49,14 +49,14 @@ int LMFunctor::df(const Eigen::VectorXf &x, Eigen::MatrixXf &fjac) {
     return 0;
 }
 
-float FitnessMetric::evaluate_fitness(AGraphCpp &indv, TrainingData &train) {
+float FitnessMetric::evaluate_fitness(AcyclicGraph &indv, TrainingData &train) {
     if (indv.needs_optimization()) {
         optimize_constants(indv, train);
     }
     return ((evaluate_fitness_vector(indv, train)).abs()).mean();
 }
 
-void FitnessMetric::optimize_constants(AGraphCpp &indv, TrainingData &train) {
+void FitnessMetric::optimize_constants(AcyclicGraph &indv, TrainingData &train) {
     LMFunctor functor;
     functor.train = &train;
     functor.fit = this;
@@ -69,7 +69,7 @@ void FitnessMetric::optimize_constants(AGraphCpp &indv, TrainingData &train) {
     indv.set_constants(vec);
 }
 
-Eigen::ArrayXXd StandardRegression::evaluate_fitness_vector(AGraphCpp &indv, TrainingData &train) {
+Eigen::ArrayXXd StandardRegression::evaluate_fitness_vector(AcyclicGraph &indv, TrainingData &train) {
     ExplicitTrainingData* temp = dynamic_cast<ExplicitTrainingData*>(&train);
     return (indv.evaluate(temp->x)) - temp->y;
 }

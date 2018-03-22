@@ -33,35 +33,35 @@ PYBIND11_MODULE(bingocpp, m) {
   
   m.def("rand_init", &rand_init);
   
-  py::class_<AGraphCpp>(m, "AGraphCpp")
+  py::class_<AcyclicGraph>(m, "AcyclicGraph")
     .def(py::init<>())
-    .def(py::init<AGraphCpp &>())
-    .def_readwrite("stack", &AGraphCpp::stack)
-    .def("needs_optimization", &AGraphCpp::needs_optimization)
-    .def("set_constants", &AGraphCpp::set_constants)
-    .def("count_constants", &AGraphCpp::count_constants)
-    .def("evaluate", &AGraphCpp::evaluate)
-    .def("evaluate_deriv", &AGraphCpp::evaluate_deriv)
-    .def("latexstring", &AGraphCpp::latexstring)
-    .def("utilized_commands", &AGraphCpp::utilized_commands)
-    .def("complexity", &AGraphCpp::complexity)
-    .def("__str__", &AGraphCpp::print_stack); 
+    .def(py::init<AcyclicGraph &>())
+    .def_readwrite("stack", &AcyclicGraph::stack)
+    .def("needs_optimization", &AcyclicGraph::needs_optimization)
+    .def("set_constants", &AcyclicGraph::set_constants)
+    .def("count_constants", &AcyclicGraph::count_constants)
+    .def("evaluate", &AcyclicGraph::evaluate)
+    .def("evaluate_deriv", &AcyclicGraph::evaluate_deriv)
+    .def("latexstring", &AcyclicGraph::latexstring)
+    .def("utilized_commands", &AcyclicGraph::utilized_commands)
+    .def("complexity", &AcyclicGraph::complexity)
+    .def("__str__", &AcyclicGraph::print_stack); 
             
-  py::class_<AGraphCppManipulator>(m, "AGraphCppManipulator")
+  py::class_<AcyclicGraphManipulator>(m, "AcyclicGraphManipulator")
     .def(py::init<int &, int &, int &, float &, float &>(), 
        py::arg("nvars")=3, py::arg("ag_size")=15, py::arg("nloads")=1, 
        py::arg("float_lim")=10.0, py::arg("terminal_prob")=0.1)
-    .def("add_node_type", &AGraphCppManipulator::add_node_type)
-    .def("generate", &AGraphCppManipulator::generate)
-    .def("crossover", &AGraphCppManipulator::crossover)
-    .def("mutation", &AGraphCppManipulator::mutation)
-    .def("distance", &AGraphCppManipulator::distance)
-    .def("rand_operator_params", &AGraphCppManipulator::rand_operator_params)
-    .def("rand_operator_type", &AGraphCppManipulator::rand_operator_type)
-    .def("rand_operator", &AGraphCppManipulator::rand_operator) 
-    .def("rand_terminal_param", &AGraphCppManipulator::rand_operator_params)
-    .def("mutate_terminal_param", &AGraphCppManipulator::rand_operator_type)
-    .def("rand_terminal", &AGraphCppManipulator::rand_operator); 
+    .def("add_node_type", &AcyclicGraphManipulator::add_node_type)
+    .def("generate", &AcyclicGraphManipulator::generate)
+    .def("crossover", &AcyclicGraphManipulator::crossover)
+    .def("mutation", &AcyclicGraphManipulator::mutation)
+    .def("distance", &AcyclicGraphManipulator::distance)
+    .def("rand_operator_params", &AcyclicGraphManipulator::rand_operator_params)
+    .def("rand_operator_type", &AcyclicGraphManipulator::rand_operator_type)
+    .def("rand_operator", &AcyclicGraphManipulator::rand_operator) 
+    .def("rand_terminal_param", &AcyclicGraphManipulator::rand_operator_params)
+    .def("mutate_terminal_param", &AcyclicGraphManipulator::rand_operator_type)
+    .def("rand_terminal", &AcyclicGraphManipulator::rand_operator); 
 
   py::class_<FitnessMetric>(m, "FitnessMetric")
     //  .def(py::init<>())
@@ -71,6 +71,18 @@ PYBIND11_MODULE(bingocpp, m) {
   py::class_<StandardRegression, FitnessMetric>(m, "StandardRegression")
      .def(py::init<>())
      .def("evaluate_fitness_vector", &StandardRegression::evaluate_fitness_vector);
+
+  py::class_<TrainingData>(m, "TrainingData");
+
+  py::class_<ExplicitTrainingData, TrainingData>(m, "ExplicitTrainingData")
+     .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
+     .def("get_item", &ExplicitTrainingData::get_item)
+     .def("size", &ExplicitTrainingData::size);
+
+  py::class_<ImplicitTrainingData, TrainingData>(m, "ImplicitTrainingData")
+     .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
+     .def("get_item", &ImplicitTrainingData::get_item)
+     .def("size", &ImplicitTrainingData::size);    
 }
 
 
