@@ -1,0 +1,128 @@
+/*!
+ * \file fitness_metric.h
+ *
+ * \author Ethan Adams
+ * \date 
+ *
+ * This file contains the cpp version of FitnessMetric.py
+ */
+
+#ifndef INCLUDE_BINGOCPP_FITNESS_METRIC_H_
+#define INCLUDE_BINGOCPP_FITNESS_METRIC_H_
+
+#include "BingoCpp/graph_manip.h"
+#include "BingoCpp/training_data.h"
+#include <Eigen/Dense>
+#include <Eigen/Core>
+
+struct FitnessMetric;
+
+/*! \struct LMFunctor
+ *
+ *  Used for Levenberg-Marquardt Optimization
+ *
+ *  \fn int operator()(const Eigen::VectorXf &x, Eigen::VectorXf &fvec)
+ *  \fn int df(const Eigen::VectorXf &x, Eigen::MatrixXf &fjac)
+ *  \fn int values() const
+ *  \fn int inputs() const
+ */
+struct LMFunctor {
+    //! int m
+    /*! Number of data points, i.e. values */
+    int m;
+    //! int n
+    /*! Number of parameters, i.e. inputs */
+    int n;
+    //! AGraphCpp indv
+    /*! The Agraph individual */
+    AGraphCpp agraphIndv;
+    //! TrainingData* train
+    /*! object that holds data needed */
+    TrainingData* train;
+    //! FitnessMetric* fit
+    /*! object that holds fitness metric */
+    FitnessMetric* fit;
+    /*! \brief Compute 'm' errors, one for each data point, for the given paramter values in 'x'
+     *
+     *  \param[in] x contains current estimates for parameters. Eigen::VectorXf (dimensions nx1)
+     *  \param[in] fvec contain error for each data point. Eigen::VectorXf (dimensions mx1)
+     *  \return 0
+     */
+    int operator()(const Eigen::VectorXf &x, Eigen::VectorXf &fvec);
+    /*! \brief Compute jacobian of the errors
+     *
+     *  \param[in] x contains current estimates for parameters. Eigen::VectorXf (dimensions nx1)
+     *  \param[in] fjac contain jacobian of the errors, calculated numerically. Eigen::MatrixXf (dimensions mxn)
+     *  \return 0
+     */
+    int df(const Eigen::VectorXf &x, Eigen::MatrixXf &fjac);
+    /*! \brief gets the values
+     *
+     *  \return m - values
+     */
+    int values() const { return m; }
+    /*! \brief gets the inputs
+     *
+     *  \return n - inputs
+     */
+    int inputs() const { return n; }
+
+};
+
+/*! \struct FitnessMetric
+ *
+ *  An abstract struct to evaluate metric based on type of regression
+ *
+ *  \note FitnessMetric includes : StandardRegression 
+ *
+ *  \fn virtual Eigen::ArrayXXd evaluate_fitness_vector(AGraphCpp &indv, TrainingData &train) = 0
+ *  \fn float evaluate_fitness(AGraphCpp &indv, TrainingData &train)
+ *  \fn void optimize_constants(AGraphCpp &indv, TrainingData &train)
+ */
+struct FitnessMetric {
+    public:
+    FitnessMetric() { }
+    /*! \brief f(x) - y where f is defined by indv and x, y are in train
+    *  
+    *  \note Each implementation will need to hard code casting TrainingData
+    *        to a specific type in this function.
+    *
+    *  \param[in] indv agcpp indv to be evaluated. AGraphCpp
+    *  \param[in] train The TrainingData to evaluate the fitness. TrainingData
+    *  \return Eigen::ArrayXXd the fitness vector
+    */
+    virtual Eigen::ArrayXXd evaluate_fitness_vector(AGraphCpp &indv, TrainingData &train) = 0;
+    /*! \brief Finds the fitness metric
+    *
+    *  \param[in] indv agcpp indv to be evaluated. AGraphCpp
+    *  \param[in] train The TrainingData to evaluate the fitness. TrainingData
+    *  \return float the fitness metric
+    */
+    float evaluate_fitness(AGraphCpp &indv, TrainingData &train);
+    /*! \brief perform levenberg-marquardt optimization on embedded constants
+    *
+    *  \param[in] indv agcpp indv to be evaluated. AGraphCpp
+    *  \param[in] train The TrainingData used by fitness metric. TrainingData
+    */
+    void optimize_constants(AGraphCpp &indv, TrainingData &train);    
+};
+
+/*! \struct StandardRegression
+ *  \brief Traditional fitness evaluation
+ */
+struct StandardRegression : FitnessMetric {
+    public:
+    StandardRegression() : FitnessMetric() {}
+    Eigen::ArrayXXd evaluate_fitness_vector(AGraphCpp &indv, TrainingData &train);
+};
+
+/*! \struct ImplicitRegression
+ *  \brief ImplicitRegression
+ */
+// struct ImplicitRegression : FitnessMetric {
+//     public:
+//     ImplicitRegression() : FitnessMetric() {}
+//     Eigen::ArrayXXd evaluate_fitness_vector(AGraphCpp &indv, TrainingData &train);
+// };
+
+#endif

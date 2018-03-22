@@ -20,25 +20,6 @@ double add(double i, double j) {
 
 namespace py = pybind11;
 
-// class PyFitnessMetric : public FitnessMetric {
-// public:
-//   using FitnessMetric::FitnessMetric;
-//   float evaluate_metric(AGraphCpp &indv, Eigen::ArrayXXd &eval_x, 
-//                                          Eigen::ArrayXXd &eval_y) override 
-//                        { PYBIND11_OVERLOAD(float, FitnessMetric,
-//                        evaluate_metric, indv, eval_x, eval_y);}
-// };
-
-// class PyStandardRegression : public StandardRegression {
-// public:
-//   using StandardRegression::StandardReression;
-//   float evaluate_metric(AGraphCpp &indv, Eigen::ArrayXXd &eval_x, 
-//                                          Eigen::ArrayXXd &eval_y) override 
-//                        { PYBIND11_OVERLOAD(float, FitnessMetric,
-//                        evaluate_metric, indv, eval_x, eval_y);}
-// };
-
-
 PYBIND11_MODULE(bingocpp, m) {
   m.doc() = "pybind11 example plugin";  // optional module docstring
   m.def("evaluate", &Evaluate, "evaluate");
@@ -83,12 +64,13 @@ PYBIND11_MODULE(bingocpp, m) {
     .def("rand_terminal", &AGraphCppManipulator::rand_operator); 
 
   py::class_<FitnessMetric>(m, "FitnessMetric")
-     .def(py::init<>())
-     .def("evaluate_metric", &FitnessMetric::evaluate_metric);
+    //  .def(py::init<>())
+     .def("evaluate_fitness", &FitnessMetric::evaluate_fitness)
+     .def("optimize_constants", &FitnessMetric::optimize_constants);
 
   py::class_<StandardRegression, FitnessMetric>(m, "StandardRegression")
      .def(py::init<>())
-     .def("evaluate_vector", &StandardRegression::evaluate_vector);
+     .def("evaluate_fitness_vector", &StandardRegression::evaluate_fitness_vector);
 }
 
 
