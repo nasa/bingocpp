@@ -217,6 +217,36 @@ TEST_F(AgcppManipTest, generate) {
     ASSERT_DOUBLE_EQ(indv2.stack.rows(), 12);
 }
 
+TEST_F(AgcppManipTest, dump) {
+    SetUp();
+    std::pair<Eigen::ArrayX3d, Eigen::VectorXd> truth(indv.stack, indv.constants);
+    std::pair<Eigen::ArrayX3d, Eigen::VectorXd> temp = manip.dump(indv);
+    
+    for (int i = 0; i < indv.stack.rows(); ++i) {
+        ASSERT_DOUBLE_EQ(indv.stack(i, 0), truth.first(i, 0));
+        ASSERT_DOUBLE_EQ(indv.stack(i, 1), truth.first(i, 1));
+        ASSERT_DOUBLE_EQ(indv.stack(i, 2), truth.first(i, 2));
+    }
+    for (int i = 0; i < indv.constants.size(); ++i) {
+        ASSERT_DOUBLE_EQ(indv.constants(i), truth.second(i));
+    }
+}
+
+TEST_F(AgcppManipTest, load) {
+    SetUp();
+    std::pair<Eigen::ArrayX3d, Eigen::VectorXd> temp_pair(indv.stack, indv.constants);
+    AcyclicGraph temp = manip.load(temp_pair);
+    
+    for (int i = 0; i < indv.stack.rows(); ++i) {
+        ASSERT_DOUBLE_EQ(indv.stack(i, 0), temp.stack(i, 0));
+        ASSERT_DOUBLE_EQ(indv.stack(i, 1), temp.stack(i, 1));
+        ASSERT_DOUBLE_EQ(indv.stack(i, 2), temp.stack(i, 2));
+    }
+    for (int i = 0; i < indv.constants.size(); ++i) {
+        ASSERT_DOUBLE_EQ(indv.constants(i), temp.constants(i));
+    }
+}
+
 TEST_F(AgcppManipTest, crossover) {
     SetUp();
     manip.add_node_type(2);

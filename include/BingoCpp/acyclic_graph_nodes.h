@@ -426,4 +426,5 @@ class OperatorInterface {
   static std::map<int, Operation*> operator_map;
   static std::map<int, Operation*> create_op_map();
 };
+
 #endif  // INCLUDE_BINGOCPP_ACYCLIC_GRAPH_NODES_H_

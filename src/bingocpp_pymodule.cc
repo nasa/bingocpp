@@ -38,6 +38,9 @@ PYBIND11_MODULE(bingocpp, m) {
     .def(py::init<>())
     .def(py::init<AcyclicGraph &>())
     .def_readwrite("stack", &AcyclicGraph::stack)
+    .def_readwrite("fitness", &AcyclicGraph::fitness)
+    .def_readwrite("fit_set", &AcyclicGraph::fit_set)
+    .def("copy", &AcyclicGraph::copy)
     .def("needs_optimization", &AcyclicGraph::needs_optimization)
     .def("set_constants", &AcyclicGraph::set_constants)
     .def("count_constants", &AcyclicGraph::count_constants)
@@ -54,6 +57,8 @@ PYBIND11_MODULE(bingocpp, m) {
        py::arg("float_lim")=10.0, py::arg("terminal_prob")=0.1)
     .def("add_node_type", &AcyclicGraphManipulator::add_node_type)
     .def("generate", &AcyclicGraphManipulator::generate)
+    .def("dump", &AcyclicGraphManipulator::dump)
+    .def("load", &AcyclicGraphManipulator::load)
     .def("crossover", &AcyclicGraphManipulator::crossover)
     .def("mutation", &AcyclicGraphManipulator::mutation)
     .def("distance", &AcyclicGraphManipulator::distance)
@@ -64,26 +69,26 @@ PYBIND11_MODULE(bingocpp, m) {
     .def("mutate_terminal_param", &AcyclicGraphManipulator::rand_operator_type)
     .def("rand_terminal", &AcyclicGraphManipulator::rand_operator); 
 
-  // py::class_<FitnessMetric>(m, "FitnessMetric")
-  //   //  .def(py::init<>())
-  //    .def("evaluate_fitness", &FitnessMetric::evaluate_fitness)
-  //    .def("optimize_constants", &FitnessMetric::optimize_constants);
+  py::class_<FitnessMetric>(m, "FitnessMetric")
+    //  .def(py::init<>())
+     .def("evaluate_fitness", &FitnessMetric::evaluate_fitness)
+     .def("optimize_constants", &FitnessMetric::optimize_constants);
 
-  // py::class_<StandardRegression, FitnessMetric>(m, "StandardRegression")
-  //    .def(py::init<>())
-  //    .def("evaluate_fitness_vector", &StandardRegression::evaluate_fitness_vector);
+  py::class_<StandardRegression, FitnessMetric>(m, "StandardRegression")
+     .def(py::init<>())
+     .def("evaluate_fitness_vector", &StandardRegression::evaluate_fitness_vector);
 
-  // py::class_<TrainingData>(m, "TrainingData");
+  py::class_<TrainingData>(m, "TrainingData");
 
-  // py::class_<ExplicitTrainingData, TrainingData>(m, "ExplicitTrainingData")
-  //    .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
-  //    .def("get_item", &ExplicitTrainingData::get_item)
-  //    .def("size", &ExplicitTrainingData::size);
+  py::class_<ExplicitTrainingData, TrainingData>(m, "ExplicitTrainingData")
+     .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
+     .def("__getitem__", &ExplicitTrainingData::get_item)
+     .def("size", &ExplicitTrainingData::size);
 
-  // py::class_<ImplicitTrainingData, TrainingData>(m, "ImplicitTrainingData")
-  //    .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
-  //    .def("get_item", &ImplicitTrainingData::get_item)
-  //    .def("size", &ImplicitTrainingData::size);    
+  py::class_<ImplicitTrainingData, TrainingData>(m, "ImplicitTrainingData")
+     .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
+     .def("__getitem__", &ImplicitTrainingData::get_item)
+     .def("size", &ImplicitTrainingData::size);    
 }
 
 

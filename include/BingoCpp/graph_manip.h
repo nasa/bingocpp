@@ -25,6 +25,8 @@
 
 #include "BingoCpp/acyclic_graph_nodes.h"
 
+
+
 /*! \class AcyclicGraph
  *
  *  Acyclic Graph representation of an equation.
@@ -53,11 +55,19 @@ class AcyclicGraph {
     //! OperatorInterface oper_interface
     /*! map that holds operators with arity / strings */
     OperatorInterface oper_interface;
+    //! double fitness
+    /*! holds fitness for individual */
+    std::vector<double> fitness;
+    //! bool fit_set
+    /*! if the fitness is set */
+    bool fit_set;
 
     //! \brief Default constructor
     AcyclicGraph();
     //! \brief Copy constructor
     AcyclicGraph(const AcyclicGraph &ag);
+    //! \brief Copies self (for pybind)
+    AcyclicGraph copy();
     /*! \brief find out whether constants need optimization
      *
      *  \return true if stack needs optimization
@@ -164,6 +174,16 @@ class AcyclicGraphManipulator {
      *  \returns new AcyclicGraph individual
      */
     AcyclicGraph generate();
+    /*! \brief takes the stack and constants into one object
+     *
+     *  \returns pair with the stack and constants
+     */
+    std::pair<Eigen::ArrayX3d, Eigen::VectorXd> dump(AcyclicGraph &indv);
+    /*! \brief loads a new AcyclicGraph with the stack and constants
+     *
+     *  \returns AcyclicGraph with the stack and constants
+     */
+    AcyclicGraph load(std::pair<Eigen::ArrayX3d, Eigen::VectorXd> indv_list);
     /*! \brief Single point crossover
      *
      *  \param[in] parent1 the first parent. AcyclicGraph
@@ -175,7 +195,7 @@ class AcyclicGraphManipulator {
      *
      *  \param[in] indv The individual to be mutated. AcyclicGraph
      */
-    void mutation(AcyclicGraph &indv);
+    AcyclicGraph mutation(AcyclicGraph &indv);
     /*! \brief Computes the distance (a measure of similarity) between two individuals
      *
      *  \param[in] indv1 first individual. AcyclicGraph

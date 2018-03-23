@@ -19,11 +19,24 @@
 AcyclicGraph::AcyclicGraph() {
     stack = Eigen::ArrayX3d(0, 3);
     constants = Eigen::VectorXd(0);
+    fitness = std::vector<double>();
+    fit_set = false;
 }
 
 AcyclicGraph::AcyclicGraph(const AcyclicGraph &ag) {
     stack = ag.stack;
     constants = ag.constants;
+    fitness = ag.fitness;
+    fit_set = ag.fit_set;
+}
+
+AcyclicGraph AcyclicGraph::copy() {
+    AcyclicGraph temp = AcyclicGraph();
+    temp.stack = stack;
+    temp.constants = constants;
+    temp.fitness = fitness;
+    temp.fit_set = fit_set;
+    return temp;
 }
 
 bool AcyclicGraph::needs_optimization() {
@@ -231,6 +244,18 @@ AcyclicGraph AcyclicGraphManipulator::generate() {
   return indv;
 }
 
+std::pair<Eigen::ArrayX3d, Eigen::VectorXd> AcyclicGraphManipulator::dump(AcyclicGraph &indv) {
+    std::pair<Eigen::ArrayX3d, Eigen::VectorXd> temp(indv.stack, indv.constants);
+    return temp;
+}
+
+AcyclicGraph AcyclicGraphManipulator::load(std::pair<Eigen::ArrayX3d, Eigen::VectorXd> indv_list) {
+    AcyclicGraph temp;
+    temp.stack = indv_list.first;
+    temp.constants = indv_list.second;
+    return temp;
+}
+
 std::vector<AcyclicGraph> AcyclicGraphManipulator::crossover(AcyclicGraph &parent1, AcyclicGraph &parent2) {
   int c_point = rand() % ag_size;
   std::vector<AcyclicGraph> temp;
@@ -243,13 +268,17 @@ std::vector<AcyclicGraph> AcyclicGraphManipulator::crossover(AcyclicGraph &paren
   c2.stack(c_point, 0) = parent1.stack(c_point, 0);
   c2.stack(c_point, 1) = parent1.stack(c_point, 1);
   c2.stack(c_point, 2) = parent1.stack(c_point, 2);
+  c1.fitness = std::vector<double>();
+  c2.fitness = std::vector<double>();
+  c1.fit_set = false;
+  c2.fit_set = false;
 
   temp.push_back(c1);
   temp.push_back(c2);
   return temp;
 }
 
-void AcyclicGraphManipulator::mutation(AcyclicGraph &indv) {
+AcyclicGraph AcyclicGraphManipulator::mutation(AcyclicGraph &indv) {
     
   std::set<int> util = indv.utilized_commands();
   int loc = rand() % util.size();
@@ -265,7 +294,7 @@ void AcyclicGraphManipulator::mutation(AcyclicGraph &indv) {
   
   float r = static_cast <float> (rand()) / static_cast < float> (RAND_MAX);
   std::vector<int> vec;
-  
+
   if (r < 0.4 && mut_point > nloads) {
       float ran = static_cast <float> (rand()) / static_cast < float> (RAND_MAX);
       int temp_node = -1;
@@ -325,7 +354,10 @@ void AcyclicGraphManipulator::mutation(AcyclicGraph &indv) {
               indv.stack(i, 2) = p1;
           }
       }
-  }  
+  }
+  indv.fitness = std::vector<double>();  
+  indv.fit_set = false;
+  return indv;
 }
 
 int AcyclicGraphManipulator::distance(AcyclicGraph &indv1, AcyclicGraph &indv2) {
