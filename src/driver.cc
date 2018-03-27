@@ -32,7 +32,7 @@ int test_eig() {
 void TestAcyclicGraph(int num_loops, int num_evals) {
   Eigen::ArrayX3d stack(12, 3);
   Eigen::ArrayXXd x(60, 3);
-  Eigen::VectorXd constants;
+  Eigen::VectorXd constants(2);
   // y = x_0 * ( C_0 + C_1/x_1 ) - x_0
   stack << 0, 0, 0,
            0, 1, 1,
@@ -60,7 +60,6 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
   //PrintStack(stack);
   Eigen::ArrayXXd y;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy;
-
   double avg_time_per_eval = 0.;
   double avg_time_per_seval = 0.;
   double avg_time_per_deval = 0.;
