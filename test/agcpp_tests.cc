@@ -255,21 +255,19 @@ TEST_F(AgcppManipTest, crossover) {
     manip.add_node_type(5);
 
     AcyclicGraph indv2 = AcyclicGraph();
-    Eigen::ArrayX3d stack3(14, 3);
-    stack3 << 4, 4, 4,
-              4, 4, 4,
-              0, 0, 0,
+    Eigen::ArrayX3d stack3(12, 3);
+    stack3 << 0, 0, 0,
               0, 1, 1,
               1, 0, 0,
               1, 1, 1,
               5, 3, 1,
               5, 3, 1,
               2, 4, 2,
-              2, 4, 2,
-              4, 6, 0,
-              4, 5, 6,
-              3, 7, 6,
-              3, 8, 0;
+              2, 3, 1,
+              4, 5, 3,
+              4, 4, 2,
+              3, 6, 2,
+              3, 8, 5;
     Eigen::VectorXd temp_con(2);
     temp_con << 3.14, 10.0;
     indv.set_constants(temp_con); 
@@ -279,10 +277,10 @@ TEST_F(AgcppManipTest, crossover) {
     AcyclicGraph c2 = children[1];
 
     bool all_match = true;
-    for (int i = 0, j = 2; i < 12; ++i, ++j) {
-        if ((c1.stack(i, 0) != c2.stack(j, 0)) ||
-            (c1.stack(i, 1) != c2.stack(j, 1)) ||
-            (c1.stack(i, 2) != c2.stack(j, 2)))
+    for (int i = 0; i < 12; ++i) {
+        if ((c1.stack(i, 0) != indv.stack(i, 0)) ||
+            (c1.stack(i, 1) != indv.stack(i, 1)) ||
+            (c1.stack(i, 2) != indv.stack(i, 2)))
             all_match = false;
     }
     EXPECT_FALSE(all_match);

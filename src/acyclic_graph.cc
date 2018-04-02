@@ -260,8 +260,3 @@ std::vector<bool> FindUsedCommands(const Eigen::ArrayX3d & stack) {
 
   return used_command;
 }
-
-
-
-
-
