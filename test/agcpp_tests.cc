@@ -277,11 +277,12 @@ TEST_F(AgcppManipTest, crossover) {
     std::vector<AcyclicGraph> children = manip.crossover(indv, indv2);
     AcyclicGraph c1 = children[0];
     AcyclicGraph c2 = children[1];
+
     bool all_match = true;
-    for (int i = 0; i < indv.stack.rows(); ++i) {
-        if ((c1.stack(i + 2, 0) != c2.stack(i, 0)) ||
-            (c1.stack(i + 2, 2) != c2.stack(i, 2)) ||
-            (c1.stack(i + 2, 1) != c2.stack(i, 1)))
+    for (int i = 0, j = 2; i < 12; ++i, ++j) {
+        if ((c1.stack(i, 0) != c2.stack(j, 0)) ||
+            (c1.stack(i, 1) != c2.stack(j, 1)) ||
+            (c1.stack(i, 2) != c2.stack(j, 2)))
             all_match = false;
     }
     EXPECT_FALSE(all_match);
