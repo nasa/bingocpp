@@ -26,6 +26,7 @@
  */
 struct TrainingData {
  public:
+  TrainingData() { }
   /*! \brief gets a new training data with certain rows
   *
   *  \param[in] items The rows to retrieve. std::list<int>
@@ -44,6 +45,7 @@ struct TrainingData {
  */
 struct ExplicitTrainingData : TrainingData {
  public:
+  ExplicitTrainingData() : TrainingData() { }
   //! Eigen::ArrayXXd x
   /*! x variabes for ExplicitTraining */
   Eigen::ArrayXXd x;
@@ -63,6 +65,7 @@ struct ExplicitTrainingData : TrainingData {
  */
 struct ImplicitTrainingData : TrainingData {
  public:
+  ImplicitTrainingData() : TrainingData() { }
   //! Eigen::ArrayXXd x
   /*! x variabes for ImplicitTraining */
   Eigen::ArrayXXd x;
