@@ -16,14 +16,7 @@
 
 int LMFunctor::operator()(const Eigen::VectorXd &x, Eigen::VectorXd &fvec) {
   agraphIndv.set_constants(x);
-  Eigen::ArrayXXd temp = fit->evaluate_fitness_vector(agraphIndv, *train);
-  Eigen::VectorXd vec(temp.rows());
-
-  for (int i = 0; i < temp.rows(); ++i) {
-    vec[i] = temp(i);
-  }
-
-  fvec = vec;
+  fvec = fit->evaluate_fitness_vector(agraphIndv, *train);
   return 0;
 }
 

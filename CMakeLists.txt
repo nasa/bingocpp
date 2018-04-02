@@ -71,12 +71,15 @@ include_directories("${CMAKE_SOURCE_DIR}/include/")
 # add libraries
 add_library(bingo STATIC src/acyclic_graph.cc src/acyclic_graph_nodes.cc src/graph_manip.cc src/fitness_metric.cc src/training_data.cc)
 target_link_libraries(bingo Eigen3::Eigen)
+target_link_libraries(bingo profiler)
 set_target_properties(bingo PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
  
  
 # ---------- main executable ----------
 add_executable(runBingoCpp src/driver.cc)
 target_link_libraries(runBingoCpp bingo Eigen3::Eigen)
+add_executable(runProfile test/step_profile.cc)
+target_link_libraries(runProfile bingo Eigen3::Eigen)
 
 
 # ---------- python binding ----------
