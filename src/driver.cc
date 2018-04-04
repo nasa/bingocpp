@@ -31,6 +31,7 @@ int test_eig() {
 
 void TestAcyclicGraph(int num_loops, int num_evals) {
   Eigen::ArrayX3d stack(12, 3);
+  Eigen::ArrayX3d simple_stack(8, 3);
   Eigen::ArrayXXd x(60, 3);
   Eigen::VectorXd constants(2);
   // y = x_0 * ( C_0 + C_1/x_1 ) - x_0
@@ -46,6 +47,14 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
         4, 5, 6,
         3, 7, 6,
         3, 8, 0;
+  stack << 0, 0, 0,
+        0, 1, 1,
+        1, 0, 0,
+        1, 1, 1,
+        5, 3, 1,
+        2, 4, 2,
+        4, 5, 0,
+        3, 6, 0;
   x << 1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9.,
   1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9.,
   1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9.,
@@ -81,7 +90,8 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
     t1 = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < num_evals; ++i) {
-      y = SimplifyAndEvaluate(stack, x, constants);
+      y = Evaluate(simple_stack, x, constants);
+      // y = SimplifyAndEvaluate(stack, x, constants);
     }
 
     t2 = std::chrono::high_resolution_clock::now();
@@ -99,7 +109,8 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
     t1 = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < num_evals; ++i) {
-      y_and_dy = SimplifyAndEvaluateWithDerivative(stack, x, constants);
+      y_and_dy = EvaluateWithDerivative(simple_stack, x, constants);
+      // y_and_dy = SimplifyAndEvaluateWithDerivative(stack, x, constants);
     }
 
     t2 = std::chrono::high_resolution_clock::now();

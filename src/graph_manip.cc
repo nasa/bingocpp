@@ -19,6 +19,7 @@
 AcyclicGraph::AcyclicGraph() {
   stack = Eigen::ArrayX3d(0, 3);
   constants = Eigen::VectorXd(0);
+  simple_stack = Eigen::ArrayX3d(0, 3);
   fitness = std::vector<double>();
   fit_set = false;
 }
@@ -26,6 +27,7 @@ AcyclicGraph::AcyclicGraph() {
 AcyclicGraph::AcyclicGraph(const AcyclicGraph &ag) {
   stack = ag.stack;
   constants = ag.constants;
+  simple_stack = ag.simple_stack;
   fitness = ag.fitness;
   fit_set = ag.fit_set;
 }
@@ -34,18 +36,26 @@ AcyclicGraph AcyclicGraph::copy() {
   AcyclicGraph temp = AcyclicGraph();
   temp.stack = stack;
   temp.constants = constants;
+  temp.simple_stack = simple_stack;
   temp.fitness = fitness;
   temp.fit_set = fit_set;
   return temp;
 }
 
 bool AcyclicGraph::needs_optimization() {
-  std::set<int> util = utilized_commands();
-  std::set<int>::iterator it;
+  // std::set<int> util = utilized_commands();
+  // std::set<int>::iterator it;
 
-  for (it = util.begin(); it != util.end(); ++it) {
-    if (stack(*it, 0) == 1 && stack(*it, 1) == -1 ||
-        stack(*it, 0) == 1 && stack(*it, 1) >= constants.size()) {
+  // for (it = util.begin(); it != util.end(); ++it) {
+  //   if (stack(*it, 0) == 1 && stack(*it, 1) == -1 ||
+  //       stack(*it, 0) == 1 && stack(*it, 1) >= constants.size()) {
+  //     return true;
+  //   }
+  // }
+
+  for (int i = 0; i < simple_stack.rows(); ++i) {
+    if (simple_stack(i, 0) == 1 && simple_stack(i, 1) == -1 ||
+        simple_stack(i, 0) == 1 && simple_stack(i, 1) >= constants.size()) {
       return true;
     }
   }
@@ -59,84 +69,96 @@ void AcyclicGraph::set_constants(Eigen::VectorXd con) {
 
 int AcyclicGraph::count_constants() {
   std::set<int> util = utilized_commands();
-  std::set<int>::iterator it;
+  std::set<int>::iterator it = util.begin();
   int const_num = 0;
 
-  for (it = util.begin(); it != util.end(); ++it) {
-    if (stack(*it, 0) == 1) {
+  // for (int i = 0; i < simple_stack.rows(); ++i) {
+  //   if (simple_stack(i, 0) == 1) {
+  //     simple_stack(i, 1) = const_num;
+  //     simple_stack(i, 2) = const_num;
+  //     const_num += 1;
+  //   }
+  // }
+
+  for (int i = 0; i < simple_stack.rows(); ++i, ++it) {
+    if (simple_stack(i, 0) == 1) {
+      simple_stack(i, 1) = const_num;
+      simple_stack(i, 2) = const_num;
       stack(*it, 1) = const_num;
       stack(*it, 2) = const_num;
       const_num += 1;
     }
   }
 
+  // for (it = util.begin(); it != util.end(); ++it) {
+  //   if (stack(*it, 0) == 1) {
+  //     stack(*it, 1) = const_num;
+  //     stack(*it, 2) = const_num;
+  //     const_num += 1;
+  //   }
+  // }
+
   return const_num;
 }
 
 Eigen::ArrayXXd AcyclicGraph::evaluate(Eigen::ArrayXXd &eval_x) {
-  return SimplifyAndEvaluate(stack, eval_x, constants);
+  // return SimplifyAndEvaluate(stack, eval_x, constants);
+  return Evaluate(simple_stack, eval_x, constants);
 }
 
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> AcyclicGraph::evaluate_deriv(
   Eigen::ArrayXXd &eval_x) {
-  return SimplifyAndEvaluateWithDerivative(stack, eval_x, constants);
+  return EvaluateWithDerivative(simple_stack, eval_x, constants);
+  // return SimplifyAndEvaluateWithDerivative(stack, eval_x, constants);
 }
 
 std::string AcyclicGraph::latexstring() {
-  std::set<int> util = utilized_commands();
-  std::set<int>::iterator it = util.begin();
   std::vector<std::string> strings;
   std::ostringstream stream;
 
-  for (int i = 0; i < stack.rows(); ++i) {
+  for (int i = 0; i < simple_stack.rows(); ++i) {
     std::string temp = "";
-
-    if (util.count(i) == 1) {
-      if (stack(*it, 0) == 0)
-        stream << oper_interface.operator_map[stack(*it, 0)]->get_print()
-               << "_" << stack(*it, 1);
-
-      else if (stack(*it, 0) == 1) {
-        if (stack(*it, 1) == -1) {
+    switch ((int)simple_stack(i, 0)) {
+      case 0:
+        stream << oper_interface.operator_map[simple_stack(i, 0)]->get_print()
+               << "_" << simple_stack(i, 1);
+               break;
+      case 1:
+        if (simple_stack(i, 1) == -1)
           stream << "0";
-
-        } else {
-          stream << constants[stack(*it, 1)];
-        }
-
-      } else if (stack(*it, 0) == 2)
-        stream << strings[stack(*it, 1)] << " + " <<
-               strings[stack(*it, 2)];
-
-      else if (stack(*it, 0) == 3)
-        stream << strings[stack(*it, 1)] << " - (" <<
-               strings[stack(*it, 2)] << ")";
-
-      else if (stack(*it, 0) == 4)
-        stream << "(" << strings[stack(*it, 1)] << ")(" <<
-               strings[stack(*it, 2)] << ")";
-
-      else if (stack(*it, 0) == 5)
-        stream << "\\frac{" << strings[stack(*it, 1)] << "}{" <<
-               strings[stack(*it, 2)] << "}";
-
-      else if (stack(*it, 0) == 6 || stack(*it, 0) == 7 || stack(*it, 0) == 8
-               || stack(*it, 0) == 9 || stack(*it, 0) == 12)
-        stream << "\\" << oper_interface.operator_map[stack(*it, 0)]->get_print()
-               << "{" << strings[stack(*it, 1)] << "}";
-
-      else if (stack(*it, 0) == 10)
-        stream << "(" << strings[stack(*it, 1)] << ")^{(" <<
-               strings[stack(*it, 2)] << ")}";
-
-      else if (stack(*it, 0) == 11) {
-        stream << "|{" << strings[stack(*it, 1)] << "}|";
-      }
-
-      ++it;
-
-    } else {
-      stream << "";
+        else
+          stream << constants[simple_stack(i, 1)];
+        break;
+      case 2:
+        stream << strings[simple_stack(i, 1)] << " + " << 
+                  strings[simple_stack(i, 2)];
+        break;
+      case 3:
+        stream << strings[simple_stack(i, 1)] << " - (" << 
+                  strings[simple_stack(i, 2)] << ")";
+        break;
+      case 4:
+        stream << "(" << strings[simple_stack(i, 1)] << ")(" << 
+                  strings[simple_stack(i, 2)] << ")";
+        break;
+      case 5:
+        stream << "\\frac{" << strings[simple_stack(i, 1)] << "}{" << 
+                  strings[simple_stack(i, 2)] << "}";
+        break;
+      case 6: case 7: case 8: case 9: case 12:
+        stream << "\\" << oper_interface.operator_map[simple_stack(i, 0)]
+                  ->get_print() << "{" << strings[simple_stack(i, 1)] << "}";
+        break;
+      case 10:
+        stream << "(" << strings[simple_stack(i, 1)] << ")^{(" << 
+                  strings[simple_stack(i, 2)] << ")}";
+        break;
+      case 11:
+        stream << "|{" << strings[simple_stack(i, 1)] << "}|";
+        break;
+      default:
+        stream << "";
+        break;
     }
 
     temp = stream.str();
@@ -162,7 +184,7 @@ std::set<int> AcyclicGraph::utilized_commands() {
 }
 
 int AcyclicGraph::complexity() {
-  return utilized_commands().size();
+  return simple_stack.rows();
 }
 
 std::string AcyclicGraph::print_stack() {
@@ -195,40 +217,65 @@ std::string AcyclicGraph::print_stack() {
   }
 
   out << "---small stack---\n";
-  std::set<int>::iterator it;
-  std::set<int> util = utilized_commands();
-
-  for (it = util.begin(); it != util.end(); ++it) {
-    out << std::left << std::setw(4) << *it;
+  for (int i = 0; i < simple_stack.rows(); ++i) {
+    out << std::left << std::setw(4) << i;
     out << "<= ";
 
-    if (stack(*it, 0) == 0)
-      out << oper_interface.operator_map[stack(*it, 0)]->get_print()
-          << stack(*it, 1) << std::endl;
+    if (simple_stack(i, 0) == 0)
+      out << oper_interface.operator_map[simple_stack(i, 0)]->get_print()
+          << simple_stack(i, 1) << std::endl;
 
-    else if (stack(*it, 0) == 1) {
-      if (stack(*it, 1) == -1) {
-        out << oper_interface.operator_map[stack(*it, 0)]->get_print();
+    else if (simple_stack(i, 0) == 1) {
+      if (simple_stack(i, 1) == -1) {
+        out << oper_interface.operator_map[simple_stack(i, 0)]->get_print();
 
       } else {
-        out << constants[stack(*it, 1)];
+        out << constants[simple_stack(i, 1)];
       }
 
       out << std::endl;
 
     } else {
-      out << "(" << stack(*it, 1) << ") "
-          << oper_interface.operator_map[stack(*it, 0)]->get_print()
-          << " (" << stack(*it, 2) << ")\n";
+      out << "(" << simple_stack(i, 1) << ") "
+          << oper_interface.operator_map[simple_stack(i, 0)]->get_print()
+          << " (" << simple_stack(i, 2) << ")\n";
     }
   }
+
+
+  // std::set<int>::iterator it;
+  // std::set<int> util = utilized_commands();
+
+  // for (it = util.begin(); it != util.end(); ++it) {
+  //   out << std::left << std::setw(4) << *it;
+  //   out << "<= ";
+
+  //   if (stack(*it, 0) == 0)
+  //     out << oper_interface.operator_map[stack(*it, 0)]->get_print()
+  //         << stack(*it, 1) << std::endl;
+
+  //   else if (stack(*it, 0) == 1) {
+  //     if (stack(*it, 1) == -1) {
+  //       out << oper_interface.operator_map[stack(*it, 0)]->get_print();
+
+  //     } else {
+  //       out << constants[stack(*it, 1)];
+  //     }
+
+  //     out << std::endl;
+
+  //   } else {
+  //     out << "(" << stack(*it, 1) << ") "
+  //         << oper_interface.operator_map[stack(*it, 0)]->get_print()
+  //         << " (" << stack(*it, 2) << ")\n";
+  //   }
+  // }
 
   return out.str();
 }
 
 AcyclicGraphManipulator::AcyclicGraphManipulator(int nvars, int ag_size,
-    int nloads,
-    float float_lim, float terminal_prob) {
+    int nloads, float float_lim, float terminal_prob) {
   this->nvars = nvars;
   this->ag_size = ag_size;
   this->nloads = nloads;
@@ -285,7 +332,30 @@ AcyclicGraph AcyclicGraphManipulator::generate() {
   }
 
   indv.stack = array;
+  simplify_stack(indv);
   return indv;
+}
+
+void AcyclicGraphManipulator::simplify_stack(AcyclicGraph &indv) {
+  std::set<int> util = indv.utilized_commands();
+  std::map<int, int> reduced;
+  Eigen::ArrayX3d temp(util.size(), 3);
+  int i = 0;
+  for (std::set<int>::iterator it = util.begin(); it != util.end(); ++it) {
+    reduced[*it] = i;
+    temp(i, 0) = indv.stack(*it, 0);
+    int arity = indv.oper_interface.operator_map[temp(i, 0)]->get_arity();
+    if (arity == 0) {
+      temp(i, 1) = indv.stack(*it, 1);
+      temp(i, 2) = indv.stack(*it, 2);
+    }
+    else {
+      temp(i, 1) = reduced[indv.stack(*it, 1)];
+      temp(i, 2) = reduced[indv.stack(*it, 2)];
+    }
+    ++i;
+  }
+  indv.simple_stack = temp;
 }
 
 std::pair<Eigen::ArrayX3d, Eigen::VectorXd> AcyclicGraphManipulator::dump(
@@ -299,15 +369,54 @@ AcyclicGraph AcyclicGraphManipulator::load(
   AcyclicGraph temp;
   temp.stack = indv_list.first;
   temp.constants = indv_list.second;
+  simplify_stack(temp);
   return temp;
 }
 
 std::vector<AcyclicGraph> AcyclicGraphManipulator::crossover(
   AcyclicGraph &parent1, AcyclicGraph &parent2) {
+  // int cross = rand() % ag_size;
   int c_point = rand() % ag_size;
   std::vector<AcyclicGraph> temp;
   AcyclicGraph c1 = AcyclicGraph(parent1);
   AcyclicGraph c2 = AcyclicGraph(parent2);
+  // Eigen::ArrayX3d cstack1(parent2.stack.rows(), parent2.stack.cols());
+  // Eigen::ArrayX3d cstack2(parent1.stack.rows(), parent1.stack.cols());
+
+  // cstack1.block(0, 0, c_point, cstack1.cols()) = parent1.stack.block(0, 0, c_point, parent1.stack.cols());
+  // cstack2.block(0, 0, c_point, cstack2.cols()) = parent2.stack.block(0, 0, c_point, parent2.stack.cols());
+  // cstack1.block(c_point, 0, cstack1.rows() - c_point, cstack1.cols()) = parent2.stack.block(c_point, 0, parent2.stack.rows() - c_point, parent2.stack.cols());
+  // cstack2.block(c_point, 0, cstack2.rows() - c_point, cstack2.cols()) = parent1.stack.block(c_point, 0, parent1.stack.rows() - c_point, parent1.stack.cols());
+
+  // int row = parent1.stack.rows() - c_point;
+  // int col = parent1.stack.cols();
+  // c1.stack.block(c_point, 0, row, col) = parent2.stack.block(c_point, 0, row, col);
+  // c2.stack.block(c_point, 0, row, col) = parent1.stack.block(c_point, 0, row, col);
+
+
+  // AcyclicGraph ch1 = AcyclicGraph(parent1);
+  // AcyclicGraph ch2 = AcyclicGraph(parent2);
+  // int r1 = parent1.stack.rows() - cross;
+  // int r2 = parent2.stack.rows() - cross;
+  // int c1 = parent1.stack.cols();
+  // int c2 = parent2.stack.cols();
+  // ch1.stack.block(cross, 0, r1, c1) = parent2.stack.block(cross, 0, r2, c2);
+  // ch2.stack.block(cross, 0, r2, c2) = parent1.stack.block(cross, 0, r1, c1);
+  
+  // ch1.fitness = std::vector<double>();
+  // ch2.fitness = std::vector<double>();
+  // ch1.fit_set = false;
+  // ch2.fit_set = false;
+  // simplify_stack(ch1);
+  // simplify_stack(ch2);
+  // temp.push_back(ch1);
+  // temp.push_back(ch2);
+  // c1.stack = cstack1;
+  // c2.stack = cstack2;
+
+  // std::cout << "Parent 1\n" << parent1.print_stack() << "\nChild 1\n" << ch1.print_stack() << std::endl;
+  // std::cout << "Parent 2\n" << parent2.print_stack();
+  // std::cout << "\nChild 2\n" << ch2.print_stack() << std::endl;
   c1.stack(c_point, 0) = parent2.stack(c_point, 0);
   c1.stack(c_point, 1) = parent2.stack(c_point, 1);
   c1.stack(c_point, 2) = parent2.stack(c_point, 2);
@@ -318,6 +427,8 @@ std::vector<AcyclicGraph> AcyclicGraphManipulator::crossover(
   c2.fitness = std::vector<double>();
   c1.fit_set = false;
   c2.fit_set = false;
+  simplify_stack(c1);
+  simplify_stack(c2);
   temp.push_back(c1);
   temp.push_back(c2);
   return temp;
@@ -414,6 +525,7 @@ AcyclicGraph AcyclicGraphManipulator::mutation(AcyclicGraph &indv) {
 
   indv.fitness = std::vector<double>();
   indv.fit_set = false;
+  simplify_stack(indv);
   return indv;
 }
 
