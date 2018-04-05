@@ -53,6 +53,7 @@ bool AcyclicGraph::needs_optimization() {
   //   }
   // }
 
+ // if it needs, true, if not, check constants in simple stack are not out of bounds of constants vector, make the constants vector the size and return true, else false
   for (int i = 0; i < simple_stack.rows(); ++i) {
     if (simple_stack(i, 0) == 1 && simple_stack(i, 1) == -1 ||
         simple_stack(i, 0) == 1 && simple_stack(i, 1) >= constants.size()) {
@@ -375,62 +376,28 @@ AcyclicGraph AcyclicGraphManipulator::load(
 
 std::vector<AcyclicGraph> AcyclicGraphManipulator::crossover(
   AcyclicGraph &parent1, AcyclicGraph &parent2) {
-  // int cross = rand() % ag_size;
-  int c_point = rand() % ag_size;
+  int cross = rand() % ag_size;
   std::vector<AcyclicGraph> temp;
-  AcyclicGraph c1 = AcyclicGraph(parent1);
-  AcyclicGraph c2 = AcyclicGraph(parent2);
-  // Eigen::ArrayX3d cstack1(parent2.stack.rows(), parent2.stack.cols());
-  // Eigen::ArrayX3d cstack2(parent1.stack.rows(), parent1.stack.cols());
 
-  // cstack1.block(0, 0, c_point, cstack1.cols()) = parent1.stack.block(0, 0, c_point, parent1.stack.cols());
-  // cstack2.block(0, 0, c_point, cstack2.cols()) = parent2.stack.block(0, 0, c_point, parent2.stack.cols());
-  // cstack1.block(c_point, 0, cstack1.rows() - c_point, cstack1.cols()) = parent2.stack.block(c_point, 0, parent2.stack.rows() - c_point, parent2.stack.cols());
-  // cstack2.block(c_point, 0, cstack2.rows() - c_point, cstack2.cols()) = parent1.stack.block(c_point, 0, parent1.stack.rows() - c_point, parent1.stack.cols());
-
-  // int row = parent1.stack.rows() - c_point;
-  // int col = parent1.stack.cols();
-  // c1.stack.block(c_point, 0, row, col) = parent2.stack.block(c_point, 0, row, col);
-  // c2.stack.block(c_point, 0, row, col) = parent1.stack.block(c_point, 0, row, col);
-
-
-  // AcyclicGraph ch1 = AcyclicGraph(parent1);
-  // AcyclicGraph ch2 = AcyclicGraph(parent2);
-  // int r1 = parent1.stack.rows() - cross;
-  // int r2 = parent2.stack.rows() - cross;
-  // int c1 = parent1.stack.cols();
-  // int c2 = parent2.stack.cols();
-  // ch1.stack.block(cross, 0, r1, c1) = parent2.stack.block(cross, 0, r2, c2);
-  // ch2.stack.block(cross, 0, r2, c2) = parent1.stack.block(cross, 0, r1, c1);
+  AcyclicGraph ch1 = AcyclicGraph(parent1);
+  AcyclicGraph ch2 = AcyclicGraph(parent2);
+  // int r1 = 1;
+  // int r2 = 1;
+  int r1 = parent1.stack.rows() - cross;
+  int r2 = parent2.stack.rows() - cross;
+  int c1 = parent1.stack.cols();
+  int c2 = parent2.stack.cols();
+  ch1.stack.block(cross, 0, r1, c1) = parent2.stack.block(cross, 0, r2, c2);
+  ch2.stack.block(cross, 0, r2, c2) = parent1.stack.block(cross, 0, r1, c1);
   
-  // ch1.fitness = std::vector<double>();
-  // ch2.fitness = std::vector<double>();
-  // ch1.fit_set = false;
-  // ch2.fit_set = false;
-  // simplify_stack(ch1);
-  // simplify_stack(ch2);
-  // temp.push_back(ch1);
-  // temp.push_back(ch2);
-  // c1.stack = cstack1;
-  // c2.stack = cstack2;
-
-  // std::cout << "Parent 1\n" << parent1.print_stack() << "\nChild 1\n" << ch1.print_stack() << std::endl;
-  // std::cout << "Parent 2\n" << parent2.print_stack();
-  // std::cout << "\nChild 2\n" << ch2.print_stack() << std::endl;
-  c1.stack(c_point, 0) = parent2.stack(c_point, 0);
-  c1.stack(c_point, 1) = parent2.stack(c_point, 1);
-  c1.stack(c_point, 2) = parent2.stack(c_point, 2);
-  c2.stack(c_point, 0) = parent1.stack(c_point, 0);
-  c2.stack(c_point, 1) = parent1.stack(c_point, 1);
-  c2.stack(c_point, 2) = parent1.stack(c_point, 2);
-  c1.fitness = std::vector<double>();
-  c2.fitness = std::vector<double>();
-  c1.fit_set = false;
-  c2.fit_set = false;
-  simplify_stack(c1);
-  simplify_stack(c2);
-  temp.push_back(c1);
-  temp.push_back(c2);
+  ch1.fitness = std::vector<double>();
+  ch2.fitness = std::vector<double>();
+  ch1.fit_set = false;
+  ch2.fit_set = false;
+  simplify_stack(ch1);
+  simplify_stack(ch2);
+  temp.push_back(ch1);
+  temp.push_back(ch2);
   return temp;
 }
 
@@ -525,6 +492,7 @@ AcyclicGraph AcyclicGraphManipulator::mutation(AcyclicGraph &indv) {
 
   indv.fitness = std::vector<double>();
   indv.fit_set = false;
+  // renumber constants
   simplify_stack(indv);
   return indv;
 }
