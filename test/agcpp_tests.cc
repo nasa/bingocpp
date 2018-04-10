@@ -44,6 +44,8 @@ class AgcppTest : public::testing::Test {
               3, 8, 0;
     x << 1., 4., 7., 2., 5., 8., 3., 6., 9.;
     indv.stack = stack2;
+    AcyclicGraphManipulator manip = AcyclicGraphManipulator(3, 12, 1);
+    manip.simplify_stack(indv);
     Eigen::VectorXd temp_con(2);
     temp_con << 3.14, 10.0;
     indv.set_constants(temp_con); 
@@ -82,6 +84,7 @@ class AgcppManipTest : public::testing::Test {
              3, 8, 0;
     x << 1., 4., 7., 2., 5., 8., 3., 6., 9.;
     indv.stack = stack;
+    manip.simplify_stack(indv);
     Eigen::VectorXd temp_con(2);
     temp_con << 3.14, 10.0;
     indv.set_constants(temp_con); 
@@ -126,14 +129,36 @@ TEST_F(AgcppTest, set_constants) {
 }
 
 TEST_F(AgcppTest, count_constants) {
-    AcyclicGraphManipulator manip = AcyclicGraphManipulator(3, 12, 1);
-    manip.simplify_stack(indv);
     ASSERT_EQ(indv.count_constants(), 2);
 }
 
+// TEST_F(AgcppTest, input_constants) {
+//     Eigen::ArrayX3d stack(12,3);
+//     stack << 0, 0, 0,
+//               0, 1, 1,
+//               1, -1, -1,
+//               1, -1, -1,
+//               5, 3, 1,
+//               5, 3, 1,
+//               2, 4, 2,
+//               2, 4, 2,
+//               4, 6, 0,
+//               4, 5, 6,
+//               3, 7, 6,
+//               3, 8, 0;
+//     indv.stack = stack;
+//     AcyclicGraphManipulator manip = AcyclicGraphManipulator(3, 12, 1);
+//     manip.simplify_stack(indv);
+//     indv.input_constants();
+//     bool fail = false;
+//     for (int i = 0; i < indv.simple_stack.rows(); ++i) {
+//         if (indv.simple_stack(i, 0) == 1 && indv.simple_stack(i, 1) == -1)
+//             fail = true;
+//     }
+//     ASSERT_EQ(fail, false);
+// }
+
 TEST_F(AgcppTest, evaluate) {
-    AcyclicGraphManipulator manip = AcyclicGraphManipulator(3, 12, 1);
-    manip.simplify_stack(indv);
     std::vector<double> truth;
     truth.push_back(4.64);
     truth.push_back(8.28);
@@ -146,8 +171,6 @@ TEST_F(AgcppTest, evaluate) {
 }
 
 TEST_F(AgcppTest, evaluate_deriv) {
-    AcyclicGraphManipulator manip = AcyclicGraphManipulator(3, 12, 1);
-    manip.simplify_stack(indv);
     std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> p = indv.evaluate_deriv(x);
     ASSERT_NEAR(p.first(0), 4.64, .001);
     ASSERT_NEAR(p.first(1), 8.28, .001);
@@ -159,14 +182,10 @@ TEST_F(AgcppTest, evaluate_deriv) {
 
 TEST_F(AgcppTest, latexstring) {
     std::string str_true = "(\\frac{10}{X_1} + 3.14)(X_0) - (X_0)";
-    AcyclicGraphManipulator manip = AcyclicGraphManipulator(3, 12, 1);
-    manip.simplify_stack(indv);
     EXPECT_EQ(str_true, indv.latexstring());
 }
 
 TEST_F(AgcppTest, complexity) {
-    AcyclicGraphManipulator manip = AcyclicGraphManipulator(3, 12, 1);
-    manip.simplify_stack(indv);
     EXPECT_EQ(8, indv.complexity());
 }
 
@@ -194,8 +213,6 @@ TEST_F(AgcppTest, print_stack) {
     out << 5 << "   <= (4) + (2)\n";
     out << 6 << "   <= (5) * (0)\n";
     out << 7 << "   <= (6) - (0)\n";
-    AcyclicGraphManipulator manip = AcyclicGraphManipulator(3, 12, 1);
-    manip.simplify_stack(indv);
     EXPECT_EQ(out.str(), indv.print_stack());
 }
 
@@ -231,8 +248,6 @@ TEST_F(AgcppManipTest, generate) {
 
 TEST_F(AgcppManipTest, simplify_stack) {
     SetUp();
-
-    manip.simplify_stack(indv);
     ASSERT_DOUBLE_EQ(indv.simple_stack.rows(), 8);
 }
 
@@ -275,28 +290,47 @@ TEST_F(AgcppManipTest, crossover) {
 
     AcyclicGraph indv2 = AcyclicGraph();
     Eigen::ArrayX3d stack3(12, 3);
-    stack3 << 0, 0, 0,
-              0, 1, 1,
+            //     0, 0, 0,
+            //   0, 1, 1,
+            //   1, 0, 0,
+            //   1, 1, 1,
+            //   5, 3, 1,
+            //   5, 3, 1,
+            //   2, 4, 2,
+            //   2, 4, 2,
+            //   4, 6, 0,
+            //   4, 5, 6,
+            //   3, 7, 6,
+            //   3, 8, 0;
+
+    stack3 << 1, -1, -1,
               1, 0, 0,
-              1, 1, 1,
+              0, 0, 0,
+              0, 1, 1,
               5, 3, 1,
               5, 3, 1,
               2, 4, 2,
               2, 3, 1,
-              4, 5, 3,
+              1, 1, 1,
               4, 4, 2,
               3, 6, 2,
-              3, 8, 5;
+              3, 8, 6;
     Eigen::VectorXd temp_con(2);
     temp_con << 3.14, 10.0;
+    Eigen::VectorXd temp_con2(2);
+    temp_con2 << 7.4, 13.4;
     indv.set_constants(temp_con); 
     indv2.stack = stack3;
-    indv2.set_constants(temp_con);
-    manip.simplify_stack(indv);
+    indv2.set_constants(temp_con2);
     manip.simplify_stack(indv2);
     std::vector<AcyclicGraph> children = manip.crossover(indv, indv2);
     AcyclicGraph c1 = children[0];
     AcyclicGraph c2 = children[1];
+
+    // std::cout << "------------- P1 --------------\n" << indv.print_stack() << std::endl;
+    // std::cout << "------------- P2 --------------\n" << indv2.print_stack() << std::endl;
+    // std::cout << "------------- C2 --------------\n" << c2.print_stack() << std::endl;
+    // std::cout << "------------- C1 --------------\n" << c1.print_stack() << std::endl;
 
     bool all_match = true;
     for (int i = 0; i < 12; ++i) {

@@ -42,6 +42,7 @@ PYBIND11_MODULE(bingocpp, m) {
   .def("needs_optimization", &AcyclicGraph::needs_optimization)
   .def("set_constants", &AcyclicGraph::set_constants)
   .def("count_constants", &AcyclicGraph::count_constants)
+//   .def("input_constants", &AcyclicGraph::input_constants)
   .def("evaluate", &AcyclicGraph::evaluate)
   .def("evaluate_deriv", &AcyclicGraph::evaluate_deriv)
   .def("latexstring", &AcyclicGraph::latexstring)
@@ -49,9 +50,10 @@ PYBIND11_MODULE(bingocpp, m) {
   .def("complexity", &AcyclicGraph::complexity)
   .def("__str__", &AcyclicGraph::print_stack);
   py::class_<AcyclicGraphManipulator>(m, "AcyclicGraphManipulator")
-  .def(py::init<int &, int &, int &, float &, float &>(),
+  .def(py::init<int &, int &, int &, float &, float &, int &>(),
        py::arg("nvars") = 3, py::arg("ag_size") = 15, py::arg("nloads") = 1,
-       py::arg("float_lim") = 10.0, py::arg("terminal_prob") = 0.1)
+       py::arg("float_lim") = 10.0, py::arg("terminal_prob") = 0.1, 
+       py::arg("opt_rate") = 1)
   .def("add_node_type", &AcyclicGraphManipulator::add_node_type)
   .def("generate", &AcyclicGraphManipulator::generate)
   .def("simplify_stack", &AcyclicGraphManipulator::simplify_stack)

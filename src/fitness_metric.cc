@@ -56,6 +56,7 @@ void FitnessMetric::optimize_constants(AcyclicGraph &indv,
   functor.train = &train;
   functor.fit = this;
   functor.m = functor.train->size();
+  // indv.input_constants();
   functor.n = indv.count_constants();
   functor.agraphIndv = indv;
   Eigen::VectorXd vec = Eigen::VectorXd::Random(functor.n);

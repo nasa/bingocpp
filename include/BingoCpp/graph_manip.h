@@ -64,6 +64,12 @@ class AcyclicGraph {
   //! bool fit_set
   /*! if the fitness is set */
   bool fit_set;
+  //! bool needs_opt
+  /*! if the constants need optimization */
+  bool needs_opt;
+  //! int opt_rate
+  /*! holds rate of optimization */
+  int opt_rate;
   //! \brief Default constructor
   AcyclicGraph();
   //! \brief Copy constructor
@@ -80,11 +86,16 @@ class AcyclicGraph {
    *  \param[in] con The constants to set. Eigen::VectorXd
    */
   void set_constants(Eigen::VectorXd con);
-  /*! \brief count the utilized constants in stack
+  /*! \brief returns constants.size()
    *
-   *  \return int the number of utilized constants in stack
+   *  \return int the number constants in stack
    */
   int count_constants();
+  /*! \brief replaces -1 in stack with location in constants vector
+   *
+   *  \return void
+   */
+  // void input_constants();
   /*! \brief evaluate the compiled stack
    *
    *  \param[in] eval_x The x parameters. Eigen::ArrayXXd
@@ -153,6 +164,9 @@ class AcyclicGraphManipulator {
   //! float terminal_prob
   /*! float to hold probability */
   float terminal_prob;
+  //! int op_rate
+  /*! optimization rate to give to generated AGraphs */
+  int opt_rate;
   //! std::vector<int> node_type_vec
   /*! vector to hold the types of nodes in the manipulator */
   std::vector<int> node_type_vec;
@@ -165,7 +179,8 @@ class AcyclicGraphManipulator {
 
   //! \brief Constructor
   AcyclicGraphManipulator(int nvars = 3, int ag_size = 15, int nloads = 1,
-                          float float_lim = 10.0, float terminal_prob = 0.1);
+                          float float_lim = 10.0, float terminal_prob = 0.1,
+                          int opt_rate = 1);
   /*! \brief Add a type of node to the set of allowed types
    *
    *  \param[in] node_type The type of node to add. int
