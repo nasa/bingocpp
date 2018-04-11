@@ -65,7 +65,13 @@ class AcyclicGraph {
   /*! if the fitness is set */
   bool fit_set;
   //! bool needs_opt
-  /*! if the constants need optimization */
+  /*! if the constants need optimization 
+   *  1 - Default
+   *  2 - Keep old constants
+   *  3 - Optimize every crossover
+   *  4 - Optimize every mutation
+   *  5 - Optimize every time
+   */
   bool needs_opt;
   //! int opt_rate
   /*! holds rate of optimization */

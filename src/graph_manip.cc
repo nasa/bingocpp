@@ -472,7 +472,7 @@ std::vector<AcyclicGraph> AcyclicGraphManipulator::crossover(
     }
   }
 
-  if (opt_rate == 3) {
+  if (opt_rate == 3 || opt_rate == 5) {
     if (child_1.count_constants() > 0)
       child_1.needs_opt = true;
     if (child_2.count_constants() > 0)
@@ -583,7 +583,7 @@ AcyclicGraph AcyclicGraphManipulator::mutation(AcyclicGraph &indv) {
   indv.fit_set = false;
   // renumber constants
   simplify_stack(indv);
-  if (opt_rate == 3 && indv.count_constants() > 0)
+  if ((opt_rate == 4 || opt_rate == 5) && indv.count_constants() > 0)
     indv.needs_opt = true;
   return indv;
 }
