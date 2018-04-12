@@ -118,14 +118,15 @@ Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3d &stack,
  *
  * An acyclic graph is given in stack form.  The stack is evaluated command by
  * command putting the result of each command into a local buffer.  References
- * can be made in the satck to columns of the x input as well as constants; both
+ * can be made in the stack to columns of the x input as well as constants; both
  * are referenced by index.  The stack is then processed in reverse to calculate
- * the gradient of the stack with respect to x.  This reverse processing is
- * standard reverse auto-differentiation.
+ * the gradient of the stack with respect to the chosen parameter.  This reverse 
+ * processing is standard reverse auto-differentiation.
  *
  * \param[in] stack Description of an acyclic graph in stack format.
  * \param[in] x The input variables to the acyclic graph. (Eigen::ArrayXXd)
  * \param[in] constants Vector of the constants used in the stack.
+ * \param[in] param_x_or_c true: x derivative, false: c derivative
  *
  * \return The value of the last command in the stack and the gradient.
  *         (std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>)
@@ -133,7 +134,8 @@ Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3d &stack,
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
   const Eigen::ArrayX3d &stack,
   const Eigen::ArrayXXd &x,
-  const Eigen::VectorXd &constants);
+  const Eigen::VectorXd &constants,
+  const bool param_x_or_c=true);
 
 
 
@@ -146,6 +148,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
  * \param[in] stack Description of an acyclic graph in stack format.
  * \param[in] x The input variables to the acyclic graph. (Eigen::ArrayXXd)
  * \param[in] constants Vector of the constants used in the stack.
+ * \param[in] param_x_or_c true: x derivative, false: c derivative
  *
  * \return The value of the last command in the stack and the gradient.
  *         (std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>)
@@ -153,7 +156,8 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
   const Eigen::ArrayX3d &stack,
   const Eigen::ArrayXXd &x,
-  const Eigen::VectorXd &constants);
+  const Eigen::VectorXd &constants,
+  const bool param_x_or_c=true);
 
 
 
@@ -166,12 +170,14 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
  * columns of the x input as well as constants; both are referenced by index.
  * The stack is then processed in reverse (again considering only the ones with
  * a true value of the mask) to calculate the gradient of the stack with respect
- * to x.  This reverse processing is standard reverse auto-differentiation.
+ * to to the chosen parameter.  This reverse processing is standard reverse 
+ * auto-differentiation.
  *
  * \param[in] stack Description of an acyclic graph in stack format.
  * \param[in] x The input variables to the acyclic graph. (Eigen::ArrayXXd)
  * \param[in] constants Vector of the constants used in the stack.
  * \param[in] mask Vector of booleans detailing which commands are included.
+ * \param[in] param_x_or_c true: x derivative, false: c derivative
  *
  * \return The value of the last command in the stack and the gradient.
  *         (std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>)
@@ -180,7 +186,8 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
   const Eigen::ArrayX3d &stack,
   const Eigen::ArrayXXd &x,
   const Eigen::VectorXd &constants,
-  const std::vector<bool> &mask);
+  const std::vector<bool> &mask,
+  const bool param_x_or_c=true);
 
 
 
