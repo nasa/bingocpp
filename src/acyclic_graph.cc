@@ -86,19 +86,30 @@ Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3d & stack,
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
   const Eigen::ArrayX3d &stack,
   const Eigen::ArrayXXd &x,
-  const Eigen::VectorXd &constants) {
+  const Eigen::VectorXd &constants,
+  const bool param_x_or_c) {
   // Evaluates a stack and its derivative with the given x and constants.
   std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
-  std::vector<std::set<int>> x_dependencies(x.cols(), std::set<int>());
   std::vector<std::set<int>> stack_dependencies(stack.rows(), std::set<int>());
+  
+  int deriv_size;
+  int deriv_operator_number;
+  if (param_x_or_c) {  // true = x
+    deriv_size = x.cols();
+    deriv_operator_number = 0;
+  } else {  // false = c
+    deriv_size = constants.size();
+    deriv_operator_number = 1;
+  }
+  std::vector<std::set<int>> param_dependencies(deriv_size, std::set<int>());
 
   // forward eval with dependencies
   for (std::size_t i = 0; i < stack.rows(); ++i) {
     oper_interface.operator_map[stack(i, 0)]->evaluate(
       stack, x, constants, forward_eval, i);
 
-    if (stack(i, 0) == 0) {
-      x_dependencies[stack(i, 1)].insert(i);
+    if (stack(i, 0) == deriv_operator_number) {
+      param_dependencies[stack(i, 1)].insert(i);
     }
 
     for (int j = 0; j < oper_interface.operator_map[stack(i, 0)]->get_arity();
@@ -118,15 +129,15 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
   }
 
   // build derivative array
-  Eigen::ArrayXXd deriv_x = Eigen::ArrayXXd::Zero(x.rows(), x.cols());
+  Eigen::ArrayXXd deriv = Eigen::ArrayXXd::Zero(x.rows(), deriv_size);
 
   for (std::size_t i = 0; i < x.cols(); ++i) {
-    for (auto const& dependency : x_dependencies[i]) {
-      deriv_x.col(i) += reverse_eval[dependency];
+    for (auto const& dependency : param_dependencies[i]) {
+      deriv.col(i) += reverse_eval[dependency];
     }
   }
 
-  return std::make_pair(forward_eval.back(), deriv_x);
+  return std::make_pair(forward_eval.back(), deriv);
 }
 
 
@@ -134,10 +145,11 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
   const Eigen::ArrayX3d &stack,
   const Eigen::ArrayXXd &x,
-  const Eigen::VectorXd &constants) {
+  const Eigen::VectorXd &constants,
+  const bool param_x_or_c) {
   // Evaluates a stack and its derivative, but only the utilized commands.
   std::vector<bool> mask = FindUsedCommands(stack);
-  return EvaluateWithDerivativeAndMask(stack, x, constants, mask);
+  return EvaluateWithDerivativeAndMask(stack, x, constants, mask, param_x_or_c);
 }
 
 
@@ -146,12 +158,23 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
   const Eigen::ArrayX3d &stack,
   const Eigen::ArrayXXd &x,
   const Eigen::VectorXd &constants,
-  const std::vector<bool> &mask) {
+  const std::vector<bool> &mask,
+  const bool param_x_or_c) {
   // Evaluates a stack and its derivative with the given x and constants.
   std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
-  std::vector<std::set<int>> x_dependencies(x.cols(), std::set<int>());
   std::vector<std::set<int>> stack_dependencies(stack.rows(),
                           std::set<int>());
+  
+  int deriv_size;
+  int deriv_operator_number;
+  if (param_x_or_c) {  // true = x
+    deriv_size = x.cols();
+    deriv_operator_number = 0;
+  } else {  // false = c
+    deriv_size = constants.size();
+    deriv_operator_number = 1;
+  }
+  std::vector<std::set<int>> param_dependencies(deriv_size, std::set<int>());
 
   // forward eval with dependencies
   for (std::size_t i = 0; i < stack.rows(); ++i) {
@@ -159,8 +182,8 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
       oper_interface.operator_map[stack(i, 0)]->evaluate(
         stack, x, constants, forward_eval, i);
 
-      if (stack(i, 0) == 0) {
-        x_dependencies[stack(i, 1)].insert(i);
+      if (stack(i, 0) == deriv_operator_number) {
+        param_dependencies[stack(i, 1)].insert(i);
       }
 
       for (int j = 0; j < oper_interface.operator_map[stack(i, 0)]->get_arity();
@@ -183,15 +206,15 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
   }
 
   // build derivative array
-  Eigen::ArrayXXd deriv_x = Eigen::ArrayXXd::Zero(x.rows(), x.cols());
+  Eigen::ArrayXXd deriv = Eigen::ArrayXXd::Zero(x.rows(), deriv_size);
 
-  for (std::size_t i = 0; i < x.cols(); ++i) {
-    for (auto const& dependency : x_dependencies[i]) {
-      deriv_x.col(i) += reverse_eval[dependency];
+  for (std::size_t i = 0; i < deriv_size; ++i) {
+    for (auto const& dependency : param_dependencies[i]) {
+      deriv.col(i) += reverse_eval[dependency];
     }
   }
 
-  return std::make_pair(forward_eval.back(), deriv_x);
+  return std::make_pair(forward_eval.back(), deriv);
 }
 
 

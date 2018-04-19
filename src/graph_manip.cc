@@ -82,6 +82,12 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> AcyclicGraph::evaluate_deriv(
   return SimplifyAndEvaluateWithDerivative(stack, eval_x, constants);
 }
 
+std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> AcyclicGraph::evaluate_with_const_deriv(
+  Eigen::ArrayXXd &eval_x) {
+    return SimplifyAndEvaluateWithDerivative(stack, eval_x, constants, false);
+}
+
+
 std::string AcyclicGraph::latexstring() {
   std::set<int> util = utilized_commands();
   std::set<int>::iterator it = util.begin();
@@ -234,12 +240,13 @@ AcyclicGraphManipulator::AcyclicGraphManipulator(int nvars, int ag_size,
   this->nloads = nloads;
   this->float_lim = float_lim;
   this->terminal_prob = terminal_prob;
-  node_type_vec.push_back(0);
-  node_type_vec.push_back(1);
-
+  num_node_types = 0;
+  
+  add_node_type(0);
   for (int i = 1; i < nvars; ++i) {
     term_vec.push_back(0);
   }
+  add_node_type(1);
 }
 
 void AcyclicGraphManipulator::add_node_type(int node_type) {
@@ -255,29 +262,32 @@ void AcyclicGraphManipulator::add_node_type(int node_type) {
     node_type_vec.push_back(node_type);
 
     if (node_type <= 1) {
-      term_vec.push_back(node_type_vec.size());
+      term_vec.push_back(num_node_types);
 
     } else {
-      op_vec.push_back(node_type_vec.size());
+      op_vec.push_back(num_node_types);
     }
+    num_node_types++;
   }
 }
 
 AcyclicGraph AcyclicGraphManipulator::generate() {
   AcyclicGraph indv = AcyclicGraph();
   Eigen::ArrayX3d array(ag_size, 3);
+  float r = 0;
+  std::vector<int> vec;
 
   for (int i = 0; i < ag_size; ++i) {
-    float r = static_cast <float> (rand()) / static_cast < float> (RAND_MAX);
+    r = static_cast <float> (rand()) / static_cast < float> (RAND_MAX);
 
     if (i < nloads || r < terminal_prob) {
-      std::vector<int> vec = rand_terminal();
+      vec = rand_terminal();
       array(i, 0) = vec[0];
       array(i, 1) = vec[1];
       array(i, 2) = vec[2];
 
     } else {
-      std::vector<int> vec = rand_operator(i);
+      vec = rand_operator(i);
       array(i, 0) = vec[0];
       array(i, 1) = vec[1];
       array(i, 2) = vec[2];
@@ -304,16 +314,17 @@ AcyclicGraph AcyclicGraphManipulator::load(
 
 std::vector<AcyclicGraph> AcyclicGraphManipulator::crossover(
   AcyclicGraph &parent1, AcyclicGraph &parent2) {
-  int c_point = rand() % ag_size;
+  int c_point = (rand() % (ag_size - 1)) + 1;
   std::vector<AcyclicGraph> temp;
   AcyclicGraph c1 = AcyclicGraph(parent1);
   AcyclicGraph c2 = AcyclicGraph(parent2);
-  c1.stack(c_point, 0) = parent2.stack(c_point, 0);
-  c1.stack(c_point, 1) = parent2.stack(c_point, 1);
-  c1.stack(c_point, 2) = parent2.stack(c_point, 2);
-  c2.stack(c_point, 0) = parent1.stack(c_point, 0);
-  c2.stack(c_point, 1) = parent1.stack(c_point, 1);
-  c2.stack(c_point, 2) = parent1.stack(c_point, 2);
+  int parent_1_rows = parent1.stack.rows() - c_point;
+  int parent_2_rows = parent2.stack.rows() - c_point;
+  c1.stack.block(c_point, 0, parent_1_rows, parent1.stack.cols()) = 
+          parent2.stack.block(c_point, 0, parent_2_rows, parent2.stack.cols());
+  c2.stack.block(c_point, 0, parent_2_rows, parent2.stack.cols()) = 
+          parent1.stack.block(c_point, 0, parent_1_rows, parent1.stack.cols());
+
   c1.fitness = std::vector<double>();
   c2.fitness = std::vector<double>();
   c1.fit_set = false;
@@ -341,11 +352,12 @@ AcyclicGraph AcyclicGraphManipulator::mutation(AcyclicGraph &indv) {
 
   if (r < 0.4 && mut_point > nloads) {
     float ran = static_cast <float> (rand()) / static_cast < float> (RAND_MAX);
-    int temp_node = -1;
+    int temp_node = 0;
     int temp_p1 = 0;
     int temp_p2 = 0;
+    bool new_type_found = false;
 
-    while (temp_node < 0) {
+    while (!new_type_found) {
       if (ran < terminal_prob) {
         vec = rand_terminal();
         temp_node = vec[0];
@@ -359,8 +371,8 @@ AcyclicGraph AcyclicGraphManipulator::mutation(AcyclicGraph &indv) {
         temp_p2 = vec[2];
       }
 
-      if (temp_node == orig_node_type && orig_node_type > 1) {
-        temp_node = -1;
+      if (temp_node != orig_node_type || orig_node_type <= 1) {
+        new_type_found = true;
       }
     }
 
@@ -385,29 +397,34 @@ AcyclicGraph AcyclicGraphManipulator::mutation(AcyclicGraph &indv) {
   } else {
     if (orig_node_type > 1) {
       int ran = rand() % 2;
-      int pruned_param = -2;
+      int pruned_param = 0;
 
       if (ran == 0) {
         pruned_param = new_param1;
 
-      } else if (ran == 1) {
+      } 
+      // if random is 1
+      else {
         pruned_param = new_param2;
       }
 
       for (int i = mut_point; i < indv.stack.rows(); ++i) {
-        int p0 = indv.stack(i, 1);
-        int p1 = indv.stack(i, 2);
+        if (indv.stack(i, 0) > 1 && (mut_point == indv.stack(i, 1) ||
+                                     mut_point == indv.stack(i, 2))) {
+          int p0 = indv.stack(i, 1);
+          int p1 = indv.stack(i, 2);
 
-        if (p0 == mut_point) {
-          p0 = pruned_param;
+          if (p0 == mut_point) {
+            p0 = pruned_param;
+          }
+
+          if (p1 == mut_point) {
+            p1 = pruned_param;
+          }
+
+          indv.stack(i, 1) = p0;
+          indv.stack(i, 2) = p1;
         }
-
-        if (p1 == mut_point) {
-          p1 = pruned_param;
-        }
-
-        indv.stack(i, 1) = p0;
-        indv.stack(i, 2) = p1;
       }
     }
   }
@@ -419,7 +436,17 @@ AcyclicGraph AcyclicGraphManipulator::mutation(AcyclicGraph &indv) {
 
 int AcyclicGraphManipulator::distance(AcyclicGraph &indv1,
                                       AcyclicGraph &indv2) {
-  return (indv1.stack - indv2.stack).sum();
+  int tot = 0;
+  for (int i = 0; i < indv1.stack.rows(); ++i) {
+    if (indv1.stack(i, 0) != indv2.stack(i, 0))
+      tot++;
+    if (indv1.stack(i, 1) != indv2.stack(i, 1))
+      tot++;
+    if (indv1.stack(i, 2) != indv2.stack(i, 2))
+      tot++;
+  }
+  return tot;
+  // return (indv1.stack - indv2.stack).sum();
 }
 
 std::vector<int> AcyclicGraphManipulator::rand_operator_params(int arity,
@@ -441,7 +468,8 @@ std::vector<int> AcyclicGraphManipulator::rand_operator_params(int arity,
 }
 
 int AcyclicGraphManipulator::rand_operator_type() {
-  return node_type_vec[rand() % op_vec.size() + 2];
+
+  return node_type_vec[op_vec[rand() % op_vec.size()]];
 }
 
 std::vector<int> AcyclicGraphManipulator::rand_operator(int stack_location) {
@@ -457,7 +485,6 @@ std::vector<int> AcyclicGraphManipulator::rand_operator(int stack_location) {
 int AcyclicGraphManipulator::rand_terminal_param(int terminal) {
   if (terminal == 0) {
     return (rand() % nvars);
-
   } else {
     return -1;
   }
@@ -466,7 +493,6 @@ int AcyclicGraphManipulator::rand_terminal_param(int terminal) {
 int AcyclicGraphManipulator::mutate_terminal_param(int terminal) {
   if (terminal == 0) {
     return (rand() % nvars);
-
   } else {
     return -1;
   }
@@ -474,7 +500,7 @@ int AcyclicGraphManipulator::mutate_terminal_param(int terminal) {
 
 std::vector<int> AcyclicGraphManipulator::rand_terminal() {
   std::vector<int> temp;
-  int node = node_type_vec[rand() % term_vec.size()];
+  int node = node_type_vec[term_vec[rand() % term_vec.size()]];
   int param = rand_terminal_param(node);
   temp.push_back(node);
   temp.push_back(param);

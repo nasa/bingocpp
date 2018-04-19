@@ -93,6 +93,8 @@ class AcyclicGraph {
    *  \param[in] eval_x The x parameters. Eigen::ArrayXXd
    *  \return std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> of evaluated deriv stack
    */
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>evaluate_with_const_deriv(
+  Eigen::ArrayXXd &eval_x);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> evaluate_deriv(
     Eigen::ArrayXXd &eval_x);
   /*! \brief conversion to simplified latex string
@@ -159,6 +161,7 @@ class AcyclicGraphManipulator {
   //! std::vector<int> term_vec
   /*! vector to hold the types of terminals used in the manipulator */
   std::vector<int> term_vec;
+  int num_node_types;
 
   //! \brief Constructor
   AcyclicGraphManipulator(int nvars = 3, int ag_size = 15, int nloads = 1,
