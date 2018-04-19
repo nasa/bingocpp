@@ -24,11 +24,13 @@ class AgcppTest : public::testing::Test {
   AcyclicGraph indv;
   Eigen::ArrayX3d stack2;
   Eigen::ArrayXXd x;
+  AcyclicGraphManipulator manip;
 
   AgcppTest(): stack2(12, 3), x(3, 3) {
   }
 
   void SetUp() {
+    manip = AcyclicGraphManipulator(3, 12, 1);
     indv = AcyclicGraph();
     stack2 << 0, 0, 0,
               0, 1, 1,
@@ -47,6 +49,7 @@ class AgcppTest : public::testing::Test {
     Eigen::VectorXd temp_con(2);
     temp_con << 3.14, 10.0;
     indv.set_constants(temp_con); 
+    manip.simplify_stack(indv);    
   }
 
   void TearDown() {
@@ -85,6 +88,7 @@ class AgcppManipTest : public::testing::Test {
     Eigen::VectorXd temp_con(2);
     temp_con << 3.14, 10.0;
     indv.set_constants(temp_con); 
+    manip.simplify_stack(indv);
   }
 
   void TearDown() {
@@ -181,9 +185,9 @@ TEST_F(AgcppTest, print_stack) {
     out << 2 << "   <= 3.14\n";
     out << 3 << "   <= 10\n";
     out << 4 << "   <= (3) / (1)\n";
-    out << 6 << "   <= (4) + (2)\n";
-    out << 8 << "   <= (6) * (0)\n";
-    out << 11 << "  <= (8) - (0)\n";
+    out << 5 << "   <= (4) + (2)\n";
+    out << 6 << "   <= (5) * (0)\n";
+    out << 7 << "   <= (6) - (0)\n";
     EXPECT_EQ(out.str(), indv.print_stack());
 }
 
@@ -272,6 +276,9 @@ TEST_F(AgcppManipTest, crossover) {
     temp_con << 3.14, 10.0;
     indv.set_constants(temp_con); 
     indv2.stack = stack3;
+    indv2.set_constants(temp_con);
+    manip.simplify_stack(indv);
+    manip.simplify_stack(indv2);
     std::vector<AcyclicGraph> children = manip.crossover(indv, indv2);
     AcyclicGraph c1 = children[0];
     AcyclicGraph c2 = children[1];

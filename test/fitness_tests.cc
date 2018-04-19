@@ -36,6 +36,8 @@ TEST(FitnessTest, optimize_constants) {
               3, 7, 6,
               3, 8, 0;
     indv.stack = stack2;
+    AcyclicGraphManipulator manip = AcyclicGraphManipulator(3, 12, 1);
+    manip.simplify_stack(indv);
     x << 1., 4., 7., 2., 5., 8., 3., 6., 9.;
     Eigen::ArrayXXd y(3, 1);
     y << 4.64, 8.28, 11.42;
@@ -74,6 +76,8 @@ TEST(FitnessTest, evaluate_fitness_vector) {
     Eigen::VectorXd temp_con(2);
     temp_con << 3.14, 10.0;
     indv.set_constants(temp_con); 
+    AcyclicGraphManipulator manip = AcyclicGraphManipulator(3, 12, 1);
+    manip.simplify_stack(indv);
     x << 1., 4., 7., 2., 5., 8., 3., 6., 9.;
     Eigen::ArrayXXd y(3, 1);
     y << 4.64, 8.28, 11.42;
@@ -105,6 +109,8 @@ TEST(FitnessTest, evaluate_fitness) {
               3, 7, 6,
               3, 8, 0;
     indv.stack = stack2;
+    AcyclicGraphManipulator manip = AcyclicGraphManipulator(3, 12, 1);
+    manip.simplify_stack(indv);
     x << 1., 4., 7., 2., 5., 8., 3., 6., 9.;
     Eigen::ArrayXXd y(3, 1);
     y << 4.64, 8.28, 11.42;

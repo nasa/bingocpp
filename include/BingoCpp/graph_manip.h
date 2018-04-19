@@ -49,6 +49,9 @@ class AcyclicGraph {
   //! Eigen::ArrayX3d stack
   /*! stack representation of equation */
   Eigen::ArrayX3d stack;
+  //! Eigen::ArrayX3d simple_stack
+  /*! stack simplified stack */
+  Eigen::ArrayX3d simple_stack;
   //! Eigen::VectorXd constants
   /*! vector to hold constants */
   Eigen::VectorXd constants;
@@ -161,6 +164,8 @@ class AcyclicGraphManipulator {
   //! std::vector<int> term_vec
   /*! vector to hold the types of terminals used in the manipulator */
   std::vector<int> term_vec;
+  //! int num_node_types
+  /*! int to hold the number of node types (matches the python) */
   int num_node_types;
 
   //! \brief Constructor
@@ -176,7 +181,12 @@ class AcyclicGraphManipulator {
    *
    *  \returns new AcyclicGraph individual
    */
-  AcyclicGraph generate();
+  AcyclicGraph generate();  
+  /*! \brief simplifies the individual's stack.
+   *
+   *  \param[in] indv The individual with the stack to simplify. AcyclicGraph
+   */
+  void simplify_stack(AcyclicGraph &indv);
   /*! \brief takes the stack and constants into one object
    *
    *  \returns pair with the stack and constants
