@@ -67,6 +67,9 @@ class AcyclicGraph {
   //! bool needs_opt
   /*! if the constants need optimization */
   bool needs_opt;
+  //! int opt_rate
+  /*! holds rate of optimization */
+  int opt_rate;
   //! \brief Default constructor
   AcyclicGraph();
   //! \brief Copy constructor
@@ -158,6 +161,14 @@ class AcyclicGraphManipulator {
   //! float terminal_prob
   /*! float to hold probability */
   float terminal_prob;
+  //! int op_rate
+  /*! optimization rate to give to generated AGraphs 
+   *
+   * 0 - Default - no extra optimization 
+   * 1 - Simplify stack inputs constants and sets needs optimization
+   * 
+   */
+  int opt_rate;
   //! std::vector<int> node_type_vec
   /*! vector to hold the types of nodes in the manipulator */
   std::vector<int> node_type_vec;
@@ -173,7 +184,8 @@ class AcyclicGraphManipulator {
 
   //! \brief Constructor
   AcyclicGraphManipulator(int nvars = 3, int ag_size = 15, int nloads = 1,
-                          float float_lim = 10.0, float terminal_prob = 0.1);
+                          float float_lim = 10.0, float terminal_prob = 0.1,
+                          int opt_rate = 1);
   /*! \brief Add a type of node to the set of allowed types
    *
    *  \param[in] node_type The type of node to add. int

@@ -23,6 +23,7 @@ AcyclicGraph::AcyclicGraph() {
   fitness = std::vector<double>();
   fit_set = false;
   needs_opt = false;
+  opt_rate = 0;
 }
 
 AcyclicGraph::AcyclicGraph(const AcyclicGraph &ag) {
@@ -32,6 +33,7 @@ AcyclicGraph::AcyclicGraph(const AcyclicGraph &ag) {
   fitness = ag.fitness;
   fit_set = ag.fit_set;
   needs_opt = ag.needs_opt;
+  opt_rate = ag.opt_rate;
 }
 
 AcyclicGraph AcyclicGraph::copy() {
@@ -42,20 +44,22 @@ AcyclicGraph AcyclicGraph::copy() {
   temp.fitness = fitness;
   temp.fit_set = fit_set;
   temp.needs_opt = needs_opt;
+  temp.opt_rate = opt_rate;
   return temp;
 }
 
 bool AcyclicGraph::needs_optimization() {
-  // if (needs_opt)
-  //   return true;
-  // for (int i = 0; i < simple_stack.rows(); ++i) {
-  //   if (simple_stack(i, 0) == 1 && simple_stack(i, 1) == -1 ||
-  //       simple_stack(i, 0) == 1 && simple_stack(i, 1) >= constants.size()) {
-  //     return true;
-  //   }
-  // }
-  // return false;
-  return needs_opt;
+  if (opt_rate == 0) {
+    for (int i = 0; i < simple_stack.rows(); ++i) {
+      if (simple_stack(i, 0) == 1 && simple_stack(i, 1) == -1 ||
+          simple_stack(i, 0) == 1 && simple_stack(i, 1) >= constants.size()) {
+        return true;
+      }
+    }
+    return false;
+  }
+  else
+    return needs_opt;
 }
 
 void AcyclicGraph::set_constants(Eigen::VectorXd con) {
@@ -63,7 +67,24 @@ void AcyclicGraph::set_constants(Eigen::VectorXd con) {
 }
 
 int AcyclicGraph::count_constants() {
-  return constants.size();
+  if (opt_rate == 0) {
+    std::set<int> util = utilized_commands();
+    std::set<int>::iterator it = util.begin();
+    int const_num = 0;
+
+    for (int i = 0; i < simple_stack.rows(); ++i, ++it) {
+      if (simple_stack(i, 0) == 1) {
+        simple_stack(i, 1) = const_num;
+        simple_stack(i, 2) = const_num;
+        stack(*it, 1) = const_num;
+        stack(*it, 2) = const_num;
+        const_num += 1;
+      }
+    }
+    return const_num;
+  }
+  else
+    return constants.size();
 }
 
 Eigen::ArrayXXd AcyclicGraph::evaluate(Eigen::ArrayXXd &eval_x) {
@@ -210,12 +231,14 @@ std::string AcyclicGraph::print_stack() {
 }
 
 AcyclicGraphManipulator::AcyclicGraphManipulator(int nvars, int ag_size,
-    int nloads, float float_lim, float terminal_prob) {
+    int nloads, float float_lim, float terminal_prob, int opt_rate) {
   this->nvars = nvars;
   this->ag_size = ag_size;
   this->nloads = nloads;
   this->float_lim = float_lim;
   this->terminal_prob = terminal_prob;
+  this->opt_rate = opt_rate;
+
   num_node_types = 0;
   
   add_node_type(0);
@@ -271,6 +294,7 @@ AcyclicGraph AcyclicGraphManipulator::generate() {
   }
 
   indv.stack = array;
+  indv.opt_rate = opt_rate;
   simplify_stack(indv);
   return indv;
 }
@@ -279,46 +303,66 @@ void AcyclicGraphManipulator::simplify_stack(AcyclicGraph &indv) {
   std::set<int> util = indv.utilized_commands();
   std::map<int, int> reduced;
   Eigen::ArrayX3d temp(util.size(), 3);
-  std::set<int>::iterator it = util.begin();
-  int j = 0;
-  int const_num = 0;
-  for (int i = 0; i < indv.stack.rows(); ++i) {
-    if (i == *it) {
-      reduced[*it] = j;
-      temp(j, 0) = indv.stack(*it, 0);
-      if (temp(j, 0) == 0) {
-        temp(j, 1) = indv.stack(*it, 1);
-        temp(j, 2) = indv.stack(*it, 2);
-      }
-      else if (temp(j, 0) == 1) {
-        if (indv.stack(*it, 1) == -1) {
-          indv.needs_opt = true;
-        }
-        temp(j, 1) = const_num;
-        temp(j, 2) = const_num;
-        indv.stack(*it, 1) = const_num;
-        indv.stack(*it, 2) = const_num;
-        const_num += 1;
+  if (opt_rate == 0) {
+    int i = 0;
+    for (std::set<int>::iterator it = util.begin(); it != util.end(); ++it) {
+      reduced[*it] = i;
+      temp(i, 0) = indv.stack(*it, 0);
+      int arity = indv.oper_interface.operator_map[temp(i, 0)]->get_arity();
+      if (arity == 0) {
+        temp(i, 1) = indv.stack(*it, 1);
+        temp(i, 2) = indv.stack(*it, 2);
       }
       else {
-        temp(j, 1) = reduced[indv.stack(*it, 1)];
-        temp(j, 2) = reduced[indv.stack(*it, 2)];
+        temp(i, 1) = reduced[indv.stack(*it, 1)];
+        temp(i, 2) = reduced[indv.stack(*it, 2)];
       }
-      ++j;
-      ++it;
+      ++i;
     }
-    else {
-      if (indv.stack(i, 0) == 1) {
-        indv.stack(i, 1) = -1;
-        indv.stack(i, 2) = -1;
-      }
-    }
+    indv.simple_stack = temp;
   }
-  indv.simple_stack = temp;
-  if (const_num != indv.count_constants()) {
-    if (const_num > indv.count_constants())
-      indv.needs_opt = true;
-    indv.constants.conservativeResize(const_num);
+  else {  
+    std::set<int>::iterator it = util.begin();
+    int j = 0;
+    int const_num = 0;
+    for (int i = 0; i < indv.stack.rows(); ++i) {
+      if (i == *it) {
+        reduced[*it] = j;
+        temp(j, 0) = indv.stack(*it, 0);
+        if (temp(j, 0) == 0) {
+          temp(j, 1) = indv.stack(*it, 1);
+          temp(j, 2) = indv.stack(*it, 2);
+        }
+        else if (temp(j, 0) == 1) {
+          if (indv.stack(*it, 1) == -1) {
+            indv.needs_opt = true;
+          }
+          temp(j, 1) = const_num;
+          temp(j, 2) = const_num;
+          indv.stack(*it, 1) = const_num;
+          indv.stack(*it, 2) = const_num;
+          const_num += 1;
+        }
+        else {
+          temp(j, 1) = reduced[indv.stack(*it, 1)];
+          temp(j, 2) = reduced[indv.stack(*it, 2)];
+        }
+        ++j;
+        ++it;
+      }
+      else {
+        if (indv.stack(i, 0) == 1) {
+          indv.stack(i, 1) = -1;
+          indv.stack(i, 2) = -1;
+        }
+      }
+    }
+    indv.simple_stack = temp;
+    if (const_num != indv.count_constants()) {
+      indv.constants.conservativeResize(const_num);
+      if (const_num > indv.count_constants())
+        indv.needs_opt = true;
+    }
   }
 }
 
@@ -330,7 +374,7 @@ std::pair<Eigen::ArrayX3d, Eigen::VectorXd> AcyclicGraphManipulator::dump(
 
 AcyclicGraph AcyclicGraphManipulator::load(
   std::pair<Eigen::ArrayX3d, Eigen::VectorXd> indv_list) {
-  AcyclicGraph temp;
+  AcyclicGraph temp = AcyclicGraph();
   temp.stack = indv_list.first;
   temp.constants = indv_list.second;
   simplify_stack(temp);

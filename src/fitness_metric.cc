@@ -62,6 +62,7 @@ void FitnessMetric::optimize_constants(AcyclicGraph &indv,
   Eigen::LevenbergMarquardt<LMFunctor, double> lm(functor);
   lm.minimize(vec);
   indv.set_constants(vec);
+  indv.needs_opt = false;
 }
 
 Eigen::ArrayXXd StandardRegression::evaluate_fitness_vector(AcyclicGraph &indv,
