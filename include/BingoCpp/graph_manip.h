@@ -64,6 +64,9 @@ class AcyclicGraph {
   //! bool fit_set
   /*! if the fitness is set */
   bool fit_set;
+  //! bool needs_opt
+  /*! if the constants need optimization */
+  bool needs_opt;
   //! \brief Default constructor
   AcyclicGraph();
   //! \brief Copy constructor
@@ -80,9 +83,9 @@ class AcyclicGraph {
    *  \param[in] con The constants to set. Eigen::VectorXd
    */
   void set_constants(Eigen::VectorXd con);
-  /*! \brief count the utilized constants in stack
+  /*! \brief returns constants.size()
    *
-   *  \return int the number of utilized constants in stack
+   *  \return int the size of the constants vector
    */
   int count_constants();
   /*! \brief evaluate the compiled stack
