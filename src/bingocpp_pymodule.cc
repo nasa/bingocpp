@@ -54,7 +54,7 @@ PYBIND11_MODULE(bingocpp, m) {
   .def(py::init<int &, int &, int &, float &, float &, int &>(),
        py::arg("nvars") = 3, py::arg("ag_size") = 15, py::arg("nloads") = 1,
        py::arg("float_lim") = 10.0, py::arg("terminal_prob") = 0.1,
-       py::arg("opt_rate") = 1)
+       py::arg("opt_rate") = 0)
   .def("add_node_type", &AcyclicGraphManipulator::add_node_type)
   .def("generate", &AcyclicGraphManipulator::generate)
   .def("simplify_stack", &AcyclicGraphManipulator::simplify_stack)

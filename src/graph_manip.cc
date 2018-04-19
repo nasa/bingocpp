@@ -358,10 +358,9 @@ void AcyclicGraphManipulator::simplify_stack(AcyclicGraph &indv) {
       }
     }
     indv.simple_stack = temp;
-    if (const_num != indv.count_constants()) {
-      indv.constants.conservativeResize(const_num);
-      if (const_num > indv.count_constants())
-        indv.needs_opt = true;
+    if (const_num > indv.count_constants()) {
+      indv.constants.resize(const_num);
+      indv.needs_opt = true;
     }
   }
 }
@@ -400,6 +399,74 @@ std::vector<AcyclicGraph> AcyclicGraphManipulator::crossover(
   child2.fit_set = false;
   simplify_stack(child1);
   simplify_stack(child2);
+
+  if (opt_rate == 2) {
+    int child_1_cons = child1.count_constants();
+    int child_2_cons = child2.count_constants();
+    if (child_1_cons > 0 || child_2_cons > 0) {
+      Eigen::VectorXd temp_const_vec_1(child_1_cons);
+      Eigen::VectorXd temp_const_vec_2(child_2_cons);
+      int i = 0;
+      int const_1_loc = 0;
+      int const_2_loc = 0;
+      while (i < cross) {
+        if (child1.stack(i, 0) == 1 && child1.stack(i, 1) != -1) {
+          int con = parent1.stack(i, 1);
+          if (con == -1) {
+            child1.needs_opt = true;
+            temp_const_vec_1(const_1_loc) = 0;
+          }
+          else
+            temp_const_vec_1(const_1_loc) = parent1.constants(con);
+          ++const_1_loc;
+        }
+        if (child2.stack(i, 0) == 1 && child2.stack(i, 1) != -1) {
+          int con = parent2.stack(i, 1);
+          if (con == -1) {
+            child2.needs_opt = true;
+            temp_const_vec_2(const_2_loc) = 0;
+          }
+          else
+            temp_const_vec_2(const_2_loc) = parent2.constants(con);
+          ++const_2_loc;
+        }
+        ++i;
+      }
+      while (i < parent1.stack.rows()) {
+        if (child2.stack(i, 0) == 1 && child2.stack(i, 1) != -1) {
+          int con = parent1.stack(i, 1);
+          if (con == -1) {
+            child2.needs_opt = true;
+            temp_const_vec_2(const_2_loc) = 0;
+          }
+          else
+            temp_const_vec_2(const_2_loc) = parent1.constants(con);
+          ++const_2_loc;
+        }
+        if (child1.stack(i, 0) == 1 && child1.stack(i, 1) != -1) {
+          int con = parent2.stack(i, 1);
+          if (con == -1) {
+            child1.needs_opt = true;
+            temp_const_vec_1(const_1_loc) = 0;
+          }
+          else
+            temp_const_vec_1(const_1_loc) = parent2.constants(con);
+          ++const_1_loc;
+        }
+        ++i;
+      }
+      child1.set_constants(temp_const_vec_1);
+      child2.set_constants(temp_const_vec_2);
+    }
+  }
+
+  if (opt_rate == 3 || opt_rate == 5) {
+    if (child1.count_constants() > 0)
+      child1.needs_opt = true;
+    if (child2.count_constants() > 0)
+      child2.needs_opt = true;
+  }
+
   temp.push_back(child1);
   temp.push_back(child2);
   return temp;
@@ -503,6 +570,8 @@ AcyclicGraph AcyclicGraphManipulator::mutation(AcyclicGraph &indv) {
   indv.fitness = std::vector<double>();
   indv.fit_set = false;
   simplify_stack(indv);
+  if ((opt_rate == 4 || opt_rate == 5) && indv.count_constants() > 0)
+    indv.needs_opt = true;
   return indv;
 }
 

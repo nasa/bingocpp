@@ -67,8 +67,16 @@ class AcyclicGraph {
   //! bool needs_opt
   /*! if the constants need optimization */
   bool needs_opt;
-  //! int opt_rate
-  /*! holds rate of optimization */
+  //! int op_rate
+  /*! rate to determine when to optimize 
+   *
+   * 0 - Default - no extra optimization 
+   * 1 - Simplify stack inputs constants and sets needs optimization
+   * 2 - Same as 1, but during crossover, bring constants from parent to child
+   * 3 - Same as 1, but optimize every crossover
+   * 4 - Same as 1, but optimize every mutation
+   * 5 - Same as 1, but optimize every mutation and crossover
+   */
   int opt_rate;
   //! \brief Default constructor
   AcyclicGraph();
@@ -166,7 +174,10 @@ class AcyclicGraphManipulator {
    *
    * 0 - Default - no extra optimization 
    * 1 - Simplify stack inputs constants and sets needs optimization
-   * 
+   * 2 - Same as 1, but during crossover, bring constants from parent to child
+   * 3 - Same as 1, but optimize every crossover
+   * 4 - Same as 1, but optimize every mutation
+   * 5 - Same as 1, but optimize every mutation and crossover
    */
   int opt_rate;
   //! std::vector<int> node_type_vec
@@ -185,7 +196,7 @@ class AcyclicGraphManipulator {
   //! \brief Constructor
   AcyclicGraphManipulator(int nvars = 3, int ag_size = 15, int nloads = 1,
                           float float_lim = 10.0, float terminal_prob = 0.1,
-                          int opt_rate = 1);
+                          int opt_rate = 0);
   /*! \brief Add a type of node to the set of allowed types
    *
    *  \param[in] node_type The type of node to add. int
