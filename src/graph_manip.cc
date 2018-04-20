@@ -24,6 +24,7 @@ AcyclicGraph::AcyclicGraph() {
   fit_set = false;
   needs_opt = false;
   opt_rate = 0;
+  genetic_age = 0;
 }
 
 AcyclicGraph::AcyclicGraph(const AcyclicGraph &ag) {
@@ -34,6 +35,7 @@ AcyclicGraph::AcyclicGraph(const AcyclicGraph &ag) {
   fit_set = ag.fit_set;
   needs_opt = ag.needs_opt;
   opt_rate = ag.opt_rate;
+  genetic_age = ag.genetic_age;
 }
 
 AcyclicGraph AcyclicGraph::copy() {
@@ -45,6 +47,7 @@ AcyclicGraph AcyclicGraph::copy() {
   temp.fit_set = fit_set;
   temp.needs_opt = needs_opt;
   temp.opt_rate = opt_rate;
+  temp.genetic_age = genetic_age;
   return temp;
 }
 
@@ -365,17 +368,24 @@ void AcyclicGraphManipulator::simplify_stack(AcyclicGraph &indv) {
   }
 }
 
-std::pair<Eigen::ArrayX3i, Eigen::VectorXd> AcyclicGraphManipulator::dump(
-  AcyclicGraph &indv) {
+std::pair<std::pair<Eigen::ArrayX3i, Eigen::VectorXd>, int> AcyclicGraphManipulator::dump(AcyclicGraph &indv) {
+// std::pair<Eigen::ArrayX3i, Eigen::VectorXd> AcyclicGraphManipulator::dump(
+//   AcyclicGraph &indv) {
   std::pair<Eigen::ArrayX3i, Eigen::VectorXd> temp(indv.stack, indv.constants);
-  return temp;
+  std::pair<std::pair<Eigen::ArrayX3i, Eigen::VectorXd>, int> dumped(temp, indv.genetic_age);
+  return dumped;
+  // return temp;
 }
 
-AcyclicGraph AcyclicGraphManipulator::load(
-  std::pair<Eigen::ArrayX3i, Eigen::VectorXd> indv_list) {
+AcyclicGraph AcyclicGraphManipulator::load(std::pair<std::pair<Eigen::ArrayX3i, Eigen::VectorXd>, int> indv_list) {
+// AcyclicGraph AcyclicGraphManipulator::load(
+//   std::pair<Eigen::ArrayX3i, Eigen::VectorXd> indv_list) {
   AcyclicGraph temp = AcyclicGraph();
-  temp.stack = indv_list.first;
-  temp.constants = indv_list.second;
+  temp.stack = indv_list.first.first;
+  temp.constants = indv_list.first.second;
+  // temp.stack = indv_list.first;
+  // temp.constants = indv_list.second;
+  temp.genetic_age = indv_list.second;
   simplify_stack(temp);
   return temp;
 }
@@ -393,6 +403,9 @@ std::vector<AcyclicGraph> AcyclicGraphManipulator::crossover(
   child2.stack.block(cross, 0, parent_2_rows, parent2.stack.cols()) = 
           parent1.stack.block(cross, 0, parent_1_rows, parent1.stack.cols());
 
+  int max_gen_age = std::max(parent1.genetic_age, parent2.genetic_age);
+  child1.genetic_age = max_gen_age;
+  child2.genetic_age = max_gen_age;
   child1.fitness = std::vector<double>();
   child2.fitness = std::vector<double>();
   child1.fit_set = false;

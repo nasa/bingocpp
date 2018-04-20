@@ -39,6 +39,7 @@ PYBIND11_MODULE(bingocpp, m) {
   .def_readwrite("constants", &AcyclicGraph::constants)
   .def_readwrite("fitness", &AcyclicGraph::fitness)
   .def_readwrite("fit_set", &AcyclicGraph::fit_set)
+  .def_readwrite("genetic_age", &AcyclicGraph::genetic_age)
   .def("copy", &AcyclicGraph::copy)
   .def("needs_optimization", &AcyclicGraph::needs_optimization)
   .def("set_constants", &AcyclicGraph::set_constants)

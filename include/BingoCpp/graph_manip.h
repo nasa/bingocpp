@@ -78,6 +78,9 @@ class AcyclicGraph {
    * 5 - Same as 1, but optimize every mutation and crossover
    */
   int opt_rate;
+  //! int genetic_age
+  /*! holds genetic age of individual */
+  int genetic_age;
   //! \brief Default constructor
   AcyclicGraph();
   //! \brief Copy constructor
@@ -217,12 +220,14 @@ class AcyclicGraphManipulator {
    *
    *  \returns pair with the stack and constants
    */
-  std::pair<Eigen::ArrayX3i, Eigen::VectorXd> dump(AcyclicGraph &indv);
+  // std::pair<Eigen::ArrayX3i, Eigen::VectorXd> dump(AcyclicGraph &indv);
+  std::pair<std::pair<Eigen::ArrayX3i, Eigen::VectorXd>, int> dump(AcyclicGraph &indv);
   /*! \brief loads a new AcyclicGraph with the stack and constants
    *
    *  \returns AcyclicGraph with the stack and constants
    */
-  AcyclicGraph load(std::pair<Eigen::ArrayX3i, Eigen::VectorXd> indv_list);
+  AcyclicGraph load(std::pair<std::pair<Eigen::ArrayX3i, Eigen::VectorXd>, int> indv_list);
+  // AcyclicGraph load(std::pair<Eigen::ArrayX3i, Eigen::VectorXd> indv_list);
   /*! \brief Single point crossover
    *
    *  \param[in] parent1 the first parent. AcyclicGraph
