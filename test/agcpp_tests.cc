@@ -22,7 +22,7 @@
 class AgcppTest : public::testing::Test {
  public:
   AcyclicGraph indv;
-  Eigen::ArrayX3d stack2;
+  Eigen::ArrayX3i stack2;
   Eigen::ArrayXXd x;
   AcyclicGraphManipulator manip;
 
@@ -68,7 +68,7 @@ class AgcppManipTest : public::testing::Test {
 
   void SetUp() {
     manip = AcyclicGraphManipulator(3, 12, 1);
-    Eigen::ArrayX3d stack(12, 3);
+    Eigen::ArrayX3i stack(12, 3);
     Eigen::ArrayXXd x(3, 3);
     indv = AcyclicGraph();
     stack << 0, 0, 0,
@@ -223,8 +223,8 @@ TEST_F(AgcppManipTest, generate) {
 
 TEST_F(AgcppManipTest, dump) {
     SetUp();
-    std::pair<Eigen::ArrayX3d, Eigen::VectorXd> truth(indv.stack, indv.constants);
-    std::pair<Eigen::ArrayX3d, Eigen::VectorXd> temp = manip.dump(indv);
+    std::pair<Eigen::ArrayX3i, Eigen::VectorXd> truth(indv.stack, indv.constants);
+    std::pair<Eigen::ArrayX3i, Eigen::VectorXd> temp = manip.dump(indv);
     
     for (int i = 0; i < indv.stack.rows(); ++i) {
         ASSERT_DOUBLE_EQ(indv.stack(i, 0), truth.first(i, 0));
@@ -238,7 +238,7 @@ TEST_F(AgcppManipTest, dump) {
 
 TEST_F(AgcppManipTest, load) {
     SetUp();
-    std::pair<Eigen::ArrayX3d, Eigen::VectorXd> temp_pair(indv.stack, indv.constants);
+    std::pair<Eigen::ArrayX3i, Eigen::VectorXd> temp_pair(indv.stack, indv.constants);
     AcyclicGraph temp = manip.load(temp_pair);
     
     for (int i = 0; i < indv.stack.rows(); ++i) {
@@ -259,7 +259,7 @@ TEST_F(AgcppManipTest, crossover) {
     manip.add_node_type(5);
 
     AcyclicGraph indv2 = AcyclicGraph();
-    Eigen::ArrayX3d stack3(12, 3);
+    Eigen::ArrayX3i stack3(12, 3);
     stack3 << 0, 0, 0,
               0, 1, 1,
               1, 0, 0,

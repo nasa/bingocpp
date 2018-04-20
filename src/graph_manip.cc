@@ -17,9 +17,9 @@
 
 
 AcyclicGraph::AcyclicGraph() {
-  stack = Eigen::ArrayX3d(0, 3);
+  stack = Eigen::ArrayX3i(0, 3);
   constants = Eigen::VectorXd(0);
-  simple_stack = Eigen::ArrayX3d(0, 3);
+  simple_stack = Eigen::ArrayX3i(0, 3);
   fitness = std::vector<double>();
   fit_set = false;
   needs_opt = false;
@@ -272,7 +272,7 @@ void AcyclicGraphManipulator::add_node_type(int node_type) {
 
 AcyclicGraph AcyclicGraphManipulator::generate() {
   AcyclicGraph indv = AcyclicGraph();
-  Eigen::ArrayX3d array(ag_size, 3);
+  Eigen::ArrayX3i array(ag_size, 3);
   float r = 0;
   std::vector<int> vec;
 
@@ -302,7 +302,7 @@ AcyclicGraph AcyclicGraphManipulator::generate() {
 void AcyclicGraphManipulator::simplify_stack(AcyclicGraph &indv) {
   std::set<int> util = indv.utilized_commands();
   std::map<int, int> reduced;
-  Eigen::ArrayX3d temp(util.size(), 3);
+  Eigen::ArrayX3i temp(util.size(), 3);
   if (opt_rate == 0) {
     int i = 0;
     for (std::set<int>::iterator it = util.begin(); it != util.end(); ++it) {
@@ -365,14 +365,14 @@ void AcyclicGraphManipulator::simplify_stack(AcyclicGraph &indv) {
   }
 }
 
-std::pair<Eigen::ArrayX3d, Eigen::VectorXd> AcyclicGraphManipulator::dump(
+std::pair<Eigen::ArrayX3i, Eigen::VectorXd> AcyclicGraphManipulator::dump(
   AcyclicGraph &indv) {
-  std::pair<Eigen::ArrayX3d, Eigen::VectorXd> temp(indv.stack, indv.constants);
+  std::pair<Eigen::ArrayX3i, Eigen::VectorXd> temp(indv.stack, indv.constants);
   return temp;
 }
 
 AcyclicGraph AcyclicGraphManipulator::load(
-  std::pair<Eigen::ArrayX3d, Eigen::VectorXd> indv_list) {
+  std::pair<Eigen::ArrayX3i, Eigen::VectorXd> indv_list) {
   AcyclicGraph temp = AcyclicGraph();
   temp.stack = indv_list.first;
   temp.constants = indv_list.second;

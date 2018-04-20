@@ -23,7 +23,7 @@
 // create an instance of the Operator_Interface map
 OperatorInterface oper_interface;
 
-void ReverseSingleCommand(const Eigen::ArrayX3d &stack,
+void ReverseSingleCommand(const Eigen::ArrayX3i &stack,
                           const int command_index,
                           const std::vector<Eigen::ArrayXXd> &forward_buffer,
                           std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -38,7 +38,7 @@ void ReverseSingleCommand(const Eigen::ArrayX3d &stack,
 
 
 
-Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3d & stack,
+Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3i & stack,
                          const Eigen::ArrayXXd &x,
                          const Eigen::VectorXd &constants) {
   // Evaluates a stack at the given x using the given constants.
@@ -54,7 +54,7 @@ Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3d & stack,
 
 
 
-Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3d & stack,
+Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i & stack,
                                     const Eigen::ArrayXXd & x,
                                     const Eigen::VectorXd &constants) {
   // Evaluates a stack, but only the commands that are utilized.
@@ -64,7 +64,7 @@ Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3d & stack,
 
 
 
-Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3d & stack,
+Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3i & stack,
                                  const Eigen::ArrayXXd & x,
                                  const Eigen::VectorXd &constants,
                                  const std::vector<bool> &mask) {
@@ -84,7 +84,7 @@ Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3d & stack,
 
 
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
-  const Eigen::ArrayX3d &stack,
+  const Eigen::ArrayX3i &stack,
   const Eigen::ArrayXXd &x,
   const Eigen::VectorXd &constants,
   const bool param_x_or_c) {
@@ -143,7 +143,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
 
 
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
-  const Eigen::ArrayX3d &stack,
+  const Eigen::ArrayX3i &stack,
   const Eigen::ArrayXXd &x,
   const Eigen::VectorXd &constants,
   const bool param_x_or_c) {
@@ -155,7 +155,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
 
 
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
-  const Eigen::ArrayX3d &stack,
+  const Eigen::ArrayX3i &stack,
   const Eigen::ArrayXXd &x,
   const Eigen::VectorXd &constants,
   const std::vector<bool> &mask,
@@ -219,7 +219,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
 
 
 
-void PrintStack(const Eigen::ArrayX3d & stack) {
+void PrintStack(const Eigen::ArrayX3i & stack) {
   // Prints a stack to std::cout.
   for (std::size_t i = 0; i < stack.rows(); ++i) {
     //this is the operator
@@ -243,11 +243,11 @@ void PrintStack(const Eigen::ArrayX3d & stack) {
 
 
 
-Eigen::ArrayX3d SimplifyStack(const Eigen::ArrayX3d & stack) {
+Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i & stack) {
   // Simplifies a stack.
   std::vector<bool> used_command = FindUsedCommands(stack);
   std::map<int, int> reduced_param_map;
-  Eigen::ArrayX3d new_stack(used_command.size(), 3);
+  Eigen::ArrayX3i new_stack(used_command.size(), 3);
 
   // TODO(gbomarito)  would size_t be faster?
   for (int i = 0, j = 0; i < stack.rows(); ++i) {
@@ -267,7 +267,7 @@ Eigen::ArrayX3d SimplifyStack(const Eigen::ArrayX3d & stack) {
 
 
 
-std::vector<bool> FindUsedCommands(const Eigen::ArrayX3d & stack) {
+std::vector<bool> FindUsedCommands(const Eigen::ArrayX3i & stack) {
   // Finds which commands are utilized in a stack.
   std::vector<bool> used_command(stack.rows());
   used_command.back() = true;

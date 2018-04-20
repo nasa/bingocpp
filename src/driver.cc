@@ -30,8 +30,8 @@ int test_eig() {
 }
 
 void TestAcyclicGraph(int num_loops, int num_evals) {
-  Eigen::ArrayX3d stack(12, 3); 
-  Eigen::ArrayX3d simple_stack(8, 3);
+  Eigen::ArrayX3i stack(12, 3); 
+  Eigen::ArrayX3i simple_stack(8, 3);
   Eigen::ArrayXXd x(60, 3);
   Eigen::VectorXd constants(2);
   // y = x_0 * ( C_0 + C_1/x_1 ) - x_0

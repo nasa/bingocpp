@@ -46,12 +46,12 @@
  */
 class AcyclicGraph {
  public:
-  //! Eigen::ArrayX3d stack
+  //! Eigen::ArrayX3i stack
   /*! stack representation of equation */
-  Eigen::ArrayX3d stack;
-  //! Eigen::ArrayX3d simple_stack
+  Eigen::ArrayX3i stack;
+  //! Eigen::ArrayX3i simple_stack
   /*! stack simplified stack */
-  Eigen::ArrayX3d simple_stack;
+  Eigen::ArrayX3i simple_stack;
   //! Eigen::VectorXd constants
   /*! vector to hold constants */
   Eigen::VectorXd constants;
@@ -217,12 +217,12 @@ class AcyclicGraphManipulator {
    *
    *  \returns pair with the stack and constants
    */
-  std::pair<Eigen::ArrayX3d, Eigen::VectorXd> dump(AcyclicGraph &indv);
+  std::pair<Eigen::ArrayX3i, Eigen::VectorXd> dump(AcyclicGraph &indv);
   /*! \brief loads a new AcyclicGraph with the stack and constants
    *
    *  \returns AcyclicGraph with the stack and constants
    */
-  AcyclicGraph load(std::pair<Eigen::ArrayX3d, Eigen::VectorXd> indv_list);
+  AcyclicGraph load(std::pair<Eigen::ArrayX3i, Eigen::VectorXd> indv_list);
   /*! \brief Single point crossover
    *
    *  \param[in] parent1 the first parent. AcyclicGraph
