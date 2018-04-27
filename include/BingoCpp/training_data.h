@@ -73,6 +73,8 @@ struct ImplicitTrainingData : TrainingData {
   /*! dx_dt variabes for ImplicitTraining */
   Eigen::ArrayXXd dx_dt;
   //! \brief Constructor
+  ImplicitTrainingData(Eigen::ArrayXXd vx);
+  //! \brief Constructor
   ImplicitTrainingData(Eigen::ArrayXXd vx, Eigen::ArrayXXd vdx_dt);
   ImplicitTrainingData* get_item(std::list<int> items);
   int size() {

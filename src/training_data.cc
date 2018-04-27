@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <Eigen/Dense>
 #include <Eigen/Core>
+#include "BingoCpp/utils.h"
 
 ExplicitTrainingData::ExplicitTrainingData(Eigen::ArrayXXd vx,
     Eigen::ArrayXXd vy) {
@@ -32,6 +33,12 @@ ExplicitTrainingData* ExplicitTrainingData:: get_item(std::list<int> items) {
 
   ExplicitTrainingData* temp = new ExplicitTrainingData(temp_x, temp_y);
   return temp;
+}
+
+ImplicitTrainingData::ImplicitTrainingData(Eigen::ArrayXXd vx) {
+  std::vector<Eigen::ArrayXXd> temp = calculate_partials(vx);
+  x = temp[0];
+  dx_dt = temp[1];
 }
 
 ImplicitTrainingData::ImplicitTrainingData(Eigen::ArrayXXd vx,
