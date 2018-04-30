@@ -410,24 +410,17 @@ void AcyclicGraphManipulator::simplify_stack(AcyclicGraph &indv) {
 
 std::pair<std::pair<Eigen::ArrayX3i, Eigen::VectorXd>, int>
 AcyclicGraphManipulator::dump(AcyclicGraph &indv) {
-// std::pair<Eigen::ArrayX3i, Eigen::VectorXd> AcyclicGraphManipulator::dump(
-//   AcyclicGraph &indv) {
   std::pair<Eigen::ArrayX3i, Eigen::VectorXd> temp(indv.stack, indv.constants);
   std::pair<std::pair<Eigen::ArrayX3i, Eigen::VectorXd>, int> dumped(temp,
       indv.genetic_age);
   return dumped;
-  // return temp;
 }
 
 AcyclicGraph AcyclicGraphManipulator::load(
   std::pair<std::pair<Eigen::ArrayX3i, Eigen::VectorXd>, int> indv_list) {
-// AcyclicGraph AcyclicGraphManipulator::load(
-//   std::pair<Eigen::ArrayX3i, Eigen::VectorXd> indv_list) {
   AcyclicGraph temp = AcyclicGraph();
   temp.stack = indv_list.first.first;
   temp.constants = indv_list.first.second;
-  // temp.stack = indv_list.first;
-  // temp.constants = indv_list.second;
   temp.genetic_age = indv_list.second;
   simplify_stack(temp);
   return temp;
