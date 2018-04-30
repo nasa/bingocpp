@@ -29,18 +29,18 @@
 std::vector<Eigen::ArrayXXd> calculate_partials(Eigen::ArrayXXd x);
 /*! \brief Generalized factorial
  *
- *   \param[in] a double 
- *   \param[in] b double 
+ *   \param[in] a double
+ *   \param[in] b double
  *   \return double factorial
  */
 double GenFact(double a, double b);
 /*! \brief Calculates the Gram Polynomial (gp_s=0) or its gp_s'th derivative
  *         evaluated at gp_i, order gp_k, over 2gp_m+1 points
  *
- *   \param[in] gp_i double 
- *   \param[in] gp_m double 
- *   \param[in] gp_k double 
- *   \param[in] gp_s double 
+ *   \param[in] gp_i double
+ *   \param[in] gp_m double
+ *   \param[in] gp_k double
+ *   \param[in] gp_s double
  *   \return double polynomial
  */
 double GramPoly(double gp_i, double gp_m, double gp_k, double gp_s);
@@ -48,14 +48,15 @@ double GramPoly(double gp_i, double gp_m, double gp_k, double gp_s);
  *         Least-Square point of the gw_s'th derivative over 2gw_m+1 points,
  *         order gw_n
  *
- *   \param[in] gw_i double 
- *   \param[in] gw_t double 
- *   \param[in] gw_m double 
+ *   \param[in] gw_i double
+ *   \param[in] gw_t double
+ *   \param[in] gw_m double
  *   \param[in] gw_n double
- *   \param[in] gw_s double  
+ *   \param[in] gw_s double
  *   \return double weight
  */
-double GramWeight(double gw_i, double gw_t, double gw_m, double gw_n, double gw_s);
+double GramWeight(double gw_i, double gw_t, double gw_m, double gw_n,
+                  double gw_s);
 /*! \brief Smooth (and optionally differentiate) data with a Savitzky-Golay filter
  *    The Savitzky-Golay filter removes high frequency noise from data.
  *    It has the advantage of preserving the original shape and
@@ -74,19 +75,19 @@ double GramWeight(double gw_i, double gw_t, double gw_m, double gw_n, double gw_
  *    .. [2] Numerical Recipes 3rd Edition: The Art of Scientific Computing
  *       W.H. Press, S.A. Teukolsky, W.T. Vetterling, B.P. Flannery
  *       Cambridge University Press ISBN-13: 9780521880688
- * 
- *  \param[in] y array_like, shape (N,) the values of the time history 
+ *
+ *  \param[in] y array_like, shape (N,) the values of the time history
  *               of the signal. Eigen::ArrayXXd
- *  \param[in] window_size the length of the window. Must be an odd integer 
+ *  \param[in] window_size the length of the window. Must be an odd integer
  *                         number. int
  *  \param[in] order the order of the polynomial used in the filtering. Must
  *                   be less than window_size - 1. int
- *  \param[in] deriv the order of the derivative to compute (default = 0 means 
+ *  \param[in] deriv the order of the derivative to compute (default = 0 means
  *                   only smoothing). int
  *  \return Eiggen::ArrayXXd the smoothed signal (or it's n-th derivative).
  */
 Eigen::ArrayXXd savitzky_golay(Eigen::ArrayXXd y, int window_size,
-                                    int order, int deriv=0);
+                               int order, int deriv = 0);
 // Eigen::ArrayXXd savitzky_golay(Eigen::ArrayXXd y, int window_size,
 //                                     int order, int deriv=0, int rate=1);
 

@@ -84,10 +84,14 @@ PYBIND11_MODULE(bingocpp, m) {
   .def("evaluate_fitness_vector", &ImplicitRegression::evaluate_fitness_vector);
   py::class_<TrainingData>(m, "TrainingData");
   py::class_<ExplicitTrainingData, TrainingData>(m, "ExplicitTrainingData")
+  .def_readwrite("x", &ExplicitTrainingData::x)
+  .def_readwrite("y", &ExplicitTrainingData::y)
   .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
   .def("__getitem__", &ExplicitTrainingData::get_item)
   .def("size", &ExplicitTrainingData::size);
   py::class_<ImplicitTrainingData, TrainingData>(m, "ImplicitTrainingData")
+  .def_readwrite("x", &ImplicitTrainingData::x)
+  .def_readwrite("dx_dt", &ImplicitTrainingData::dx_dt)
   .def(py::init<Eigen::ArrayXXd &>())
   .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
   .def("__getitem__", &ImplicitTrainingData::get_item)

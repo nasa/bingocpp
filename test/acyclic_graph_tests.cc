@@ -695,7 +695,7 @@ TEST_F(AcyclicGraphTest, maskderivative) {
 //   std::cout << "2\n";
 //   ASSERT_LE(short_stack.rows(), stack.rows());
 //   std::cout << "3\n";
-  
+
 //   // equivalent evatuation
 //   Eigen::ArrayXXd y = Evaluate(stack, x, constants);
 //   std::cout << "4\n";

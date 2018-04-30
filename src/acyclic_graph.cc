@@ -91,16 +91,18 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
   // Evaluates a stack and its derivative with the given x and constants.
   std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
   std::vector<std::set<int>> stack_dependencies(stack.rows(), std::set<int>());
-  
   int deriv_size;
   int deriv_operator_number;
+
   if (param_x_or_c) {  // true = x
     deriv_size = x.cols();
     deriv_operator_number = 0;
+
   } else {  // false = c
     deriv_size = constants.size();
     deriv_operator_number = 1;
   }
+
   std::vector<std::set<int>> param_dependencies(deriv_size, std::set<int>());
 
   // forward eval with dependencies
@@ -164,16 +166,18 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
   std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
   std::vector<std::set<int>> stack_dependencies(stack.rows(),
                           std::set<int>());
-  
   int deriv_size;
   int deriv_operator_number;
+
   if (param_x_or_c) {  // true = x
     deriv_size = x.cols();
     deriv_operator_number = 0;
+
   } else {  // false = c
     deriv_size = constants.size();
     deriv_operator_number = 1;
   }
+
   std::vector<std::set<int>> param_dependencies(deriv_size, std::set<int>());
 
   // forward eval with dependencies

@@ -68,9 +68,9 @@ class AcyclicGraph {
   /*! if the constants need optimization */
   bool needs_opt;
   //! int op_rate
-  /*! rate to determine when to optimize 
+  /*! rate to determine when to optimize
    *
-   * 0 - Default - no extra optimization 
+   * 0 - Default - no extra optimization
    * 1 - Simplify stack inputs constants and sets needs optimization
    * 2 - Same as 1, but during crossover, bring constants from parent to child
    * 3 - Same as 1, but optimize every crossover
@@ -114,7 +114,7 @@ class AcyclicGraph {
    *  \return std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> of evaluated deriv stack
    */
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>evaluate_with_const_deriv(
-  Eigen::ArrayXXd &eval_x);
+    Eigen::ArrayXXd &eval_x);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> evaluate_deriv(
     Eigen::ArrayXXd &eval_x);
   /*! \brief conversion to simplified latex string
@@ -173,9 +173,9 @@ class AcyclicGraphManipulator {
   /*! float to hold probability */
   float terminal_prob;
   //! int op_rate
-  /*! optimization rate to give to generated AGraphs 
+  /*! optimization rate to give to generated AGraphs
    *
-   * 0 - Default - no extra optimization 
+   * 0 - Default - no extra optimization
    * 1 - Simplify stack inputs constants and sets needs optimization
    * 2 - Same as 1, but during crossover, bring constants from parent to child
    * 3 - Same as 1, but optimize every crossover
@@ -210,7 +210,7 @@ class AcyclicGraphManipulator {
    *
    *  \returns new AcyclicGraph individual
    */
-  AcyclicGraph generate();  
+  AcyclicGraph generate();
   /*! \brief simplifies the individual's stack.
    *
    *  \param[in] indv The individual with the stack to simplify. AcyclicGraph
@@ -221,12 +221,14 @@ class AcyclicGraphManipulator {
    *  \returns pair with the stack and constants
    */
   // std::pair<Eigen::ArrayX3i, Eigen::VectorXd> dump(AcyclicGraph &indv);
-  std::pair<std::pair<Eigen::ArrayX3i, Eigen::VectorXd>, int> dump(AcyclicGraph &indv);
+  std::pair<std::pair<Eigen::ArrayX3i, Eigen::VectorXd>, int> dump(
+    AcyclicGraph &indv);
   /*! \brief loads a new AcyclicGraph with the stack and constants
    *
    *  \returns AcyclicGraph with the stack and constants
    */
-  AcyclicGraph load(std::pair<std::pair<Eigen::ArrayX3i, Eigen::VectorXd>, int> indv_list);
+  AcyclicGraph load(std::pair<std::pair<Eigen::ArrayX3i, Eigen::VectorXd>, int>
+                    indv_list);
   // AcyclicGraph load(std::pair<Eigen::ArrayX3i, Eigen::VectorXd> indv_list);
   /*! \brief Single point crossover
    *

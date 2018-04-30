@@ -126,10 +126,10 @@ struct StandardRegression : FitnessMetric {
  *  \brief Implicit Regression
  */
 struct ImplicitRegression : FitnessMetric {
- public: 
+ public:
   //! int required_params
   /*! minimum number of non zero components of dot */
-  int required_params;  
+  int required_params;
   //! bool normalize_dot
   /*! normalize the terms in the dot product */
   bool normalize_dot;

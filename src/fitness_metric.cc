@@ -81,26 +81,31 @@ ImplicitRegression::ImplicitRegression(int required_params, bool normalize_dot,
 Eigen::ArrayXXd ImplicitRegression::evaluate_fitness_vector(AcyclicGraph &indv,
     TrainingData &train) {
   ImplicitTrainingData* temp = dynamic_cast<ImplicitTrainingData*>(&train);
-  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> deriv = indv.evaluate_deriv(temp->x);
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> deriv = indv.evaluate_deriv(
+        temp->x);
   Eigen::ArrayXXd dot(deriv.second.rows(), deriv.second.cols());
   double infinity = std::numeric_limits<double>::infinity();
-  
+
   if (normalize_dot) {
     dot = (deriv.second / (deriv.second.square().rowwise().sum().sqrt())) *
           (temp->dx_dt / (temp->dx_dt.square().rowwise().sum().sqrt()));
-  }
-  else {
+
+  } else {
     dot = deriv.second * temp->dx_dt;
   }
 
   if (required_params != 0) {
     int n_params_used;
+
     for (int i = 0; i < dot.rows(); ++i) {
       n_params_used = 0;
+
       for (int j = 0; j < dot.cols(); ++j) {
-        if (dot(i, j) > 0)
+        if (dot(i, j) > 0) {
           ++n_params_used;
+        }
       }
+
       if (n_params_used >= required_params) {
         return Eigen::ArrayXXd::Constant(deriv.second.rows(), 1, infinity);
       }
@@ -109,5 +114,5 @@ Eigen::ArrayXXd ImplicitRegression::evaluate_fitness_vector(AcyclicGraph &indv,
 
   Eigen::ArrayXXd fit(deriv.second.rows(), 1);
   fit = dot.rowwise().sum() / dot.abs().rowwise().sum();
-  return fit;  
+  return fit;
 }

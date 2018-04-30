@@ -30,7 +30,7 @@ int test_eig() {
 }
 
 void TestAcyclicGraph(int num_loops, int num_evals) {
-  Eigen::ArrayX3i stack(12, 3); 
+  Eigen::ArrayX3i stack(12, 3);
   Eigen::ArrayX3i simple_stack(8, 3);
   Eigen::ArrayXXd x(60, 3);
   Eigen::VectorXd constants(2);
@@ -48,14 +48,13 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
         3, 7, 6,
         3, 8, 0;
   simple_stack << 0, 0, 0,
-        0, 1, 1,
-        1, 0, 0,
-        1, 1, 1,
-        5, 3, 1,
-        2, 4, 2,
-        4, 5, 0,
-        3, 6, 0;
-
+               0, 1, 1,
+               1, 0, 0,
+               1, 1, 1,
+               5, 3, 1,
+               2, 4, 2,
+               4, 5, 0,
+               3, 6, 0;
   x << 1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9.,
   1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9.,
   1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9.,
