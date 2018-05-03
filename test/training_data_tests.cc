@@ -114,37 +114,33 @@ TEST(TrainingDataTest, ImplicitSize) {
 }
 
 TEST(UtilsTest, savitzky_golay) {
-    Eigen::ArrayXXd y(9, 2);
-    y << 7, 4, 3, 11, 2, 13, 6, 15, 10, 22, 0, 14, 18, 19, 2, 15, 13, 8;
+  Eigen::ArrayXXd y(9, 2);
+  y << 7, 4, 3, 11, 2, 13, 6, 15, 10, 22, 0, 14, 18, 19, 2, 15, 13, 8;
+  Eigen::ArrayXXd truth(9, 1);
+  truth << -.0595238, -1.0119, -.964286, .0833333, 2.96032, -.18254, .186508,
+        1.72222, 4.4246;
+  Eigen::ArrayXXd sav = savitzky_golay(y, 7, 3, 1);
 
-    Eigen::ArrayXXd truth(9, 1);
-    truth << -.0595238, -1.0119, -.964286, .0833333, 2.96032, -.18254, .186508, 1.72222, 4.4246;
-    
-    Eigen::ArrayXXd sav = savitzky_golay(y, 7, 3, 1);
-
-    for (int i = 0; i < 9; ++i) {
-      ASSERT_NEAR(sav(i), truth(i), .01);
-    }
+  for (int i = 0; i < 9; ++i) {
+    ASSERT_NEAR(sav(i), truth(i), .01);
+  }
 }
 
 TEST(UtilsTest, calculate_partials) {
-    Eigen::ArrayXXd x(8, 3);
-    x << 1., 4., 7., 2., 5., 8., 3., 6., 9.,
-         5., 1., 4., 5., 6., 7., 8., 4., 5.,
-         7., 3., 14., 5.64, 8.28, 11.42;
+  Eigen::ArrayXXd x(8, 3);
+  x << 1., 4., 7., 2., 5., 8., 3., 6., 9.,
+  5., 1., 4., 5., 6., 7., 8., 4., 5.,
+  7., 3., 14., 5.64, 8.28, 11.42;
+  Eigen::ArrayXXd x_truth(1, 3);
+  Eigen::ArrayXXd time_deriv_truth(1, 3);
+  x_truth << 5, 1, 4;
+  time_deriv_truth << 1.53175, -.178571, -1.86905;
+  std::vector<Eigen::ArrayXXd> cal = calculate_partials(x);
 
-    Eigen::ArrayXXd x_truth(1, 3);
-    Eigen::ArrayXXd time_deriv_truth(1, 3);
-
-    x_truth << 5, 1, 4;
-    time_deriv_truth << 1.53175, -.178571, -1.86905;
-    
-    std::vector<Eigen::ArrayXXd> cal = calculate_partials(x);
-
-    for (int i = 0; i < 1; ++i) {
-      ASSERT_NEAR(cal[0](i, 0), x_truth(i, 0), .001);
-      ASSERT_NEAR(cal[0](i, 1), x_truth(i, 1), .001);
-      ASSERT_NEAR(cal[1](i, 0), time_deriv_truth(i, 0), .001);
-      ASSERT_NEAR(cal[1](i, 1), time_deriv_truth(i, 1), .001);
-    }
+  for (int i = 0; i < 1; ++i) {
+    ASSERT_NEAR(cal[0](i, 0), x_truth(i, 0), .001);
+    ASSERT_NEAR(cal[0](i, 1), x_truth(i, 1), .001);
+    ASSERT_NEAR(cal[1](i, 0), time_deriv_truth(i, 0), .001);
+    ASSERT_NEAR(cal[1](i, 1), time_deriv_truth(i, 1), .001);
+  }
 }

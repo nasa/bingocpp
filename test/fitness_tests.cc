@@ -140,11 +140,9 @@ TEST(FitnessTest, implicit_evaluate_fitness_vector) {
   manip.simplify_stack(indv);
   Eigen::ArrayXXd x(8, 3);
   x << 1., 4., 7., 2., 5., 8., 3., 6., 9.,
-        5., 1., 4., 5., 6., 7., 8., 4., 5.,
-        7., 3., 14., 5.64, 8.28, 11.42;
+  5., 1., 4., 5., 6., 7., 8., 4., 5.,
+  7., 3., 14., 5.64, 8.28, 11.42;
   ImplicitTrainingData im = ImplicitTrainingData(x);
-  
   Eigen::ArrayXXd f = ir.evaluate_fitness_vector(indv, im);
-
   ASSERT_NEAR(f(0), 1, .001);
 }
