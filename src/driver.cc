@@ -30,13 +30,8 @@ int test_eig() {
 }
 
 void TestAcyclicGraph(int num_loops, int num_evals) {
-<<<<<<< HEAD
-  Eigen::ArrayX3d stack(12, 3);
-  Eigen::ArrayX3d simple_stack(8, 3);
-=======
   Eigen::ArrayX3i stack(12, 3);
   Eigen::ArrayX3i simple_stack(8, 3);
->>>>>>> origin/distance
   Eigen::ArrayXXd x(60, 3);
   Eigen::VectorXd constants(2);
   // y = x_0 * ( C_0 + C_1/x_1 ) - x_0
@@ -52,16 +47,6 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
         4, 5, 6,
         3, 7, 6,
         3, 8, 0;
-<<<<<<< HEAD
-  stack << 0, 0, 0,
-        0, 1, 1,
-        1, 0, 0,
-        1, 1, 1,
-        5, 3, 1,
-        2, 4, 2,
-        4, 5, 0,
-        3, 6, 0;
-=======
   simple_stack << 0, 0, 0,
                0, 1, 1,
                1, 0, 0,
@@ -70,7 +55,6 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
                2, 4, 2,
                4, 5, 0,
                3, 6, 0;
->>>>>>> origin/distance
   x << 1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9.,
   1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9.,
   1., 2., 3., 4., 5., 6., 7., 8., 9., 1., 2., 3., 4., 5., 6., 7., 8., 9.,
@@ -107,10 +91,6 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
 
     for (int i = 0; i < num_evals; ++i) {
       y = Evaluate(simple_stack, x, constants);
-<<<<<<< HEAD
-      // y = SimplifyAndEvaluate(stack, x, constants);
-=======
->>>>>>> origin/distance
     }
 
     t2 = std::chrono::high_resolution_clock::now();
