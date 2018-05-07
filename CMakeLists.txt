@@ -69,7 +69,7 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 include_directories("${CMAKE_SOURCE_DIR}/include/")
 
 # add libraries
-add_library(bingo STATIC src/acyclic_graph.cc src/acyclic_graph_nodes.cc src/graph_manip.cc src/fitness_metric.cc src/training_data.cc)
+add_library(bingo STATIC src/acyclic_graph.cc src/acyclic_graph_nodes.cc src/graph_manip.cc src/fitness_metric.cc src/training_data.cc src/utils.cc)
 target_link_libraries(bingo Eigen3::Eigen)
 target_link_libraries(bingo profiler)
 set_target_properties(bingo PROPERTIES POSITION_INDEPENDENT_CODE TRUE)

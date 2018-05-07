@@ -23,7 +23,7 @@
 // X_Load
 X_Load::X_Load() {}
 
-void X_Load::evaluate(const Eigen::ArrayX3d &stack,
+void X_Load::evaluate(const Eigen::ArrayX3i &stack,
                       const Eigen::ArrayXXd &x,
                       const Eigen::VectorXd &constants,
                       std::vector<Eigen::ArrayXXd> &buffer,
@@ -31,7 +31,7 @@ void X_Load::evaluate(const Eigen::ArrayX3d &stack,
   buffer[result_location] = x.col(stack(result_location, 1));
 }
 
-void X_Load::deriv_evaluate(const Eigen::ArrayX3d &stack,
+void X_Load::deriv_evaluate(const Eigen::ArrayX3i &stack,
                             const int command_index,
                             const std::vector<Eigen::ArrayXXd> &forward_buffer,
                             std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -41,7 +41,7 @@ void X_Load::deriv_evaluate(const Eigen::ArrayX3d &stack,
 // C_Load
 C_Load::C_Load() {}
 
-void C_Load::evaluate(const Eigen::ArrayX3d &stack,
+void C_Load::evaluate(const Eigen::ArrayX3i &stack,
                       const Eigen::ArrayXXd &x,
                       const Eigen::VectorXd &constants,
                       std::vector<Eigen::ArrayXXd> &buffer,
@@ -55,7 +55,7 @@ void C_Load::evaluate(const Eigen::ArrayX3d &stack,
   }
 }
 
-void C_Load::deriv_evaluate(const Eigen::ArrayX3d &stack,
+void C_Load::deriv_evaluate(const Eigen::ArrayX3i &stack,
                             const int command_index,
                             const std::vector<Eigen::ArrayXXd> &forward_buffer,
                             std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -65,7 +65,7 @@ void C_Load::deriv_evaluate(const Eigen::ArrayX3d &stack,
 // Addition
 Addition::Addition() {}
 
-void Addition::evaluate(const Eigen::ArrayX3d &stack,
+void Addition::evaluate(const Eigen::ArrayX3i &stack,
                         const Eigen::ArrayXXd &x,
                         const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
@@ -74,7 +74,7 @@ void Addition::evaluate(const Eigen::ArrayX3d &stack,
                             buffer[stack(result_location, 2)];
 }
 
-void Addition::deriv_evaluate(const Eigen::ArrayX3d &stack,
+void Addition::deriv_evaluate(const Eigen::ArrayX3i &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -91,7 +91,7 @@ void Addition::deriv_evaluate(const Eigen::ArrayX3d &stack,
 // Subtraction
 Subtraction::Subtraction() {}
 
-void Subtraction::evaluate(const Eigen::ArrayX3d &stack,
+void Subtraction::evaluate(const Eigen::ArrayX3i &stack,
                            const Eigen::ArrayXXd &x,
                            const Eigen::VectorXd &constants,
                            std::vector<Eigen::ArrayXXd> &buffer,
@@ -100,7 +100,7 @@ void Subtraction::evaluate(const Eigen::ArrayX3d &stack,
                             buffer[stack(result_location, 2)];
 }
 
-void Subtraction::deriv_evaluate(const Eigen::ArrayX3d &stack,
+void Subtraction::deriv_evaluate(const Eigen::ArrayX3i &stack,
                                  const int command_index,
                                  const std::vector<Eigen::ArrayXXd> &forward_buffer,
                                  std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -117,7 +117,7 @@ void Subtraction::deriv_evaluate(const Eigen::ArrayX3d &stack,
 // Multiplication
 Multiplication::Multiplication() {}
 
-void Multiplication::evaluate(const Eigen::ArrayX3d &stack,
+void Multiplication::evaluate(const Eigen::ArrayX3i &stack,
                               const Eigen::ArrayXXd &x,
                               const Eigen::VectorXd &constants,
                               std::vector<Eigen::ArrayXXd> &buffer,
@@ -126,7 +126,7 @@ void Multiplication::evaluate(const Eigen::ArrayX3d &stack,
                             buffer[stack(result_location, 2)];
 }
 
-void Multiplication::deriv_evaluate(const Eigen::ArrayX3d &stack,
+void Multiplication::deriv_evaluate(const Eigen::ArrayX3i &stack,
                                     const int command_index,
                                     const std::vector<Eigen::ArrayXXd> &forward_buffer,
                                     std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -145,7 +145,7 @@ void Multiplication::deriv_evaluate(const Eigen::ArrayX3d &stack,
 // Division
 Division::Division() {}
 
-void Division::evaluate(const Eigen::ArrayX3d &stack,
+void Division::evaluate(const Eigen::ArrayX3i &stack,
                         const Eigen::ArrayXXd &x,
                         const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
@@ -154,7 +154,7 @@ void Division::evaluate(const Eigen::ArrayX3d &stack,
                             buffer[stack(result_location, 2)];
 }
 
-void Division::deriv_evaluate(const Eigen::ArrayX3d &stack,
+void Division::deriv_evaluate(const Eigen::ArrayX3i &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -174,7 +174,7 @@ void Division::deriv_evaluate(const Eigen::ArrayX3d &stack,
 // Sin
 Sin::Sin() {}
 
-void Sin::evaluate(const Eigen::ArrayX3d &stack,
+void Sin::evaluate(const Eigen::ArrayX3i &stack,
                    const Eigen::ArrayXXd &x,
                    const Eigen::VectorXd &constants,
                    std::vector<Eigen::ArrayXXd> &buffer,
@@ -182,7 +182,7 @@ void Sin::evaluate(const Eigen::ArrayX3d &stack,
   buffer[result_location] = buffer[stack(result_location, 1)].sin();
 }
 
-void Sin::deriv_evaluate(const Eigen::ArrayX3d &stack,
+void Sin::deriv_evaluate(const Eigen::ArrayX3i &stack,
                          const int command_index,
                          const std::vector<Eigen::ArrayXXd> &forward_buffer,
                          std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -194,7 +194,7 @@ void Sin::deriv_evaluate(const Eigen::ArrayX3d &stack,
 // Cos
 Cos::Cos() {}
 
-void Cos::evaluate(const Eigen::ArrayX3d &stack,
+void Cos::evaluate(const Eigen::ArrayX3i &stack,
                    const Eigen::ArrayXXd &x,
                    const Eigen::VectorXd &constants,
                    std::vector<Eigen::ArrayXXd> &buffer,
@@ -202,7 +202,7 @@ void Cos::evaluate(const Eigen::ArrayX3d &stack,
   buffer[result_location] = buffer[stack(result_location, 1)].cos();
 }
 
-void Cos::deriv_evaluate(const Eigen::ArrayX3d &stack,
+void Cos::deriv_evaluate(const Eigen::ArrayX3i &stack,
                          const int command_index,
                          const std::vector<Eigen::ArrayXXd> &forward_buffer,
                          std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -214,7 +214,7 @@ void Cos::deriv_evaluate(const Eigen::ArrayX3d &stack,
 // Exp
 Exp::Exp() {}
 
-void Exp::evaluate(const Eigen::ArrayX3d &stack,
+void Exp::evaluate(const Eigen::ArrayX3i &stack,
                    const Eigen::ArrayXXd &x,
                    const Eigen::VectorXd &constants,
                    std::vector<Eigen::ArrayXXd> &buffer,
@@ -222,7 +222,7 @@ void Exp::evaluate(const Eigen::ArrayX3d &stack,
   buffer[result_location] = buffer[stack(result_location, 1)].exp();
 }
 
-void Exp::deriv_evaluate(const Eigen::ArrayX3d &stack,
+void Exp::deriv_evaluate(const Eigen::ArrayX3i &stack,
                          const int command_index,
                          const std::vector<Eigen::ArrayXXd> &forward_buffer,
                          std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -234,7 +234,7 @@ void Exp::deriv_evaluate(const Eigen::ArrayX3d &stack,
 // Log
 Log::Log() {}
 
-void Log::evaluate(const Eigen::ArrayX3d &stack,
+void Log::evaluate(const Eigen::ArrayX3i &stack,
                    const Eigen::ArrayXXd &x,
                    const Eigen::VectorXd &constants,
                    std::vector<Eigen::ArrayXXd> &buffer,
@@ -242,7 +242,7 @@ void Log::evaluate(const Eigen::ArrayX3d &stack,
   buffer[result_location] = (buffer[stack(result_location, 1)].abs()).log();
 }
 
-void Log::deriv_evaluate(const Eigen::ArrayX3d &stack,
+void Log::deriv_evaluate(const Eigen::ArrayX3i &stack,
                          const int command_index,
                          const std::vector<Eigen::ArrayXXd> &forward_buffer,
                          std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -254,7 +254,7 @@ void Log::deriv_evaluate(const Eigen::ArrayX3d &stack,
 // Power
 Power::Power() {}
 
-void Power::evaluate(const Eigen::ArrayX3d &stack,
+void Power::evaluate(const Eigen::ArrayX3i &stack,
                      const Eigen::ArrayXXd &x,
                      const Eigen::VectorXd &constants,
                      std::vector<Eigen::ArrayXXd> &buffer,
@@ -263,7 +263,7 @@ void Power::evaluate(const Eigen::ArrayX3d &stack,
                               buffer[stack(result_location, 2)]);
 }
 
-void Power::deriv_evaluate(const Eigen::ArrayX3d &stack,
+void Power::deriv_evaluate(const Eigen::ArrayX3i &stack,
                            const int command_index,
                            const std::vector<Eigen::ArrayXXd> &forward_buffer,
                            std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -285,7 +285,7 @@ void Power::deriv_evaluate(const Eigen::ArrayX3d &stack,
 // Absolute
 Absolute::Absolute() {}
 
-void Absolute::evaluate(const Eigen::ArrayX3d &stack,
+void Absolute::evaluate(const Eigen::ArrayX3i &stack,
                         const Eigen::ArrayXXd &x,
                         const Eigen::VectorXd &constants,
                         std::vector<Eigen::ArrayXXd> &buffer,
@@ -293,7 +293,7 @@ void Absolute::evaluate(const Eigen::ArrayX3d &stack,
   buffer[result_location] = buffer[stack(result_location, 1)].abs();
 }
 
-void Absolute::deriv_evaluate(const Eigen::ArrayX3d &stack,
+void Absolute::deriv_evaluate(const Eigen::ArrayX3i &stack,
                               const int command_index,
                               const std::vector<Eigen::ArrayXXd> &forward_buffer,
                               std::vector<Eigen::ArrayXXd> &reverse_buffer,
@@ -305,7 +305,7 @@ void Absolute::deriv_evaluate(const Eigen::ArrayX3d &stack,
 // Sqrt
 Sqrt::Sqrt() {}
 
-void Sqrt::evaluate(const Eigen::ArrayX3d &stack,
+void Sqrt::evaluate(const Eigen::ArrayX3i &stack,
                     const Eigen::ArrayXXd &x,
                     const Eigen::VectorXd &constants,
                     std::vector<Eigen::ArrayXXd> &buffer,
@@ -313,7 +313,7 @@ void Sqrt::evaluate(const Eigen::ArrayX3d &stack,
   buffer[result_location] = (buffer[stack(result_location, 1)].abs()).sqrt();
 }
 
-void Sqrt::deriv_evaluate(const Eigen::ArrayX3d &stack,
+void Sqrt::deriv_evaluate(const Eigen::ArrayX3i &stack,
                           const int command_index,
                           const std::vector<Eigen::ArrayXXd> &forward_buffer,
                           std::vector<Eigen::ArrayXXd> &reverse_buffer,

@@ -46,12 +46,12 @@
  */
 class AcyclicGraph {
  public:
-  //! Eigen::ArrayX3d stack
+  //! Eigen::ArrayX3i stack
   /*! stack representation of equation */
-  Eigen::ArrayX3d stack;
-  //! Eigen::ArrayX3d simple_stack
+  Eigen::ArrayX3i stack;
+  //! Eigen::ArrayX3i simple_stack
   /*! stack simplified stack */
-  Eigen::ArrayX3d simple_stack;
+  Eigen::ArrayX3i simple_stack;
   //! Eigen::VectorXd constants
   /*! vector to hold constants */
   Eigen::VectorXd constants;
@@ -65,17 +65,22 @@ class AcyclicGraph {
   /*! if the fitness is set */
   bool fit_set;
   //! bool needs_opt
-  /*! if the constants need optimization 
-   *  1 - Default
-   *  2 - Keep old constants
-   *  3 - Optimize every crossover
-   *  4 - Optimize every mutation
-   *  5 - Optimize every time
-   */
+  /*! if the constants need optimization */
   bool needs_opt;
-  //! int opt_rate
-  /*! holds rate of optimization */
+  //! int op_rate
+  /*! rate to determine when to optimize
+   *
+   * 0 - Default - no extra optimization
+   * 1 - Simplify stack inputs constants and sets needs optimization
+   * 2 - Same as 1, but during crossover, bring constants from parent to child
+   * 3 - Same as 1, but optimize every crossover
+   * 4 - Same as 1, but optimize every mutation
+   * 5 - Same as 1, but optimize every mutation and crossover
+   */
   int opt_rate;
+  //! int genetic_age
+  /*! holds genetic age of individual */
+  int genetic_age;
   //! \brief Default constructor
   AcyclicGraph();
   //! \brief Copy constructor
@@ -94,7 +99,7 @@ class AcyclicGraph {
   void set_constants(Eigen::VectorXd con);
   /*! \brief returns constants.size()
    *
-   *  \return int the number constants in stack
+   *  \return int the size of the constants vector
    */
   int count_constants();
   /*! \brief replaces -1 in stack with location in constants vector
@@ -113,6 +118,8 @@ class AcyclicGraph {
    *  \param[in] eval_x The x parameters. Eigen::ArrayXXd
    *  \return std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> of evaluated deriv stack
    */
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>evaluate_with_const_deriv(
+    Eigen::ArrayXXd &eval_x);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> evaluate_deriv(
     Eigen::ArrayXXd &eval_x);
   /*! \brief conversion to simplified latex string
@@ -171,7 +178,15 @@ class AcyclicGraphManipulator {
   /*! float to hold probability */
   float terminal_prob;
   //! int op_rate
-  /*! optimization rate to give to generated AGraphs */
+  /*! optimization rate to give to generated AGraphs
+   *
+   * 0 - Default - no extra optimization
+   * 1 - Simplify stack inputs constants and sets needs optimization
+   * 2 - Same as 1, but during crossover, bring constants from parent to child
+   * 3 - Same as 1, but optimize every crossover
+   * 4 - Same as 1, but optimize every mutation
+   * 5 - Same as 1, but optimize every mutation and crossover
+   */
   int opt_rate;
   //! std::vector<int> node_type_vec
   /*! vector to hold the types of nodes in the manipulator */
@@ -182,11 +197,14 @@ class AcyclicGraphManipulator {
   //! std::vector<int> term_vec
   /*! vector to hold the types of terminals used in the manipulator */
   std::vector<int> term_vec;
+  //! int num_node_types
+  /*! int to hold the number of node types (matches the python) */
+  int num_node_types;
 
   //! \brief Constructor
   AcyclicGraphManipulator(int nvars = 3, int ag_size = 15, int nloads = 1,
                           float float_lim = 10.0, float terminal_prob = 0.1,
-                          int opt_rate = 1);
+                          int opt_rate = 0);
   /*! \brief Add a type of node to the set of allowed types
    *
    *  \param[in] node_type The type of node to add. int
@@ -207,12 +225,16 @@ class AcyclicGraphManipulator {
    *
    *  \returns pair with the stack and constants
    */
-  std::pair<Eigen::ArrayX3d, Eigen::VectorXd> dump(AcyclicGraph &indv);
+  // std::pair<Eigen::ArrayX3i, Eigen::VectorXd> dump(AcyclicGraph &indv);
+  std::pair<std::pair<Eigen::ArrayX3i, Eigen::VectorXd>, int> dump(
+    AcyclicGraph &indv);
   /*! \brief loads a new AcyclicGraph with the stack and constants
    *
    *  \returns AcyclicGraph with the stack and constants
    */
-  AcyclicGraph load(std::pair<Eigen::ArrayX3d, Eigen::VectorXd> indv_list);
+  AcyclicGraph load(std::pair<std::pair<Eigen::ArrayX3i, Eigen::VectorXd>, int>
+                    indv_list);
+  // AcyclicGraph load(std::pair<Eigen::ArrayX3i, Eigen::VectorXd> indv_list);
   /*! \brief Single point crossover
    *
    *  \param[in] parent1 the first parent. AcyclicGraph
