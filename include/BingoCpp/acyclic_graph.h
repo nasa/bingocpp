@@ -135,11 +135,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
   const Eigen::ArrayX3i &stack,
   const Eigen::ArrayXXd &x,
   const Eigen::VectorXd &constants,
-<<<<<<< HEAD
-  const bool param_x_or_c=true);
-=======
   const bool param_x_or_c = true);
->>>>>>> origin/distance
 
 
 
@@ -191,7 +187,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
   const Eigen::ArrayXXd &x,
   const Eigen::VectorXd &constants,
   const std::vector<bool> &mask,
-  const bool param_x_or_c = true);
+  const bool param_x_or_c=true);
 
 
 
