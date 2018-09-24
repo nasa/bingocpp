@@ -109,7 +109,7 @@ int AcyclicGraph::count_constants() {
 //         const_num += 1;
 //       }
 //       ++it;
-//       ++j;      
+//       ++j;
 //     }
 //     else
 //       if (stack(i, 0) == 1) {

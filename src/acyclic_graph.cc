@@ -177,7 +177,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
     deriv_size = constants.size();
     deriv_operator_number = 1;
   }
-  
+
   std::vector<std::set<int>> param_dependencies(deriv_size, std::set<int>());
 
   // forward eval with dependencies
