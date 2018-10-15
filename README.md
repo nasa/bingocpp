@@ -1,39 +1,36 @@
-General
--------
+# BingoCpp
+
+## General
 Bingocpp is part of the open source package Bingo for performing symbolic 
 regression.  Bingocpp contains the c++ implementation of a portion of the code 
 within bingo.
 
 
-Dependencies
-------------
+## Dependencies
 The build process requires:
--A recent version of cmake
--git
--mercurial (hg)
+- A recent version of cmake
+- git
+- mercurial (hg)
 
 The other follwoing dependencies will automatically be downloaded and installed 
 as part of the cmake build:
--google test (gtest), as part of the testing suite
--pybind, for the python byndings
--eigen, for much of the linear algebra and vectorized math
+- google test (gtest), as part of the testing suite
+- pybind, for the python byndings
+- eigen, for much of the linear algebra and vectorized math
 
 
-Tests
------
+## Tests
 Several unit and integration tests will be made upon building.  You can run the 
 testing suite by running the "run_tests" executable in the build folder.
 
 
-Notices
--------
+## Notices
 Copyright 2018 United States Government as represented by the Administrator of 
 the National Aeronautics and Space Administration. No copyright is claimed in 
 the United States under Title 17, U.S. Code. All Other Rights Reserved.
  
 
-Disclaimers
------------
+## Disclaimers
 No Warranty: THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF 
 ANY KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED 
 TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO SPECIFICATIONS, ANY 
