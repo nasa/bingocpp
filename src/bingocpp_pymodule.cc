@@ -63,6 +63,11 @@ PYBIND11_MODULE(bingocpp, m) {
   m.def("simplify_and_evaluate_with_derivative",
         &SimplifyAndEvaluateWithDerivative,
         "evaluate with derivative after simplification");
+  m.def("get_utilized_commands",
+        &FindUsedCommands,
+        "get the commands that are utilized in a stack");
+        
+        
   m.def("rand_init", &rand_init);
   py::class_<AcyclicGraph>(m, "AcyclicGraph")
   .def(py::init<>())

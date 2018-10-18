@@ -318,8 +318,9 @@ void Sqrt::deriv_evaluate(const Eigen::ArrayX3i &stack,
                           const std::vector<Eigen::ArrayXXd> &forward_buffer,
                           std::vector<Eigen::ArrayXXd> &reverse_buffer,
                           int dependency) {
-  reverse_buffer[command_index] += 0.5 * reverse_buffer[dependency].abs() /
-                                   forward_buffer[dependency];
+  reverse_buffer[command_index] += 0.5 * reverse_buffer[dependency] /
+                                   forward_buffer[dependency] *
+                                   forward_buffer[stack(dependency, 1)].sign();
 }
 
 std::map<int, Operation*> OperatorInterface::create_op_map() {

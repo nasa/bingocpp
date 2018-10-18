@@ -40,7 +40,7 @@ def TestAcyclicGraph(num_loops, num_evals):
     for _ in range(num_loops):
         t0 = time.time()
         for _ in range(num_evals): 
-            y = bingocpp.evaluate(stack, x, consts)
+            y = bingocpp.evaluate_equation_at(stack, x, consts)
         t1 = time.time()
         avg_time_per_eval += (t1 -t0)/num_evals
         
