@@ -18,7 +18,7 @@ The build process requires:
 The other follwoing dependencies will automatically be downloaded and installed 
 as part of the cmake build:
 - google test (gtest), as part of the testing suite
-- pybind, for the python byndings
+- pybind, for the python bindings
 - eigen, for much of the linear algebra and vectorized math
 
 

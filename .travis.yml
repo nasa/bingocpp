@@ -17,4 +17,4 @@ script:
   - build/run_tests
   
 after_success:
-  - coveralls --root .
+  - coveralls  -E ".*CMakeFiles.*"
