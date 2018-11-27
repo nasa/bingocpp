@@ -1,5 +1,7 @@
 # BingoCpp
-[![Build Status](https://travis-ci.com/nasa/bingocpp.svg?branch=develop)](https://travis-ci.com/nasa/bingocpp)
+master: [![Build Status](https://travis-ci.com/nasa/bingocpp.svg?branch=master)](https://travis-ci.com/nasa/bingocpp) [![Coverage Status](https://coveralls.io/repos/github/nasa/bingocpp/badge.svg?branch=master)](https://coveralls.io/github/nasa/bingocpp?branch=master)
+
+develop: [![Build Status](https://travis-ci.com/nasa/bingocpp.svg?branch=develop)](https://travis-ci.com/nasa/bingocpp) [![Coverage Status](https://coveralls.io/repos/github/nasa/bingocpp/badge.svg?branch=develop)](https://coveralls.io/github/nasa/bingocpp?branch=develop)
 
 ## General
 Bingocpp is part of the open source package Bingo for performing symbolic 
