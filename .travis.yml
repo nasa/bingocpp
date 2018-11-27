@@ -17,4 +17,4 @@ script:
   - build/run_tests
   
 after_success:
-  - coveralls  --root . --build-root "build/" -i "src/" -i "include/"
+  - coveralls  --root . --build-root "build/" --include "src/" --include "include/" --verbose
