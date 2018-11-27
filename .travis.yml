@@ -17,4 +17,6 @@ script:
   - build/run_tests
   
 after_success:
-  - coveralls  --root . --build-root "build/" --include "build/" --verbose
+  - ls -la
+  - ls -la build/
+  - coveralls  --root . --build-root "build/" --verbose --exclude test --gcov-options '\-lp'
