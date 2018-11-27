@@ -10,6 +10,7 @@ install:
   - mkdir -p build
   - cd build 
   - cmake -D CMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 ..
+  - make
   - cd ..
 
 script: 
