@@ -5,7 +5,10 @@ compiler:
   - clang
 
 before_script:
-  - ./build.sh
+  - mkdir -p build
+  - cd build 
+  - cmake -D CMAKE_BUILD_TYPE=Release ..
 
 script: 
-  - build/run_tests
+  - make
+  - ./run_tests
