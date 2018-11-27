@@ -1,7 +1,5 @@
 language: cpp
-
-python:
-  - "3.6"
+env: PYTHON=3.6
 
 compiler:
   - gcc
