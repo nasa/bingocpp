@@ -1,5 +1,5 @@
 # BingoCpp
-
+[![Build Status](https://travis-ci.com/nasa/bingocpp.svg?branch=develop)](https://travis-ci.com/nasa/bingocpp)
 
 ## General
 Bingocpp is part of the open source package Bingo for performing symbolic 
