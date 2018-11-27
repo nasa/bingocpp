@@ -1,5 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 set (CMAKE_CXX_STANDARD 11)
+SET(COVERAGE OFF CACHE BOOL "Coverage")
 
 project (BingoCpp)
 
@@ -90,5 +91,9 @@ target_link_libraries(bingocpp bingo)
 # ---------Testing executable-------------
 add_executable(run_tests test/test_main.cc test/acyclic_graph_tests.cc test/agcpp_tests.cc test/fitness_tests.cc test/training_data_tests)
 target_link_libraries(run_tests gtest bingo)
+if (COVERAGE)
+    target_compile_options(run_tests PRIVATE --coverage)
+    target_link_libraries(run_tests PRIVATE --coverage)
+endif()
 
 
