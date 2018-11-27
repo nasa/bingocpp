@@ -611,9 +611,9 @@ TEST(AcyclicGraphNodesTest, Sqrt) {
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   Eigen::ArrayXXd d_true_x(3, 3);
-  d_true_x << 1. / (2.*sqrt(7.)), 0., 0.,
+  d_true_x << -1. / (2.*sqrt(7.)), 0., 0.,
            1. / (2.*sqrt(6.)), 0., 0.,
-           1. / (2.*sqrt(9.)), 0., 0.;
+           -1. / (2.*sqrt(9.)), 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_c =
     EvaluateWithDerivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_x =
