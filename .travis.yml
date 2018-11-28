@@ -1,7 +1,8 @@
 language: cpp
 compiler: gcc
 
-#before_install:
+before_install:
+  - pyenv global 3.6
 #  # C++17
 #  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 #  - sudo apt-get update -qq
