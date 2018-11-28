@@ -55,14 +55,7 @@ set(TEST_MAIN unit_tests.x)  # Default name for test executable.
 # ------------------------------------------------------------------------------
 #                                 Pybind
 # ------------------------------------------------------------------------------
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/pybind/CMakeLists.txt")
-    message("Unable to find pybind")
-    execute_process(COMMAND git submodule update --init -- external/pybind
-                    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-    add_subdirectory( external/pybind EXCLUDE_FROM_ALL)
-else()
-    add_subdirectory( external/pybind EXCLUDE_FROM_ALL)
-endif()
+
 
 
 
@@ -86,11 +79,6 @@ add_executable(runBenchmark app/step_profile.cpp)
 add_dependencies(runBenchmark bingo)  
 target_link_libraries(runBenchmark bingo)
 
-# ---------- python binding ----------
-pybind11_add_module(bingocpp app/bingocpp_pymodule.cpp)
-target_link_libraries(bingocpp PUBLIC bingo)
-
-
 
 # ------------------------------------------------------------------------------
 #                         Make Tests
@@ -108,6 +96,21 @@ add_custom_target(gtest
 include(CTest)
 enable_testing()
 add_test(unit_tests ${PROJECT_BINARY_DIR}/${TEST_MAIN})
+
+
+# ------------------------------------------------------------------------------
+#                         Make bingocpp (python binding)
+# ------------------------------------------------------------------------------
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/pybind/CMakeLists.txt")
+    message("Unable to find pybind")
+    execute_process(COMMAND git submodule update --init -- external/pybind
+                    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+    add_subdirectory( external/pybind EXCLUDE_FROM_ALL)
+else()
+    add_subdirectory( external/pybind EXCLUDE_FROM_ALL)
+endif()
+pybind11_add_module(bingocpp app/bingocpp_pymodule.cpp EXCLUDE_FROM_ALL)
+target_link_libraries(bingocpp PUBLIC bingo)
 
 
 # ------------------------------------------------------------------------------
