@@ -163,8 +163,8 @@ int main(int argc, char *argv[]) {
   srand (time(NULL));
 
   if (argc < 3) {
-    fprintf(stdout, "%s Version %d.%d\n", argv[0], Tutorial_VERSION_MAJOR,
-            Tutorial_VERSION_MINOR);
+    fprintf(stdout, "%s Version %d.%d.%d.%d\n", argv[0], PROJECT_VERSION_MAJOR,
+            PROJECT_VERSION_MINOR, PROJECT_VERSION_PATCH, PROJECT_VERSION_TWEAK);
     fprintf(stdout, "Usage: %s number number\n", argv[0]);
     return 1;
   }

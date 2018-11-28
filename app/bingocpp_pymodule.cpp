@@ -43,9 +43,9 @@
 #include <pybind11/eigen.h>
 #include <pybind11/stl.h>
 #include "BingoCpp/acyclic_graph.h"
-#include "graph_manip.cc"
-#include "fitness_metric.cc"
-#include "training_data.cc"
+#include "graph_manip.cpp"
+#include "fitness_metric.cpp"
+#include "training_data.cpp"
 
 double add(double i, double j) {
   return i + j;
