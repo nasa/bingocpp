@@ -1,99 +1,199 @@
-cmake_minimum_required (VERSION 2.6)
-set (CMAKE_CXX_STANDARD 11)
-SET(COVERAGE OFF CACHE BOOL "Coverage")
+cmake_minimum_required(VERSION 3.1.3)
 
-project (BingoCpp)
+# Set project name, version and laguages here.
+# Version numbers are available by including "BingoCpp/version.h" in 
+# the source. See version.h.in for some more details.
+project(BingoCpp VERSION 0.1.1.0 LANGUAGES C CXX)
 
-# Set the version number.
-set (Tutorial_VERSION_MAJOR 0)
-set (Tutorial_VERSION_MINOR 1)
 configure_file (
-  "${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/version.h.in"
-  "${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/version.h"
-  )
+  "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/version.h.in"
+  "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/version.h")
+
+# Include stuff. No change needed.
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+include(ConfigSafeGuards)
+include(Colors)
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# ---------------------------    DEPENDENCIES    -------------------------------
+# ------------------------------------------------------------------------------
+#                          Compile flags
+# ------------------------------------------------------------------------------
+# Set the C++ standard you wish to use (will apply to all files).
+# If you do not use any features that limits the standard required,
+# you could omit this line.
+set(CMAKE_CXX_STANDARD 11)
 
-# ----------GTEST------------ 
-# Download and unpack googletest at configure time
-configure_file(${CMAKE_SOURCE_DIR}/cmake/CMakeLists.txt.gtest googletest-download/CMakeLists.txt)
-execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/googletest-download" )
-execute_process(COMMAND "${CMAKE_COMMAND}" --build .
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/googletest-download" )
+# Things to always include as flags. Change as needed.
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")  
 
-# Prevent GoogleTest from overriding our compiler/linker options
-# when building with Visual Studio
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+# Build-type specific flags. Change as needed.
+SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+SET(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 
-# Add googletest directly to our build. This adds
-# the following targets: gtest, gtest_main, gmock
-# and gmock_main
-add_subdirectory("${CMAKE_BINARY_DIR}/googletest-src"
-                 "${CMAKE_BINARY_DIR}/googletest-build")
+message(STATUS "Building with the following extra flags: ${CMAKE_CXX_FLAGS}")
 
-# The gtest/gmock targets carry header search path
-# dependencies automatically when using CMake 2.8.11 or
-# later. Otherwise we have to add them here ourselves.
-if(CMAKE_VERSION VERSION_LESS 2.8.11)
-    include_directories("${gtest_SOURCE_DIR}/include"
-                        "${gmock_SOURCE_DIR}/include")
-endif()
+
+# ------------------------------------------------------------------------------
+#                         Locate files (no change needed).
+# ------------------------------------------------------------------------------
+# We make sure that CMake sees all the files.
+include_directories(
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/tests
+    ${PROJECT_SOURCE_DIR}/external/googletest
+    ${PROJECT_SOURCE_DIR}/external/googletest/include)
+
+# Make variables referring to all the sources and test files.
+file(GLOB SOURCES "src/*.cpp")
+file(GLOB TESTFILES "tests/*.cpp")
+set(TEST_MAIN unit_tests.x)  # Default name for test executable.
+
+
+# ------------------------------------------------------------------------------
+#                                 Dependencies
+# ------------------------------------------------------------------------------
 
 # -------------PYBIND----------------
-# Download and unpack googletest at configure time
-configure_file(${CMAKE_SOURCE_DIR}/cmake/CMakeLists.txt.pybind11 pybind11-download/CMakeLists.txt)
-execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pybind11-download" )
-execute_process(COMMAND "${CMAKE_COMMAND}" --build .
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pybind11-download" )
-add_subdirectory(${CMAKE_BINARY_DIR}/pybind11/src/pybind11)
-
-
-# -------------EIGEN----------------
-configure_file(${CMAKE_SOURCE_DIR}/cmake/CMakeLists.txt.eigen eigen-download/CMakeLists.txt)
-execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/eigen-download" )
-execute_process(COMMAND "${CMAKE_COMMAND}" --build .
-   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/eigen-download" )
-set(Eigen3_DIR ${CMAKE_BINARY_DIR}/eigen/src/eigen/cmake)
-find_package (Eigen3 3.3 REQUIRED NO_MODULE)
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Download and unpack pybind at configure time
+#configure_file(${CMAKE_SOURCE_DIR}/cmake/CMakeLists.txt.pybind11 pybind11-download/CMakeLists.txt)
+#execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+#    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pybind11-download" )
+#execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+#    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pybind11-download" )
+#add_subdirectory(${CMAKE_BINARY_DIR}/pybind11/src/pybind11)
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/pybind/CMakeLists.txt")
+    message("Unable to find pybind")
+    execute_process(COMMAND git submodule update --init -- external/pybind
+                    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+    add_subdirectory( external/pybind EXCLUDE_FROM_ALL)
+else()
+    add_subdirectory( external/pybind EXCLUDE_FROM_ALL)
+endif()
 
 
 
-
-# add include directory
-include_directories("${CMAKE_SOURCE_DIR}/include/")
-
-# add libraries
-add_library(bingo STATIC src/acyclic_graph.cc src/acyclic_graph_nodes.cc src/graph_manip.cc src/fitness_metric.cc src/training_data.cc src/utils.cc)
-target_link_libraries(bingo Eigen3::Eigen)
-# target_link_libraries(bingo profiler)
+# ------------------------------------------------------------------------------
+#                            Build!
+# ------------------------------------------------------------------------------
+# Compile all sources into a library.
+add_library( bingo STATIC ${SOURCES} )
+add_dependencies(bingo eigen)
+target_link_libraries(bingo eigen)
 set_target_properties(bingo PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
- 
- 
-# ---------- main executable ----------
-add_executable(runBingoCpp src/driver.cc)
-target_link_libraries(runBingoCpp bingo Eigen3::Eigen)
-add_executable(runProfile test/step_profile.cc)
-target_link_libraries(runProfile bingo Eigen3::Eigen)
+# target_link_libraries(bingo profiler)
 
+# ---------- main executable ----------
+add_executable(runBingoCpp app/driver.cpp)
+add_dependencies(runBingoCpp bingo)  
+target_link_libraries(runBingoCpp bingo)
+
+# ---------- benchmarking executable ----------
+add_executable(runBenchmark app/step_profile.cpp)
+add_dependencies(runBenchmark bingo)  
+target_link_libraries(runBenchmark bingo)
 
 # ---------- python binding ----------
-pybind11_add_module(bingocpp src/bingocpp_pymodule.cc)
-target_link_libraries(bingocpp bingo)
+pybind11_add_module(bingocpp app/bingocpp_pymodule.cpp)
+target_link_libraries(bingocpp PUBLIC bingo)
 
+
+
+# ------------------------------------------------------------------------------
+#                         Make Tests
+# ------------------------------------------------------------------------------
+# Add a make target 'gtest', that runs the tests (and builds all dependencies).
+# The setup of Google Test is done at the very end of this file.
+add_executable(${TEST_MAIN} ${TESTFILES})
+add_dependencies(${TEST_MAIN} googletest bingo)
+target_link_libraries(${TEST_MAIN} googletest bingo pthread)
+add_custom_target(gtest 
+    COMMAND "${PROJECT_BINARY_DIR}/${TEST_MAIN}"
+    DEPENDS bingo ${TEST_MAIN})
+
+# Add a standard make target 'test' that runs the tests under CTest (only as an alt. to gtest).
+include(CTest)
+enable_testing()
+add_test(unit_tests ${PROJECT_BINARY_DIR}/${TEST_MAIN})
+
+
+# ------------------------------------------------------------------------------
+#                         Code Coverage
+# ------------------------------------------------------------------------------
+# If CMake aborts due to missing dependencies for code coverage 
+# (gcov, lcov, genhtml and supported compiler), comment this line.
+include(CodeCoverage)
+
+
+# ------------------------------------------------------------------------------
+#                         Documentation
+# ------------------------------------------------------------------------------
+# Add a make target 'doc' to generate API documentation with Doxygen.
+# You should set options to your liking in the file 'Doxyfile.in'.
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+    add_custom_target(doc 
+        ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile &> doxygen.log
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "${BoldMagenta}Generating API documentation with Doxygen (open ./html/index.html to view).${ColourReset}" VERBATIM
+        )
+endif(DOXYGEN_FOUND)
+
+
+
+
+
+# ------------------------------------------------------------------------------
+#                         Git Submodule Updating
+# ------------------------------------------------------------------------------
+# This is a target which can be used to ensure the most up to date versions of 
+# the submodules are used
+add_custom_target( git_update
+    COMMAND git submodule init
+    COMMAND git submodule update
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} )
+
+
+# ------------------------------------------------------------------------------
+#                         Google Test
+# ------------------------------------------------------------------------------
+# The following makes sure that an up-to-date version of googletest is available,
+# and built so that it may be used by your tests. 
+add_library( googletest
+    ${PROJECT_SOURCE_DIR}/external/googletest/src/gtest-all.cc
+    ${PROJECT_SOURCE_DIR}/external/googletest/src/gtest_main.cc )
+add_dependencies(googletest git_update)
+set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest-all.cc  PROPERTIES GENERATED 1)
+set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest_main.cc PROPERTIES GENERATED 1)
+
+
+# ------------------------------------------------------------------------------
+#                         Eigen
+# ------------------------------------------------------------------------------
+# The following makes sure that an up-to-date version of eigen is available
+add_library(eigen INTERFACE)
+target_include_directories(eigen INTERFACE 
+                           ${CMAKE_CURRENT_SOURCE_DIR}/external/eigen)
+add_dependencies(eigen git_update)
+ 
+ 
+# ------------------------------------------------------------------------------
+#                            Misc (no change needed).
+# ------------------------------------------------------------------------------
+# Have CMake parse the config file, generating the config header, with
+# correct definitions. Here only used to make version number available to
+# the source code. Include "exampleConfig.h" (no .in suffix) in the source.
+
+# add the binary tree to the search path for include files
+# so that we will find exampleConfig.h
+#include_directories("${PROJECT_BINARY_DIR}/include")
+
+# Ask CMake to output a compile_commands.json file for use with things like Vim YCM.
+# set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )
 
 # ---------Testing executable-------------
-add_executable(run_tests test/test_main.cc test/acyclic_graph_tests.cc test/agcpp_tests.cc test/fitness_tests.cc test/training_data_tests)
-target_link_libraries(run_tests gtest bingo)
-if (COVERAGE)
-    target_compile_options(run_tests PRIVATE --coverage)
-    target_link_libraries(run_tests PRIVATE --coverage)
-endif()
+#add_executable(run_tests test/test_main.cc test/acyclic_graph_tests.cc test/agcpp_tests.cc test/fitness_tests.cc test/training_data_tests)
+#target_link_libraries(run_tests gtest bingo)
 
 
