@@ -7,15 +7,15 @@ before_install:
   - sudo apt-get update -qq
 
 install: 
-  # C++17
-  - sudo apt-get install -qq g++-7
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 90
-  - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-7 90
-   
-  # install newer LCOV (apt version outdated and fails for new gcov).
-  - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz
-  - tar xf lcov_1.11.orig.tar.gz
-  - sudo make -C lcov-1.11/ install  
+#  # C++17
+#  - sudo apt-get install -qq g++-7
+#  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 90
+#  - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-7 90
+#   
+#  # install newer LCOV (apt version outdated and fails for new gcov).
+#  - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz
+#  - tar xf lcov_1.11.orig.tar.gz
+#  - sudo make -C lcov-1.11/ install  
   - which lcov 
 
   # Install coverals gem for uploading coverage to coveralls.
