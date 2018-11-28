@@ -5,11 +5,13 @@ cmake_minimum_required(VERSION 3.1.3)
 # the source. See version.h.in for some more details.
 project(BingoCpp VERSION 0.1.1.0 LANGUAGES C CXX)
 
+
+# ---------- version ----------
 configure_file (
   "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/version.h.in"
   "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/version.h")
 
-# Include stuff. No change needed.
+# Include stuff. 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 include(ConfigSafeGuards)
 include(Colors)
@@ -51,17 +53,8 @@ set(TEST_MAIN unit_tests.x)  # Default name for test executable.
 
 
 # ------------------------------------------------------------------------------
-#                                 Dependencies
+#                                 Pybind
 # ------------------------------------------------------------------------------
-
-# -------------PYBIND----------------
-# Download and unpack pybind at configure time
-#configure_file(${CMAKE_SOURCE_DIR}/cmake/CMakeLists.txt.pybind11 pybind11-download/CMakeLists.txt)
-#execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-#    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pybind11-download" )
-#execute_process(COMMAND "${CMAKE_COMMAND}" --build .
-#    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pybind11-download" )
-#add_subdirectory(${CMAKE_BINARY_DIR}/pybind11/src/pybind11)
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/pybind/CMakeLists.txt")
     message("Unable to find pybind")
     execute_process(COMMAND git submodule update --init -- external/pybind
@@ -141,9 +134,6 @@ if(DOXYGEN_FOUND)
 endif(DOXYGEN_FOUND)
 
 
-
-
-
 # ------------------------------------------------------------------------------
 #                         Git Submodule Updating
 # ------------------------------------------------------------------------------
@@ -176,24 +166,4 @@ add_library(eigen INTERFACE)
 target_include_directories(eigen INTERFACE 
                            ${CMAKE_CURRENT_SOURCE_DIR}/external/eigen)
 add_dependencies(eigen git_update)
- 
- 
-# ------------------------------------------------------------------------------
-#                            Misc (no change needed).
-# ------------------------------------------------------------------------------
-# Have CMake parse the config file, generating the config header, with
-# correct definitions. Here only used to make version number available to
-# the source code. Include "exampleConfig.h" (no .in suffix) in the source.
-
-# add the binary tree to the search path for include files
-# so that we will find exampleConfig.h
-#include_directories("${PROJECT_BINARY_DIR}/include")
-
-# Ask CMake to output a compile_commands.json file for use with things like Vim YCM.
-# set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )
-
-# ---------Testing executable-------------
-#add_executable(run_tests test/test_main.cc test/acyclic_graph_tests.cc test/agcpp_tests.cc test/fitness_tests.cc test/training_data_tests)
-#target_link_libraries(run_tests gtest bingo)
-
 
