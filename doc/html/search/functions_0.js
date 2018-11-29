@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['evaluate',['Evaluate',['../acyclic__graph_8cc.html#ae17cee06461ea8390a2dfaf6894a3d26',1,'acyclic_graph.cc']]],
-  ['evaluatewithderivative',['EvaluateWithDerivative',['../acyclic__graph_8cc.html#adac989d06e2774841fa11f9d89a394f6',1,'acyclic_graph.cc']]],
-  ['evaluatewithderivativeandmask',['EvaluateWithDerivativeAndMask',['../acyclic__graph_8cc.html#a76fca6774cc394fbc5a0140edd7679c1',1,'acyclic_graph.cc']]],
-  ['evaluatewithmask',['EvaluateWithMask',['../acyclic__graph_8cc.html#aecd7bc815523400785809ded3d04ab46',1,'acyclic_graph.cc']]]
+  ['acyclicgraph',['AcyclicGraph',['../classAcyclicGraph.html#a939b4fffe09d7157d334509bdf8ce2be',1,'AcyclicGraph::AcyclicGraph()'],['../classAcyclicGraph.html#ab76060134cbc2754f3200f57da385ad2',1,'AcyclicGraph::AcyclicGraph(const AcyclicGraph &amp;ag)']]],
+  ['acyclicgraphmanipulator',['AcyclicGraphManipulator',['../classAcyclicGraphManipulator.html#ae822e96783de629b1278bdacc936e984',1,'AcyclicGraphManipulator']]],
+  ['add_5fnode_5ftype',['add_node_type',['../classAcyclicGraphManipulator.html#aea284c38a894e8bd6a7d19f0c94ce6c1',1,'AcyclicGraphManipulator']]]
 ];
