@@ -14,10 +14,10 @@ The build process requires:
 - A recent version of cmake
 - git
 
-Installation can be performed using the typical out of source build flow:
-```bash
-mkdir <path to source dir>/build
-cd <path to source dir>/build
+Installation can be performed using the typical out-of-source build flow:
+```
+mkdir <path_to_source_dir>/build
+cd <path_to_source_dir>/build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 ```
