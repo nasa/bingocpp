@@ -24,7 +24,7 @@ make
 
 ### Python Bindings
 The python bindings that are needed for integration with bingo can be made by 
-running `make pybind` in the build directory.
+running `make bingocpp` in the build directory.
 
 ### Tests
 Several unit and integration tests can be made upon building.  You can run the 
