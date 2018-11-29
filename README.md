@@ -9,22 +9,26 @@ regression.  Bingocpp contains the c++ implementation of a portion of the code
 within bingo.
 
 
-## Dependencies
+## Installation
 The build process requires:
 - A recent version of cmake
 - git
-- mercurial (hg)
 
-The other follwoing dependencies will automatically be downloaded and installed 
-as part of the cmake build:
-- google test (gtest), as part of the testing suite
-- pybind, for the python bindings
-- eigen, for much of the linear algebra and vectorized math
+Installation can be performed using the typical out of source build flow:
+```bash
+mkdir <sourcedir>/build
+cd <sourcedir>/build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+```
 
+### Python Bindings
+The python bindings that are needed for integration with bingo can be made by 
+running `make pybind` in the build directory.
 
-## Tests
-Several unit and integration tests will be made upon building.  You can run the 
-testing suite by running the "run_tests" executable in the build folder.
+### Tests
+Several unit and integration tests can be made upon building.  You can run the 
+testing suite by running `make gtest` in the build directory.
 
 
 ## Notices
