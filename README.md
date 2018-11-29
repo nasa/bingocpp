@@ -16,8 +16,8 @@ The build process requires:
 
 Installation can be performed using the typical out of source build flow:
 ```bash
-mkdir <sourcedir>/build
-cd <sourcedir>/build
+mkdir <path to source dir>/build
+cd <path to source dir>/build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 ```
