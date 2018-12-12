@@ -55,6 +55,7 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(bingocpp, m) {
   m.doc() = "pybind11 example plugin";  // optional module docstring
+  m.def("is_cpp", &IsCpp, "is the backend c++");
   m.def("evaluate", &Evaluate, "evaluate");
   m.def("simplify_and_evaluate", &SimplifyAndEvaluate,
         "evaluate after simplification");

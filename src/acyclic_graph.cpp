@@ -23,6 +23,12 @@
 // create an instance of the Operator_Interface map
 OperatorInterface oper_interface;
 
+bool IsCpp() {
+    return true;
+}
+
+
+
 void ReverseSingleCommand(const Eigen::ArrayX3i &stack,
                           const int command_index,
                           const std::vector<Eigen::ArrayXXd> &forward_buffer,

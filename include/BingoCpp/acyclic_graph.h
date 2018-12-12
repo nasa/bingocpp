@@ -27,6 +27,13 @@ typedef Eigen::Ref<Eigen::ArrayXXd,
 // template <typename MatrixType> using EigenDRef =
 //    Eigen::Ref<MatrixType, 0, EigenDStride>;
 
+/*!
+ * \brief Identify whether a c++ backend is being used in python module.
+ *
+ *
+ * \return true, the backend is c++ (bool)
+ */
+bool IsCpp();
 
 /*!
  * \brief Computes reverse autodiff partial of a stack command.
