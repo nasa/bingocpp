@@ -13,6 +13,8 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <vector>
+#include <cmath>
 #include <Eigen/Dense>
 #include <Eigen/Core>
 

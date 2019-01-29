@@ -9,6 +9,7 @@
  */
 
 #include "BingoCpp/utils.h"
+#include <vector>
 #include <numeric>
 
 
@@ -17,7 +18,7 @@ std::vector<Eigen::ArrayXXd> calculate_partials(Eigen::ArrayXXd x) {
   break_points.push_back(0);
 
   for (int i = 0; i < x.rows(); ++i) {
-    if (isnan(x(i))) {
+    if (std::isnan(x(i))) {
       break_points.push_back(i);
     }
   }
