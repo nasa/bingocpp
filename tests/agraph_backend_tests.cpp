@@ -77,10 +77,13 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
  		op_evals_x0->push_back(x_0.cos());
  		op_evals_x0->push_back(x_0.exp());
  		op_evals_x0->push_back(x_0.abs().log());
- 		op_evals_x0->push_back(x_0.pow(x_0.abs()));
+ 		op_evals_x0->push_back(x_0.abs().pow(x_0));
  		op_evals_x0->push_back(x_0.abs());
  		op_evals_x0->push_back(x_0.abs().sqrt());
 
+ 		// for (int i=0; i<op_evals_x0->size(); i++) {
+ 		// 	std::cout << op_evals_x0->at(i) <<std::endl;
+ 		// }
  		return op_evals_x0;
  	}
 };
