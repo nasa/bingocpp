@@ -173,8 +173,33 @@ TEST_P(AGraphBackend, simplify_and_evaluate_x_deriv) {
 }
 
 TEST_P(AGraphBackend, simplify_and_evaluate_c_deriv) {
-	const int operator_i = GetParam();
-	ASSERT_TRUE(GetParam());
+
+	int operator_i = GetParam();
+
+	int num_x_points = sample_agraph_1_values.x_vals.rows();
+	int num_consts = sample_agraph_1_values.constants.size();
+
+	int last_col = num_consts - 1;
+	Eigen::ArrayXXd expected_derivative = Eigen::MatrixXd::Zero(num_x_points, num_consts);
+	expected_derivative.col(last_col) = operator_c_derivs[operator_i];
+
+	Eigen::ArrayX3i stack(4, 3);
+	stack << 1, 1, 1,
+					 1, 1, 1,
+					 0, 1, 1,
+					 operator_i, 1, 0;
+
+	Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals;
+	Eigen::ArrayXXd constants = sample_agraph_1_values.constants;
+	std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> res_and_gradient = 
+		SimplifyAndEvaluateWithDerivative(stack,
+																			x_0,
+																			constants,
+																			false);
+
+	Eigen::ArrayXXd df_dx = res_and_gradient.second;
+
+	ASSERT_TRUE(Eigen::MatrixXd(expected_derivative).isApprox(Eigen::MatrixXd(df_dx)));
 }
 
 
