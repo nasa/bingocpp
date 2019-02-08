@@ -32,13 +32,51 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
 
   virtual void SetUp() {
   	sample_agraph_1_values = init_agraph_vals(AGRAPH_VAL_START,
-											  AGRAPH_VAL_END,
-											  N_AGRAPH_VAL);
+																						  AGRAPH_VAL_END,
+											 												N_AGRAPH_VAL);
   	operator_evals_x0 = init_op_evals_x0(sample_agraph_1_values);
   	operator_x_derivs = init_op_x_derivs(sample_agraph_1_values);
   	operator_c_derivs = init_op_c_derivs(sample_agraph_1_values);
   }
+
   virtual void TearDown() {}
+
+
+  double difference(double val_1, double val_2) {
+  	if ((std::isnan(val_1) && std::isnan(val_2)) ||
+  			(val_1 == INFINITY && val_2 == INFINITY) ||
+  			(val_1 == -INFINITY && val_2 == -INFINITY)) {
+			return 0;
+		} else {
+			return val_1 - val_2;
+		}
+  }
+
+  bool almostEqual(const Eigen::ArrayXXd &array1, 
+  								 const Eigen::ArrayXXd &array2) {
+  	
+  	Eigen::MatrixXd mat1 = Eigen::MatrixXd(array1);
+  	Eigen::MatrixXd mat2 = Eigen::MatrixXd(array2);
+  	int rows_mat1 = mat1.rows();
+  	int rows_mat2 = mat2.rows();
+  	int cols_mat1 = mat1.cols();
+  	int cols_mat2 = mat2.cols();
+
+  	
+  	if (!(rows_mat1>0) || !(rows_mat2>0) || !(cols_mat1 > 0) || !(cols_mat2 > 0)
+  		|| (rows_mat1 != rows_mat2) || (cols_mat1 != cols_mat2))
+  		return false;
+
+  	Eigen::MatrixXd matrix_diff = Eigen::MatrixXd(rows_mat1, cols_mat1);
+  	for (int row = 0; row < rows_mat1; row++) {
+  		for (int col = 0; col < cols_mat1; col++) {
+  			matrix_diff(row, col) = difference(mat1(row, col), mat2(row, col));
+  		}
+		}
+
+		double frobenius_norm = matrix_diff.norm();
+  	return (frobenius_norm < TESTING_TOL ? true : false);
+  }
 
  private:
  	AGraphValues init_agraph_vals(double begin, double end, int num_points) {
@@ -47,6 +85,7 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
 
  		Eigen::ArrayXXd x_vals(num_points, 1);
  		x_vals = Eigen::ArrayXd::LinSpaced(num_points, begin, end);
+
  		AGraphValues sample_vals = AGraphValues();
  		sample_vals.x_vals = x_vals;
  		sample_vals.constants = constants;
@@ -145,7 +184,7 @@ TEST_P(AGraphBackend, simplify_and_evaluate) {
 															sample_agraph_1_values.x_vals,
 															sample_agraph_1_values.constants);
 
-	ASSERT_TRUE(Eigen::MatrixXd(expected_outcome).isApprox(Eigen::MatrixXd(f_of_x)));
+	ASSERT_TRUE(almostEqual(expected_outcome, f_of_x));
 }
 
 TEST_P(AGraphBackend, simplify_and_evaluate_x_deriv) {
@@ -169,7 +208,7 @@ TEST_P(AGraphBackend, simplify_and_evaluate_x_deriv) {
 
 	Eigen::ArrayXXd df_dx = res_and_gradient.second;
 
-	ASSERT_TRUE(Eigen::MatrixXd(expected_derivative).isApprox(Eigen::MatrixXd(df_dx)));
+	ASSERT_TRUE(almostEqual(expected_derivative, df_dx));
 }
 
 TEST_P(AGraphBackend, simplify_and_evaluate_c_deriv) {
@@ -197,12 +236,12 @@ TEST_P(AGraphBackend, simplify_and_evaluate_c_deriv) {
 																			constants,
 																			false);
 
-	Eigen::ArrayXXd df_dx = res_and_gradient.second;
+	Eigen::ArrayXXd df_dc = res_and_gradient.second;
 
-	ASSERT_TRUE(Eigen::MatrixXd(expected_derivative).isApprox(Eigen::MatrixXd(df_dx)));
+	ASSERT_TRUE(almostEqual(expected_derivative, df_dc));
 }
 
 
-INSTANTIATE_TEST_CASE_P(Instance, AGraphBackend, ::testing::Range(0, 13, 1));
+INSTANTIATE_TEST_CASE_P(,AGraphBackend, ::testing::Range(0, 13, 1));
 
 } // namespace
