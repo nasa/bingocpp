@@ -188,6 +188,8 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
   std::vector<std::set<int>> param_dependencies(deriv_size, std::set<int>());
   std::cout<<"4"<<std::endl;
   // forward eval with dependencies
+  std::cout<<"stack inside of eval EvaluateWithDerivativeAndMask"<<std::endl;
+  std::cout<<stack<<std::endl;
   for (std::size_t i = 0; i < stack.rows(); ++i) {
     std::cout<<"  4.0 :"<<i<<std::endl;
     if (mask[i]) {
