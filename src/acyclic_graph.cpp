@@ -189,16 +189,20 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
   std::cout<<"4"<<std::endl;
   // forward eval with dependencies
   for (std::size_t i = 0; i < stack.rows(); ++i) {
+    std::cout<<"  4.0 :"<<i<<std::endl;
     if (mask[i]) {
+      std::cout<<"  4.1"<<std::endl;
       oper_interface.operator_map[stack(i, 0)]->evaluate(
         stack, x, constants, forward_eval, i);
-
+      std::cout<<"  4.2"<<std::endl;
       if (stack(i, 0) == deriv_operator_number) {
+        std::cout<<"  4.3"<<std::endl;
         param_dependencies[stack(i, 1)].insert(i);
       }
-
+      std::cout<<"  4.4"<<std::endl;
       for (int j = 0; j < oper_interface.operator_map[stack(i, 0)]->get_arity();
            ++j) {
+        std::cout<<"  4.5 :(,"<<i<<","<<j<<")"<<std::endl;
         stack_dependencies[stack(i, j + 1)].insert(i);
       }
     }
