@@ -82,8 +82,9 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
 		Eigen::VectorXd constants = Eigen::VectorXd(2);
 		constants << 10, 3.14;
 
-		Eigen::ArrayXXd x_vals(num_points, 1);
-		x_vals = Eigen::ArrayXd::LinSpaced(num_points, begin, end);
+		Eigen::ArrayXXd x_vals(num_points, 2);
+		x_vals.col(0) = Eigen::ArrayXd::LinSpaced(num_points, begin, end);
+		x_vals.col(1) = Eigen::ArrayXd::LinSpaced(num_points, end, -begin);
 
 		AGraphValues sample_vals = AGraphValues();
 		sample_vals.x_vals = x_vals;
@@ -92,7 +93,7 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
 	}
 
 	std::vector<Eigen::ArrayXXd> init_op_evals_x0(AGraphValues &sample_agraph_1_values) {
-		Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals;
+		Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals.col(0);
 
 		double constant = sample_agraph_1_values.constants[0];
 		Eigen::ArrayXXd c_0 = constant * Eigen::ArrayXd::Ones(x_0.rows());
@@ -117,7 +118,7 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
 	}
 
 	std::vector<Eigen::ArrayXXd> init_op_x_derivs(AGraphValues &sample_agraph_1_values) {
-		Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals;
+		Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals.col(0);
 		std::vector<Eigen::ArrayXXd> op_x_derivs = std::vector<Eigen::ArrayXXd>();
 		int size = x_0.rows();
 
@@ -186,7 +187,9 @@ TEST_P(AGraphBackend, simplify_and_evaluate) {
 TEST_P(AGraphBackend, simplify_and_evaluate_x_deriv) {
 	int operator_i = GetParam();
 
-	Eigen::ArrayXXd expected_derivative = operator_x_derivs[operator_i];
+	Eigen::ArrayXXd expected_derivative = 
+		Eigen::ArrayXXd::Zero(sample_agraph_1_values.x_vals.rows(), 2);
+	expected_derivative.col(0) = operator_x_derivs[operator_i];
 
 	Eigen::ArrayX3i stack(4, 3);
 	stack << 0, 0, 0,
@@ -228,16 +231,13 @@ TEST_P(AGraphBackend, simplify_and_evaluate_c_deriv) {
 	
 	Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals;
 	Eigen::ArrayXXd constants = sample_agraph_1_values.constants;
-	std::cout<<"stack"<<std::endl;
-	std::cout<<stack<<std::endl<<std::endl;
+
 	std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> res_and_gradient = 
 		SimplifyAndEvaluateWithDerivative(stack,
 																			x_0,
 																			constants,
 																			false);
-	std::cout<<"20"<<std::endl;
 	Eigen::ArrayXXd df_dc = res_and_gradient.second;
-	std::cout<<"21"<<std::endl;
 	ASSERT_TRUE(almostEqual(expected_derivative, df_dc));
 }
 
