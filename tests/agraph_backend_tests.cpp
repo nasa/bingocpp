@@ -215,7 +215,7 @@ TEST_P(AGraphBackend, simplify_and_evaluate_c_deriv) {
 
 	int last_col = num_consts - 1;
 	Eigen::ArrayXXd expected_derivative = 
-		Eigen::MatrixXd::Zero(num_x_points, num_consts);
+		Eigen::MatrixXd::Zero(num_x_points, num_consts).array();
 	expected_derivative.col(last_col) = operator_c_derivs[operator_i];
 
 	Eigen::ArrayX3i stack(4, 3);
