@@ -168,6 +168,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
   const Eigen::VectorXd &constants,
   const std::vector<bool> &mask,
   const bool param_x_or_c) {
+  
   // Evaluates a stack and its derivative with the given x and constants.
   std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
   std::vector<std::set<int>> stack_dependencies(stack.rows(),
@@ -191,22 +192,18 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
     if (mask[i]) {
       oper_interface.operator_map[stack(i, 0)]->evaluate(
         stack, x, constants, forward_eval, i);
-
       if (stack(i, 0) == deriv_operator_number) {
         param_dependencies[stack(i, 1)].insert(i);
       }
-
       for (int j = 0; j < oper_interface.operator_map[stack(i, 0)]->get_arity();
            ++j) {
         stack_dependencies[stack(i, j + 1)].insert(i);
       }
     }
   }
-
   // reverse pass through stack
   std::vector<Eigen::ArrayXXd> reverse_eval(stack.rows());
   reverse_eval[stack.rows() - 1] = Eigen::ArrayXXd::Ones(x.rows(), 1);
-
   for (int i = stack.rows() - 2; i >= 0; --i) {
     if (mask[i]) {
       reverse_eval[i] = Eigen::ArrayXXd::Zero(x.rows(), 1);
@@ -214,16 +211,13 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
                            stack_dependencies[i]);
     }
   }
-
   // build derivative array
   Eigen::ArrayXXd deriv = Eigen::ArrayXXd::Zero(x.rows(), deriv_size);
-
   for (std::size_t i = 0; i < deriv_size; ++i) {
     for (auto const& dependency : param_dependencies[i]) {
       deriv.col(i) += reverse_eval[dependency];
     }
   }
-
   return std::make_pair(forward_eval.back(), deriv);
 }
 
