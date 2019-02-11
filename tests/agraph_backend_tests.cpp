@@ -229,8 +229,7 @@ TEST_P(AGraphBackend, simplify_and_evaluate_c_deriv) {
 	Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals;
 	Eigen::ArrayXXd constants = sample_agraph_1_values.constants;
 	std::cout<<"stack"<<std::endl;
-	std::cout<<stack<<std::endl;
-	std::endl;
+	std::cout<<stack<<std::endl<<std::endl;
 	std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> res_and_gradient = 
 		SimplifyAndEvaluateWithDerivative(stack,
 																			x_0,
