@@ -79,7 +79,13 @@ add_executable(runBenchmark app/step_profile.cpp)
 add_dependencies(runBenchmark bingo)  
 target_link_libraries(runBenchmark bingo)
 
-
+# ---------- performance benchmark executable ----------
+add_executable(performanceBenchmark app/performance_benchmarks.cpp)
+add_dependencies(performanceBenchmark bingo)  
+target_link_libraries(performanceBenchmark bingo)
+configure_file(app/test-agraph-stacks.csv test-agraph-stacks.csv COPYONLY)
+configure_file(app/test-agraph-consts.csv test-agraph-consts.csv COPYONLY)
+configure_file(app/test-agraph-x-vals.csv test-agraph-x-vals.csv COPYONLY)
 # ------------------------------------------------------------------------------
 #                         Make Tests
 # ------------------------------------------------------------------------------
