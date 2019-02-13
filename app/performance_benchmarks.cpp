@@ -23,26 +23,47 @@ struct AGraphValues {
 	Eigen::VectorXd constants;
 };
 
+struct BenchMarkTestData {
+	std::vector<AGraphValues> indv_list;
+	Eigen::ArrayXXd x_vals;
+};
+
 class StatsPrinter {
  public:
 	void add_stats(std::string s) {}
 	void print() {}
 };
 
-void benchmark_evaluate(std::vector<AGraphValues> &agraph_vals,
+Eigen::ArrayXd time_benchmark(
+	std::function<void(std::vector<AGraphValues>, Eigen::ArrayXXd)> benchmark, 
+	BenchMarkTestData &test_data, int number=100, int repeat=10) {
+	Eigen::ArrayXd times = Eigen::ArrayXd(repeat);
+	for (int run=0; run<repeat; run++) {
+		auto start = std::chrono::high_resolution_clock::now();
+		for (int i=0; i<number; i++) {
+			benchmark(test_data.indv_list, test_data.x_vals);	
+		}
+		auto stop = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double, std::milli> time_span = (start - stop);
+		times(run) = time_span.count();
+	}
+	return times; 
+}
+
+void benchmark_evaluate(std::vector<AGraphValues> &indv_list,
 												Eigen::ArrayXXd &x_vals) {
 	std::vector<AGraphValues>::iterator indv;
-	for(indv=agraph_vals.begin(); indv!=agraph_vals.end(); indv++) {
+	for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
 		SimplifyAndEvaluate(indv->command_array,
 												x_vals,
 												indv->constants);
 	} 
 }
 
-void benchmark_evaluate_w_x_derivative(std::vector<AGraphValues> &agraph_vals,
+void benchmark_evaluate_w_x_derivative(std::vector<AGraphValues> &indv_list,
 																			 Eigen::ArrayXXd &x_vals) {
 	std::vector<AGraphValues>::iterator indv;
-	for(indv=agraph_vals.begin(); indv!=agraph_vals.end(); indv++) {
+	for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
 		SimplifyAndEvaluateWithDerivative(indv->command_array,
 																			x_vals,
 																			indv->constants,
@@ -50,10 +71,10 @@ void benchmark_evaluate_w_x_derivative(std::vector<AGraphValues> &agraph_vals,
 	}
 }
 
-void benchmark_evaluate_w_c_derivative(std::vector<AGraphValues> &agraph_vals,
+void benchmark_evaluate_w_c_derivative(std::vector<AGraphValues> &indv_list,
 																			 Eigen::ArrayXXd &x_vals) {
 	std::vector<AGraphValues>::iterator indv;
-	for(indv=agraph_vals.begin(); indv!=agraph_vals.end(); indv++) {
+	for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
 		SimplifyAndEvaluateWithDerivative(indv->command_array,
 																			x_vals,
 																			indv->constants,
@@ -72,14 +93,13 @@ void run_benchmarking() {
 
 void set_indv_stack(AGraphValues &indv, std::string &stack_string) {
 	std::stringstream string_stream(stack_string);
-	// std::cout<<"d"<<std::endl;
+
 	Eigen::ArrayX3i curr_stack = Eigen::ArrayX3i(STACK_SIZE, 3);
-// std::cout<<"e"<<std::endl;
+
 	std::string curr_op;
 	for (int i=0; std::getline(string_stream, curr_op, ','); i++) {
 		curr_stack(i/3, i%3) = std::stoi(curr_op);
 	}
-	// std::cout<<"e"<<std::endl;
 	indv.command_array = curr_stack;
 }
 
@@ -90,23 +110,22 @@ void set_indv_constants(AGraphValues &indv, std::string &const_string) {
 	std::getline(string_stream, num_constants, ',');
 	Eigen::VectorXd curr_const(std::stoi(num_constants));
 
-	std::string curr_op;
-	for (int i=0; std::getline(string_stream, curr_op, ','); i++) {
-		curr_const(i) = std::stod(curr_op);
+	std::string curr_val;
+	for (int i=0; std::getline(string_stream, curr_val, ','); i++) {
+		curr_const(i) = std::stod(curr_val);
 	}
 	indv.constants = curr_const;
 }
 
 Eigen::ArrayXXd load_agraph_x_vals() {
-	Eigen::ArrayXXd x_vals = Eigen::ArrayXXd(NUM_DATA_POINTS, INPUT_DIM);
-
 	std::ifstream filename;
 	filename.open(X_FILE);
+
+	Eigen::ArrayXXd x_vals = Eigen::ArrayXXd(NUM_DATA_POINTS, INPUT_DIM);
 
 	std::string curr_x_row;
 	for (int row = 0; filename >> curr_x_row; row++) {
 		std::stringstream string_stream(curr_x_row);
-
 		std::string curr_x;
 		for (int col = 0; std::getline(string_stream, curr_x, ','); col++) {
 			x_vals(row, col) = std::stod(curr_x);
@@ -116,8 +135,7 @@ Eigen::ArrayXXd load_agraph_x_vals() {
 	return x_vals;
 }
 
-void load_agraph_indvidual_data(std::vector<AGraphValues> &agraph_vals,
-																const char *filename) {
+void load_agraph_indvidual_data(std::vector<AGraphValues> &indv_list) {
 	std::ifstream stack_filestream;
 	std::ifstream const_filestream;
 	stack_filestream.open(STACK_FILE);
@@ -132,24 +150,30 @@ void load_agraph_indvidual_data(std::vector<AGraphValues> &agraph_vals,
 		AGraphValues curr_indv = AGraphValues();
 		set_indv_stack(curr_indv, stack_file_line);
 		set_indv_constants(curr_indv, const_file_line);
-		agraph_vals.push_back(curr_indv);
+		indv_list.push_back(curr_indv);
 	}
 	stack_filestream.close();
 	const_filestream.close();
 }
 
-void init_a_graphs(std::vector<AGraphValues> &benchmark_test_data) {
-	load_agraph_indvidual_data(benchmark_test_data, STACK_FILE);
-	load_agraph_indvidual_data(benchmark_test_data, CONST_FILE);
+void load_benchmark_data(BenchMarkTestData &benchmark_test_data) {
+	std::vector<AGraphValues> indv_list= std::vector<AGraphValues>();
+
+	load_agraph_indvidual_data(indv_list);
+	load_agraph_indvidual_data(indv_list);
 	Eigen::ArrayXXd x_vals = load_agraph_x_vals();
-	std::cout<<benchmark_test_data[0].command_array<<std::endl;
-	std::cout<<benchmark_test_data[1].constants<<std::endl;
-	std::cout<<x_vals<<std::endl;
+
+	benchmark_test_data.indv_list = indv_list;
+	benchmark_test_data.x_vals = x_vals;
+	// std::cout<<benchmark_test_data[0].command_array<<std::endl;
+	// std::cout<<benchmark_test_data[1].constants<<std::endl;
+	// std::cout<<x_vals<<std::endl;
+
 }
 
 int main() {
-	std::vector<AGraphValues> agraph_vals = std::vector<AGraphValues>();
-	init_a_graphs(agraph_vals);	
+	BenchMarkTestData benchmark_test_data = BenchMarkTestData();
+	load_benchmark_data(benchmark_test_data);	
 	run_benchmarking();
 	return 0;
 }
