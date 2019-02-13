@@ -118,35 +118,33 @@ Eigen::ArrayXXd load_agraph_x_vals() {
 
 void load_agraph_indvidual_data(std::vector<AGraphValues> &agraph_vals,
 																const char *filename) {
-	std::ifstream filestream;
-	filestream.open(filename);
+	std::ifstream stack_filestream;
+	std::ifstream const_filestream;
+	stack_filestream.open(STACK_FILE);
+	const_filestream.open(CONST_FILE);
 
-	std::string file_line;
-	for (int indv=0; filestream >> file_line; indv++) {
-		// std::cout<<"a"<<std::endl;
+	std::string stack_file_line;
+	std::string const_file_line;
+	for (int indv=0; 
+			(stack_filestream >> stack_file_line) && 
+			(const_filestream >> const_file_line); 
+			indv++) {
 		AGraphValues curr_indv = AGraphValues();
-		// if (strcmp(filename, STACK_FILE)) 
-		set_indv_stack(curr_indv, file_line);
-		// else if (strcmp(filename, CONST_FILE)) 
-		// 	set_indv_constants(curr_indv, file_line);
-		// std::cout<<"b"<<std::endl;
+		set_indv_stack(curr_indv, stack_file_line);
+		set_indv_constants(curr_indv, const_file_line);
 		agraph_vals.push_back(curr_indv);
-		// std::cout<<"c"<<std::endl;
 	}
-	filestream.close();
+	stack_filestream.close();
+	const_filestream.close();
 }
 
 void init_a_graphs(std::vector<AGraphValues> &benchmark_test_data) {
-	// load_agraph_indvidual_data(benchmark_test_data, STACK_FILE);
-	// load_agraph_indvidual_data(benchmark_test_data, CONST_FILE);
-	// std::cout<<"1"<<std::endl;
+	load_agraph_indvidual_data(benchmark_test_data, STACK_FILE);
+	load_agraph_indvidual_data(benchmark_test_data, CONST_FILE);
 	Eigen::ArrayXXd x_vals = load_agraph_x_vals();
-// std::cout<<"2"<<std::endl;
-	// std::cout<<benchmark_test_data[0].command_array<<std::endl;
-// std::cout<<"3"<<std::endl;
-	// std::cout<<benchmark_test_data[1].constants<<std::endl;
+	std::cout<<benchmark_test_data[0].command_array<<std::endl;
+	std::cout<<benchmark_test_data[1].constants<<std::endl;
 	std::cout<<x_vals<<std::endl;
-// std::cout<<"4"<<std::endl;
 }
 
 int main() {
