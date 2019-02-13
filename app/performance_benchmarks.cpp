@@ -6,7 +6,6 @@
 #include <Eigen/Core>
 
 #include "BingoCpp/acyclic_graph.h"
-#include "BingoCpp/graph_manip.h"
 
 #define STACK_FILE "test-agraph-stacks.csv"
 #define CONST_FILE "test-agraph-consts.csv"
@@ -27,6 +26,17 @@ class StatsPrinter {
 	void print() {}
 };
 
+void benchmark_evaluate(std::vector<AGraphValues> &agraph_vals) {
+	std::vector<AGraphValues>::iterator ag_iterator;
+	for(ag_iterator=agraph_vals.begin(); 
+			ag_iterator!=agraph_vals.end(); 
+			ag_iterator++) {
+		SimplifyAndEvaluate(ag_iterator->command_array,
+												ag_iterator->x_vals,
+												ag_iterator->constants);
+	} 
+}
+
 void run_benchmarking() {
 	StatsPrinter printer = StatsPrinter();
 	printer.add_stats("c++: evaluate");
@@ -46,7 +56,6 @@ void read_in_stacks(std::vector<Eigen::ArrayX3i> &command_arrays) {
 		Eigen::ArrayX3i curr_stack(STACK_SIZE, 3);
 		for (int i=0; std::getline(string_stream, curr_op, ','); i++) {
 			curr_stack(i/3, i%3) = std::stoi(curr_op);
-			std::cout<<i<<": "<<curr_op<<std::endl;
 		}
 		command_arrays.push_back(curr_stack);
 	}
@@ -69,6 +78,25 @@ void read_in_constants(std::vector<Eigen::VectorXd> &constants) {
 
 		constants.push_back(curr_const);
 	}
+}
+
+template <class T>
+void set_next_val(T &agraph_data_struct, 
+									std::stringstream &string_stream, 
+									bool isArray) {
+	std::string current_token;
+	for (int i=0; std::getline(string_stream, current_token, ','); i++) {
+			if (isArray) {
+				int num_cols = agraph_data_struct.cols();
+
+			} else {
+				agraph_data_struct(i) = std::stod(curr_op);
+			}			
+		}
+}
+
+void get_next_agraph_val_line() {
+
 }
 
 void read_in_x_vals(Eigen::ArrayXXd &x_vals) {
@@ -94,22 +122,5 @@ int main() {
 	std::vector<AGraphValues> agraph_vals = std::vector<AGraphValues>();
 	init_a_graphs(agraph_vals);	
 	run_benchmarking();
-	// std::ifstream filename;
-	// filename.open("test-agraph-stacks.csv");
-	// std::cout<<filename<<std::endl;
-	// std::string stack_string;
-	// while(filename >> stack_string){
-	// 	std::cout<<"stack===========\n";
-	// 	std::cout<<stack_string<<std::endl;
-	// 	std::stringstream string_stream(stack_string);
-	// 	std::string curr_op;
-	// 	// Eigen::ArrayX3i curr_stack(STACK_SIZE, 3);
-	// 	while(std::getline(string_stream, curr_op, ',')) {
-	// 		// curr_stack << std::stoi(curr_op);
-	// 		std::cout<<curr_op<<std::endl;
-	// 	}
-	// 	// command_arrays.push_back(curr_stack);
-	// 	// std::cout<<curr_stack<<std::endl;
-	// }
 	return 0;
 }
