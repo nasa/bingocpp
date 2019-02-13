@@ -27,16 +27,33 @@ class StatsPrinter {
 };
 
 void benchmark_evaluate(std::vector<AGraphValues> &agraph_vals) {
-	std::vector<AGraphValues>::iterator ag_iterator;
-	for(ag_iterator=agraph_vals.begin(); 
-			ag_iterator!=agraph_vals.end(); 
-			ag_iterator++) {
-		SimplifyAndEvaluate(ag_iterator->command_array,
-												ag_iterator->x_vals,
-												ag_iterator->constants);
+	std::vector<AGraphValues>::iterator indv;
+	for(indv=agraph_vals.begin(); indv!=agraph_vals.end(); indv++) {
+		SimplifyAndEvaluate(indv->command_array,
+												indv->x_vals,
+												indv->constants);
 	} 
 }
 
+void benchmark_evaluate_w_x_derivative(std::vector<AGraphValues> &agraph_vals) {
+	std::vector<AGraphValues>::iterator indv;
+	for(indv=agraph_vals.begin(); indv!=agraph_vals.end(); indv++) {
+		SimplifyAndEvaluateWithDerivative(indv->command_array,
+																			indv->x_vals,
+																			indv->constants,
+																			true);
+	}
+
+
+void benchmark_evaluate_w_c_derivative(std::vector<AGraphValues> &agraph_vals) {
+	std::vector<AGraphValues>::iterator indv;
+	for(indv=agraph_vals.begin(); indv!=agraph_vals.end(); indv++) {
+		SimplifyAndEvaluateWithDerivative(indv->command_array,
+																			indv->x_vals,
+																			indv->constants,
+																			true);
+	}
+}
 void run_benchmarking() {
 	StatsPrinter printer = StatsPrinter();
 	printer.add_stats("c++: evaluate");
