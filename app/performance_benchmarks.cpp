@@ -35,7 +35,7 @@ class StatsPrinter {
 };
 
 Eigen::ArrayXd time_benchmark(
-	std::function<void(std::vector<AGraphValues>, Eigen::ArrayXXd)> benchmark, 
+	void (*benchmark)(std::vector<AGraphValues>&, Eigen::ArrayXXd&) , 
 	BenchMarkTestData &test_data, int number=100, int repeat=10) {
 	Eigen::ArrayXd times = Eigen::ArrayXd(repeat);
 	for (int run=0; run<repeat; run++) {
@@ -44,7 +44,7 @@ Eigen::ArrayXd time_benchmark(
 			benchmark(test_data.indv_list, test_data.x_vals);	
 		}
 		auto stop = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<double, std::milli> time_span = (start - stop);
+		std::chrono::duration<double, std::milli> time_span = (stop - start);
 		times(run) = time_span.count();
 	}
 	return times; 
@@ -173,7 +173,8 @@ void load_benchmark_data(BenchMarkTestData &benchmark_test_data) {
 
 int main() {
 	BenchMarkTestData benchmark_test_data = BenchMarkTestData();
-	load_benchmark_data(benchmark_test_data);	
+	load_benchmark_data(benchmark_test_data);
+	std::cout<<time_benchmark(benchmark_evaluate, benchmark_test_data);
 	run_benchmarking();
 	return 0;
 }
