@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>
 #include <chrono>
+#include <iomanip>
 #include <Eigen/Core>
 
 #include "BingoCpp/acyclic_graph.h"
@@ -54,6 +55,9 @@ void load_agraph_indvidual_data(std::vector<AGraphValues> &indv_list);
 void load_benchmark_data(BenchMarkTestData &benchmark_test_data);
 void do_benchmarking();
 void run_benchmarks(BenchMarkTestData &benchmark_test_data);
+void print_results(Eigen::ArrayXd &run_times);
+double standard_deviation(Eigen::ArrayXd &vec);
+void print_header();
 
 int main() {
 	do_benchmarking();
@@ -67,10 +71,37 @@ void do_benchmarking() {
 }
 
 void run_benchmarks(BenchMarkTestData &benchmark_test_data) {
-
 	Eigen::ArrayXd evaluate_times = time_benchmark(benchmark_evaluate, benchmark_test_data);
 	Eigen::ArrayXd x_derivative_times = time_benchmark(benchmark_evaluate_w_x_derivative, benchmark_test_data);
 	Eigen::ArrayXd c_derivative_times = time_benchmark(benchmark_evaluate_w_c_derivative, benchmark_test_data);
+	print_header();
+	print_results(evaluate_times);
+	print_results(x_derivative_times);
+	print_results(c_derivative_times);
+}
+
+void print_header() {
+	std::cout<<"-----------------------"
+			<<":::: PERFORMANCE BENCHMARKS ::::"
+			<<"-----------------------\n"
+			<<"NAME" << std::setw(25) 
+			<<std::setw(10) << "MEAN"
+			<<std::setw(10) << "STD"
+			<<std::setw(10) << "MIN"
+			<<std::setw(10) << "MAX" << "\n"
+			<< "---------------------------------------------------------\n";
+}
+
+void print_results(Eigen::ArrayXd &run_times) {
+	double std_dev = standard_deviation(run_times);
+	double average = run_times.mean();
+	// double max = run_times.max();
+	// double min = run_times.min();
+	
+}
+
+double standard_deviation(Eigen::ArrayXd &vec) {
+	return std::sqrt((vec - vec.mean()).square().sum()/(vec.size()-1));
 }
 
 void load_benchmark_data(BenchMarkTestData &benchmark_test_data) {
@@ -106,7 +137,7 @@ void set_indv_constants(AGraphValues &indv, std::string &const_string) {
 
 	std::string num_constants;
 	std::getline(string_stream, num_constants, ',');
-	Eigen::VectorXd curr_const(std::stoi(num_constants));
+	Eigen::VectorXd curr_const = Eigen::VectorXd(std::stoi(num_constants));
 
 	std::string curr_val;
 	for (int i=0; std::getline(string_stream, curr_val, ','); i++) {
@@ -133,7 +164,6 @@ Eigen::ArrayXXd load_agraph_x_vals() {
 	filename.open(X_FILE);
 
 	Eigen::ArrayXXd x_vals = Eigen::ArrayXXd(NUM_DATA_POINTS, INPUT_DIM);
-
 	std::string curr_x_row;
 	for (int row = 0; filename >> curr_x_row; row++) {
 		std::stringstream string_stream(curr_x_row);
