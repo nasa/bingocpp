@@ -35,6 +35,7 @@ script:
   - make
   - make gtest
   - make coverage
+  - ./performanceBenchmark
 
 after_success:
   - cd $PARENTDIR/build
