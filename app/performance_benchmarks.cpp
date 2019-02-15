@@ -79,7 +79,7 @@ Eigen::ArrayXXd load_agraph_x_vals() {
   return x_vals;
 }
 
-void run_benchmarks(BenchMarkTestData &benchmark_test_data) {
+void run_benchmarks(const BenchMarkTestData &benchmark_test_data) {
   Eigen::ArrayXd evaluate_times = time_benchmark(benchmark_evaluate, benchmark_test_data);
   Eigen::ArrayXd x_derivative_times = time_benchmark(benchmark_evaluate_w_x_derivative, benchmark_test_data);
   Eigen::ArrayXd c_derivative_times = time_benchmark(benchmark_evaluate_w_c_derivative, benchmark_test_data);
@@ -90,8 +90,8 @@ void run_benchmarks(BenchMarkTestData &benchmark_test_data) {
 }
 
 Eigen::ArrayXd time_benchmark(
-  void (*benchmark)(std::vector<AGraphValues>&, Eigen::ArrayXXd&), 
-  BenchMarkTestData &test_data, int number, int repeat) {
+  void (*benchmark)(const std::vector<AGraphValues>&, const Eigen::ArrayXXd&), 
+  const BenchMarkTestData &test_data, int number, int repeat) {
   Eigen::ArrayXd times = Eigen::ArrayXd(repeat);
   for (int run=0; run<repeat; run++) {
     auto start = std::chrono::high_resolution_clock::now();
@@ -105,9 +105,9 @@ Eigen::ArrayXd time_benchmark(
   return times; 
 }
 
-void benchmark_evaluate(std::vector<AGraphValues> &indv_list,
-                        Eigen::ArrayXXd &x_vals) {
-  std::vector<AGraphValues>::iterator indv;
+void benchmark_evaluate(const std::vector<AGraphValues> &indv_list,
+                        const Eigen::ArrayXXd &x_vals) {
+  std::vector<AGraphValues>::const_iterator indv;
   for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
     SimplifyAndEvaluate(indv->command_array,
                         x_vals,
@@ -115,9 +115,9 @@ void benchmark_evaluate(std::vector<AGraphValues> &indv_list,
   } 
 }
 
-void benchmark_evaluate_w_x_derivative(std::vector<AGraphValues> &indv_list,
-                                       Eigen::ArrayXXd &x_vals) {
-  std::vector<AGraphValues>::iterator indv;
+void benchmark_evaluate_w_x_derivative(const std::vector<AGraphValues> &indv_list,
+                                       const Eigen::ArrayXXd &x_vals) {
+  std::vector<AGraphValues>::const_iterator indv;
   for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
     SimplifyAndEvaluateWithDerivative(indv->command_array,
                                       x_vals,
@@ -126,9 +126,9 @@ void benchmark_evaluate_w_x_derivative(std::vector<AGraphValues> &indv_list,
   }
 }
 
-void benchmark_evaluate_w_c_derivative(std::vector<AGraphValues> &indv_list,
-                                       Eigen::ArrayXXd &x_vals) {
-  std::vector<AGraphValues>::iterator indv;
+void benchmark_evaluate_w_c_derivative(const std::vector<AGraphValues> &indv_list,
+                                       const Eigen::ArrayXXd &x_vals) {
+  std::vector<AGraphValues>::const_iterator indv;
   for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
     SimplifyAndEvaluateWithDerivative(indv->command_array,
                                       x_vals,
@@ -147,7 +147,7 @@ void print_header() {
   std::cout << bottom << std::endl;
 }
 
-void print_results(Eigen::ArrayXd &run_times, const std::string &name) {
+void print_results(const Eigen::ArrayXd &run_times, const std::string &name) {
   double std_dev = standard_deviation(run_times);
   double average = run_times.mean();
   double max = run_times.maxCoeff();
@@ -176,6 +176,6 @@ void output_params(const std::string &name, const std::string &mean,
             << std::endl;
 }
 
-double standard_deviation(Eigen::ArrayXd &vec) {
+double standard_deviation(const Eigen::ArrayXd &vec) {
   return std::sqrt((vec - vec.mean()).square().sum()/(vec.size()-1));
 }
