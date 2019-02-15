@@ -94,7 +94,7 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
     return AGraphValues(x_vals, constants);
   }
 
-  std::vector<Eigen::ArrayXXd> init_op_evals_x0(AGraphValues &sample_agraph_1_values) {
+  std::vector<Eigen::ArrayXXd> init_op_evals_x0(const AGraphValues &sample_agraph_1_values) {
     Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals.col(0);
     double constant = sample_agraph_1_values.constants[0];
     Eigen::ArrayXXd c_0 = constant * Eigen::ArrayXd::Ones(x_0.rows());
@@ -117,7 +117,7 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
     return op_evals_x0;
   }
 
-  std::vector<Eigen::ArrayXXd> init_op_x_derivs(AGraphValues &sample_agraph_1_values) {
+  std::vector<Eigen::ArrayXXd> init_op_x_derivs(const AGraphValues &sample_agraph_1_values) {
     Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals.col(0);
     std::vector<Eigen::ArrayXXd> op_x_derivs = std::vector<Eigen::ArrayXXd>();
     int size = x_0.rows();
@@ -145,7 +145,7 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
     return op_x_derivs;
   }
 
-  std::vector<Eigen::ArrayXXd> init_op_c_derivs(AGraphValues &sample_agraph_1_values) {
+  std::vector<Eigen::ArrayXXd> init_op_c_derivs(const AGraphValues &sample_agraph_1_values) {
     int size = sample_agraph_1_values.x_vals.rows();
     Eigen::ArrayXXd c_1 = sample_agraph_1_values.constants[1] * Eigen::ArrayXd::Ones(size);
     std::vector<Eigen::ArrayXXd> op_c_derivs = std::vector<Eigen::ArrayXXd>();
@@ -231,8 +231,6 @@ TEST_P(AGraphBackend, simplify_and_evaluate_c_deriv) {
   Eigen::ArrayXXd df_dc = res_and_gradient.second;
   ASSERT_TRUE(almostEqual(expected_derivative, df_dc));
 }
-
-
 INSTANTIATE_TEST_CASE_P(,AGraphBackend, ::testing::Range(0, 13, 1));
 
 } // namespace
