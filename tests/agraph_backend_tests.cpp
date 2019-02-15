@@ -40,7 +40,6 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
 
 	virtual void TearDown() {}
 
-
 	double difference(double val_1, double val_2) {
 		if ((std::isnan(val_1) && std::isnan(val_2)) ||
 				(val_1 == INFINITY && val_2 == INFINITY) ||
