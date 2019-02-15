@@ -29,35 +29,28 @@ struct BenchMarkTestData {
 	Eigen::ArrayXXd x_vals;
 };
 
-class StatsPrinter {
- public:
-	void add_stats(std::string s) {}
-	void print() {}
-};
-
+void do_benchmarking();
+void load_benchmark_data(BenchMarkTestData &benchmark_test_data);
+void load_agraph_indvidual_data(std::vector<AGraphValues> &indv_list);
+void set_indv_constants(AGraphValues &indv, std::string &const_string);
+void set_indv_stack(AGraphValues &indv, std::string &stack_string);
+Eigen::ArrayXXd load_agraph_x_vals();
+void run_benchmarks(BenchMarkTestData &benchmark_test_data);
 Eigen::ArrayXd time_benchmark(
 	void (*benchmark)(std::vector<AGraphValues>&, Eigen::ArrayXXd&), 
-	BenchMarkTestData &test_data, int number=100, int repeat=10
-);
+	BenchMarkTestData &test_data, int number=100, int repeat=10);
 void benchmark_evaluate(std::vector<AGraphValues> &indv_list,
-												Eigen::ArrayXXd &x_vals
-);
+												Eigen::ArrayXXd &x_vals);
 void benchmark_evaluate_w_x_derivative(std::vector<AGraphValues> &indv_list,
-																			 Eigen::ArrayXXd &x_vals
-);
+																			 Eigen::ArrayXXd &x_vals);
 void benchmark_evaluate_w_c_derivative(std::vector<AGraphValues> &indv_list,
-																			 Eigen::ArrayXXd &x_vals
-);
-void set_indv_stack(AGraphValues &indv, std::string &stack_string);
-void set_indv_constants(AGraphValues &indv, std::string &const_string);
-Eigen::ArrayXXd load_agraph_x_vals();
-void load_agraph_indvidual_data(std::vector<AGraphValues> &indv_list);
-void load_benchmark_data(BenchMarkTestData &benchmark_test_data);
-void do_benchmarking();
-void run_benchmarks(BenchMarkTestData &benchmark_test_data);
+																			 Eigen::ArrayXXd &x_vals);
 void print_results(Eigen::ArrayXd &run_times);
-double standard_deviation(Eigen::ArrayXd &vec);
 void print_header();
+double max_val(Eigen::ArrayXd &run_times);
+double min_val(Eigen::ArrayXd &run_times);
+double standard_deviation(Eigen::ArrayXd &vec);
+
 
 int main() {
 	do_benchmarking();
@@ -68,40 +61,6 @@ void do_benchmarking() {
 	BenchMarkTestData benchmark_test_data = BenchMarkTestData();
 	load_benchmark_data(benchmark_test_data);
 	run_benchmarks(benchmark_test_data);
-}
-
-void run_benchmarks(BenchMarkTestData &benchmark_test_data) {
-	Eigen::ArrayXd evaluate_times = time_benchmark(benchmark_evaluate, benchmark_test_data);
-	Eigen::ArrayXd x_derivative_times = time_benchmark(benchmark_evaluate_w_x_derivative, benchmark_test_data);
-	Eigen::ArrayXd c_derivative_times = time_benchmark(benchmark_evaluate_w_c_derivative, benchmark_test_data);
-	print_header();
-	print_results(evaluate_times);
-	print_results(x_derivative_times);
-	print_results(c_derivative_times);
-}
-
-void print_header() {
-	std::cout<<"-----------------------"
-			<<":::: PERFORMANCE BENCHMARKS ::::"
-			<<"-----------------------\n"
-			<<"NAME" << std::setw(25) 
-			<<std::setw(10) << "MEAN"
-			<<std::setw(10) << "STD"
-			<<std::setw(10) << "MIN"
-			<<std::setw(10) << "MAX" << "\n"
-			<< "---------------------------------------------------------\n";
-}
-
-void print_results(Eigen::ArrayXd &run_times) {
-	double std_dev = standard_deviation(run_times);
-	double average = run_times.mean();
-	// double max = run_times.max();
-	// double min = run_times.min();
-	
-}
-
-double standard_deviation(Eigen::ArrayXd &vec) {
-	return std::sqrt((vec - vec.mean()).square().sum()/(vec.size()-1));
 }
 
 void load_benchmark_data(BenchMarkTestData &benchmark_test_data) {
@@ -176,6 +135,16 @@ Eigen::ArrayXXd load_agraph_x_vals() {
 	return x_vals;
 }
 
+void run_benchmarks(BenchMarkTestData &benchmark_test_data) {
+	Eigen::ArrayXd evaluate_times = time_benchmark(benchmark_evaluate, benchmark_test_data);
+	Eigen::ArrayXd x_derivative_times = time_benchmark(benchmark_evaluate_w_x_derivative, benchmark_test_data);
+	Eigen::ArrayXd c_derivative_times = time_benchmark(benchmark_evaluate_w_c_derivative, benchmark_test_data);
+	print_header();
+	print_results(evaluate_times);
+	print_results(x_derivative_times);
+	print_results(c_derivative_times);
+}
+
 Eigen::ArrayXd time_benchmark(
 	void (*benchmark)(std::vector<AGraphValues>&, Eigen::ArrayXXd&), 
 	BenchMarkTestData &test_data, int number, int repeat) {
@@ -186,7 +155,7 @@ Eigen::ArrayXd time_benchmark(
 			benchmark(test_data.indv_list, test_data.x_vals);	
 		}
 		auto stop = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<double, std::milli> time_span = (stop - start);
+		std::chrono::duration<double, std::chrono::seconds> time_span = (stop - start);
 		times(run) = time_span.count();
 	}
 	return times; 
@@ -222,4 +191,50 @@ void benchmark_evaluate_w_c_derivative(std::vector<AGraphValues> &indv_list,
 																			indv->constants,
 																			false);
 	}
+}
+
+void print_header() {
+	std::cout<<"-----------------------"
+			<<":::: PERFORMANCE BENCHMARKS ::::"
+			<<"-----------------------\n"
+			<<"NAME" << std::setw(25) 
+			<<std::setw(10) << "MEAN"
+			<<std::setw(10) << "STD"
+			<<std::setw(10) << "MIN"
+			<<std::setw(10) << "MAX" << "\n"
+			<< "---------------------------------------------------------\n";
+}
+
+void print_results(Eigen::ArrayXd &run_times) {
+	double std_dev = standard_deviation(run_times);
+	double average = run_times.mean();
+	double max = max_val(run_times);
+	double min = min_val(run_times);
+	std::cout<<std_dev<<std::endl;
+	std::cout<<average<<std::endl;
+	// std::cout<<max<<std::endl;
+	// std::cout<<min<<std::endl;
+	
+}
+
+double max_val(Eigen::ArrayXd &run_times) {
+	double max = run_times(0);
+	for (int i=1; i<run_times.rows(); i++) {
+		if (run_times(i) > max) 
+			max = run_times(i);
+	}
+	return max;
+}
+
+double min_val(Eigen::ArrayXd &run_times) {
+	double min = run_times(0);
+	for (int i=1; i<run_times.rows(); i++) {
+		if (run_times(i) < min) 
+			min = run_times(i);
+	}
+	return min;
+}
+
+double standard_deviation(Eigen::ArrayXd &vec) {
+	return std::sqrt((vec - vec.mean()).square().sum()/(vec.size()-1));
 }
