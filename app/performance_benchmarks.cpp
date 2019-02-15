@@ -51,7 +51,6 @@ double max_val(Eigen::ArrayXd &run_times);
 double min_val(Eigen::ArrayXd &run_times);
 double standard_deviation(Eigen::ArrayXd &vec);
 
-
 int main() {
 	do_benchmarking();
 	return 0;
