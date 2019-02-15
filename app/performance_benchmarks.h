@@ -14,6 +14,9 @@
 
 #include "BingoCpp/acyclic_graph.h"
 
+#define EVALUATE "pure c++: evaluate"
+#define X_DERIVATIVE "pure c++: x derivative"
+#define C_DERIVATIVE "pure c++: c derivative"
 #define STACK_FILE "test-agraph-stacks.csv"
 #define CONST_FILE "test-agraph-consts.csv"
 #define X_FILE "test-agraph-x-vals.csv"
@@ -51,10 +54,12 @@ void benchmark_evaluate_w_x_derivative(std::vector<AGraphValues> &indv_list,
                                        Eigen::ArrayXXd &x_vals);
 void benchmark_evaluate_w_c_derivative(std::vector<AGraphValues> &indv_list,
                                        Eigen::ArrayXXd &x_vals);
-void print_results(Eigen::ArrayXd &run_times);
 void print_header();
-double max_val(Eigen::ArrayXd &run_times);
-double min_val(Eigen::ArrayXd &run_times);
+void print_results(Eigen::ArrayXd &run_times, const std::string &name);
+std::string string_precision(double val, int precision);
+void output_params(const std::string &name, const std::string &mean, 
+                   const std::string &std, const std::string &min, 
+                   const std::string &max); 
 double standard_deviation(Eigen::ArrayXd &vec);
 
 #endif

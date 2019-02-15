@@ -52,11 +52,11 @@ void set_indv_constants(AGraphValues &indv, std::string &const_string) {
 
 void set_indv_stack(AGraphValues &indv, std::string &stack_string) {
   std::stringstream string_stream(stack_string);
-  Eigen::ArrayX3i curr_stack = Eigen::ArrayX3i(STACK_SIZE, 3);
+  Eigen::ArrayX3i curr_stack = Eigen::ArrayX3i(STACK_SIZE, STACK_COLS);
 
   std::string curr_op;
   for (int i=0; std::getline(string_stream, curr_op, ','); i++) {
-    curr_stack(i/3, i%3) = std::stoi(curr_op);
+    curr_stack(i/STACK_COLS, i%STACK_COLS) = std::stoi(curr_op);
   }
   indv.command_array = curr_stack;
 }
@@ -84,9 +84,9 @@ void run_benchmarks(BenchMarkTestData &benchmark_test_data) {
   Eigen::ArrayXd x_derivative_times = time_benchmark(benchmark_evaluate_w_x_derivative, benchmark_test_data);
   Eigen::ArrayXd c_derivative_times = time_benchmark(benchmark_evaluate_w_c_derivative, benchmark_test_data);
   print_header();
-  print_results(evaluate_times);
-  print_results(x_derivative_times);
-  print_results(c_derivative_times);
+  print_results(evaluate_times, EVALUATE);
+  print_results(x_derivative_times, X_DERIVATIVE);
+  print_results(c_derivative_times, C_DERIVATIVE);
 }
 
 Eigen::ArrayXd time_benchmark(
@@ -99,7 +99,7 @@ Eigen::ArrayXd time_benchmark(
       benchmark(test_data.indv_list, test_data.x_vals);	
     }
     auto stop = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double, std::chrono::seconds> time_span = (stop - start);
+    std::chrono::duration<double, std::ratio<1, 1>> time_span = (stop - start);
     times(run) = time_span.count();
   }
   return times; 
@@ -142,18 +142,38 @@ void print_header() {
   const std::string title = ":::: PERFORMANCE BENCHMARKS ::::";
   const std::string full_title = top_tacks + title + top_tacks;
   const std::string bottom = std::string (78, '-');
+  std::cout << full_title << std::endl;
+  output_params("NAME", "MEAN", "STD", " MIN", "MAX");
+  std::cout << bottom << std::endl;
 }
 
-void print_results(Eigen::ArrayXd &run_times) {
+void print_results(Eigen::ArrayXd &run_times, const std::string &name) {
   double std_dev = standard_deviation(run_times);
   double average = run_times.mean();
-  double max = run_times.maxCoeff;
-  double min = run_times.minCoeff;
-  std::cout<<std_dev<<std::endl;
-  std::cout<<average<<std::endl;
-  std::cout<<max<<std::endl;
-  std::cout<<min<<std::endl;
-  
+  double max = run_times.maxCoeff();
+  double min = run_times.minCoeff();
+  std::string s_std_dev = string_precision(std_dev, 5);
+  std::string s_average= string_precision(average, 5);
+  std::string s_min= string_precision(min, 5);
+  std::string s_max= string_precision(max, 5);
+  output_params(name, s_average, s_std_dev, s_min, s_max);
+}
+
+std::string string_precision(double val, int precision) {
+  std::stringstream stream;
+  stream << std::fixed << std::setprecision(precision) << val;
+  return stream.str();
+}
+
+void output_params(const std::string &name, const std::string &mean, 
+                   const std::string &std, const std::string &min, 
+                   const std::string &max) {
+  std::cout << std::setw(25) << std::left << name << "   "
+            << std::setw(10) << std::right << mean << " +- "
+            << std::setw(10) << std::left << std << "     "
+            << std::setw(10) << std::left << min << "   "
+            << std::setw(10) << std::left << max 
+            << std::endl;
 }
 
 double standard_deviation(Eigen::ArrayXd &vec) {
