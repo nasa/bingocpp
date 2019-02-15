@@ -61,7 +61,6 @@ void set_indv_stack(AGraphValues &indv, std::string &stack_string) {
   indv.command_array = curr_stack;
 }
 
-
 Eigen::ArrayXXd load_agraph_x_vals() {
   std::ifstream filename;
   filename.open(X_FILE);
