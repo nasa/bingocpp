@@ -8,6 +8,7 @@
 #include "gtest/gtest.h"
 #include "BingoCpp/acyclic_graph.h"
 #include "BingoCpp/graph_manip.h"
+#include "testing_utils.h"
 
 namespace {
 
@@ -21,7 +22,7 @@ struct AGraphValues {
 
 class AGraphBackend : public ::testing::TestWithParam<int> {
  public:
-  const double TESTING_TOL = 1e-7;
+  
   const double AGRAPH_VAL_START =-1;
   const double AGRAPH_VAL_END = 0;
   const int N_AGRAPH_VAL = 11;
@@ -42,47 +43,7 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
   }
   virtual void TearDown() {}
 
-  bool almostEqual(const Eigen::ArrayXXd &array1, const Eigen::ArrayXXd &array2) {
-    if (non_comparable_matrices(array1, array2))
-      return false;
-
-    int rows_array1= array1.rows();
-    int cols_array1= array1.cols();
-    Eigen::MatrixXd matrix_diff = Eigen::MatrixXd(rows_array1, cols_array1);
-    for (int row = 0; row < rows_array1; row++) {
-      for (int col = 0; col < cols_array1; col++) {
-        matrix_diff(row, col) = difference(array1(row, col), array1(row, col));
-      }
-    }
-    double frobenius_norm = matrix_diff.norm();
-    return (frobenius_norm < TESTING_TOL ? true : false);
-  }
-
- private:
-  double difference(double val_1, double val_2) {
-    if ((std::isnan(val_1) && std::isnan(val_2)) ||
-        (val_1 == INFINITY && val_2 == INFINITY) ||
-        (val_1 == -INFINITY && val_2 == -INFINITY)) {
-      return 0;
-    } else {
-      return val_1 - val_2;
-    }
-  }
-
-  bool non_comparable_matrices(const Eigen::ArrayXXd &array1,
-                                const Eigen::ArrayXXd &array2) {
-    int rows_array1 = array1.rows();
-    int rows_array2= array2.rows();
-    int cols_array1= array1.cols();
-    int cols_array2= array2.cols();
-    return (!(rows_array1>0) || 
-            !(rows_array2>0) || 
-            !(cols_array1> 0) || 
-            !(cols_array2> 0) || 
-            (rows_array1 != rows_array2) || 
-            (cols_array1!= cols_array2));
-  }
-
+ private: 
   AGraphValues init_agraph_vals(double begin, double end, int num_points) {
     Eigen::VectorXd constants = Eigen::VectorXd(2);
     constants << 10, 3.14;
@@ -180,7 +141,7 @@ TEST_P(AGraphBackend, simplify_and_evaluate) {
   Eigen::ArrayXXd f_of_x = SimplifyAndEvaluate(stack,
                                                sample_agraph_1_values.x_vals,
                                                sample_agraph_1_values.constants);
-  ASSERT_TRUE(almostEqual(expected_outcome, f_of_x));
+  ASSERT_TRUE(testutils::almost_equal(expected_outcome, f_of_x));
 }
 
 TEST_P(AGraphBackend, simplify_and_evaluate_x_deriv) {
@@ -203,7 +164,7 @@ TEST_P(AGraphBackend, simplify_and_evaluate_x_deriv) {
                                       constants,
                                       true);
   Eigen::ArrayXXd df_dx = res_and_gradient.second;
-  ASSERT_TRUE(almostEqual(expected_derivative, df_dx));
+  ASSERT_TRUE(testutils::almost_equal(expected_derivative, df_dx));
 }
 
 TEST_P(AGraphBackend, simplify_and_evaluate_c_deriv) {
@@ -229,7 +190,7 @@ TEST_P(AGraphBackend, simplify_and_evaluate_c_deriv) {
                                       constants,
                                       false);
   Eigen::ArrayXXd df_dc = res_and_gradient.second;
-  ASSERT_TRUE(almostEqual(expected_derivative, df_dc));
+  ASSERT_TRUE(testutils::almost_equal(expected_derivative, df_dc));
 }
 INSTANTIATE_TEST_CASE_P(,AGraphBackend, ::testing::Range(0, 13, 1));
 
