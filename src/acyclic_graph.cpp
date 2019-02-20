@@ -19,6 +19,7 @@
 
 #include "BingoCpp/acyclic_graph.h"
 #include "BingoCpp/acyclic_graph_nodes.h"
+#include "BingoCpp/backend_nodes.h"
 
 // create an instance of the Operator_Interface map
 OperatorInterface oper_interface;
@@ -26,7 +27,6 @@ OperatorInterface oper_interface;
 bool IsCpp() {
     return true;
 }
-
 
 
 void ReverseSingleCommand(const Eigen::ArrayX3i &stack,
@@ -63,28 +63,27 @@ Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3i & stack,
 Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i & stack,
                                     const Eigen::ArrayXXd & x,
                                     const Eigen::VectorXd &constants) {
-  // Evaluates a stack, but only the commands that are utilized.
   std::vector<bool> mask = FindUsedCommands(stack);
   return EvaluateWithMask(stack, x, constants, mask);
 }
 
 
 
-Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3i & stack,
-                                 const Eigen::ArrayXXd & x,
+Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3i &stack,
+                                 const Eigen::ArrayXXd &x,
                                  const Eigen::VectorXd &constants,
                                  const std::vector<bool> &mask) {
-  // Evaluates a stack at the given x using the given constants.
-  std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
-
+  Eigen::ArrayXXd forward_eval = Eigen::ArrayXXd(stack.rows(), x.rows());
   for (std::size_t i = 0; i < stack.rows(); ++i) {
     if (mask[i]) {
-      oper_interface.operator_map[stack(i, 0)]->evaluate(
-        stack, x, constants, forward_eval, i);
+      int node = stack(i, 0);
+      int param1 = stack(i, 1);
+      int param2 = stack(i, 2);
+      forward_eval.row(i) = backendnodes::forward_eval_function(
+        node, param1, param2, x, constants, forward_eval);
     }
   }
-
-  return forward_eval.back();
+  return (forward_eval.row(forward_eval.rows() - 1)).transpose();
 }
 
 
