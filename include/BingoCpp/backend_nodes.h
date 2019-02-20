@@ -13,12 +13,13 @@ namespace backendnodes {
     *reverse_operator_function)(
       int, int, int, const Eigen::ArrayXXd&, Eigen::ArrayXXd&
   );
+
   namespace { 
     Eigen::ArrayXXd loadx_forward_eval(int param1, int param2, 
                                       const Eigen::ArrayXXd &x, 
                                       const Eigen::VectorXd &constants, 
                                       Eigen::ArrayXXd &forward_eval) {
-      return x.col(param1);
+      return x.col(param1).transpose();
     }
     void loadx_reverse_eval(int reverse_index, int param1, int param2,
                                       const Eigen::ArrayXXd &forward_eval,
@@ -30,7 +31,7 @@ namespace backendnodes {
                                       const Eigen::ArrayXXd &x, 
                                       const Eigen::VectorXd &constants, 
                                       Eigen::ArrayXXd &forward_eval) {
-      return Eigen::ArrayXd::Ones(x.cols()) * constants[param1];
+      return (Eigen::ArrayXd::Ones(x.rows()) * constants[param1]).transpose();
     }
     void loadc_reverse_eval(int reverse_index, int param1, int param2,
                                       const Eigen::ArrayXXd &forward_eval,
@@ -191,6 +192,7 @@ namespace backendnodes {
     abs_forward_eval,
     sqrt_forward_eval
   };
+
   std::vector<reverse_operator_function> reverse_eval_map {
     loadx_reverse_eval,
     loadc_reverse_eval,
