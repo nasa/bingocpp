@@ -1,5 +1,5 @@
-#ifndef TEST_TESTING_UTILS_H_
-#define TEST_TESTING_UTILS_H_
+#ifndef BINGO_TEST_TESTING_UTILS_H_
+#define BINGO_TEST_TESTING_UTILS_H_
 
 #include <Eigen/Dense>
 
@@ -142,4 +142,4 @@ namespace testutils {
   }
 } // testutils
 
-#endif // INCLUDE_BINGO_TESTING_UTILS_H_
+#endif //BINGO_TEST_TESTING_UTILS_H_
