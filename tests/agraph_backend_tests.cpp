@@ -1,6 +1,4 @@
-#include <stdio.h>
 #include <cmath>
-#include <iostream>
 #include <vector>
 
 #include <Eigen/Dense>

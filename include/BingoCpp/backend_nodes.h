@@ -214,6 +214,12 @@ namespace backendnodes {
                                          Eigen::ArrayXXd &forward_eval) {
     return forward_eval_map.at(node)(param1, param2, x, constants, forward_eval);
   }
+
+  void reverse_eval_function(int node, int reverse_index, int param1, int param2,
+                                        const Eigen::ArrayXXd &forward_eval,
+                                        Eigen::ArrayXXd &reverse_eval) {
+    reverse_eval_map.at(node)(reverse_index, param1, param2, forward_eval, reverse_eval);
+  }
 } //backendnodes
 
 #endif
