@@ -11,6 +11,7 @@
 #include "testing_utils.h"
 
 namespace {
+const int N_OPS = 13;
 
 class AGraphBackend : public ::testing::TestWithParam<int> {
  public:
@@ -18,7 +19,6 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
   const double AGRAPH_VAL_START =-1;
   const double AGRAPH_VAL_END = 0;
   const int N_AGRAPH_VAL = 11;
-  const int N_OPS = 13;
 
   testutils::AGraphValues sample_agraph_1_values;
   std::vector<Eigen::ArrayXXd> operator_evals_x0;
@@ -98,6 +98,6 @@ TEST_P(AGraphBackend, simplify_and_evaluate_c_deriv) {
   Eigen::ArrayXXd df_dc = res_and_gradient.second;
   ASSERT_TRUE(testutils::almost_equal(expected_derivative, df_dc));
 }
-INSTANTIATE_TEST_CASE_P(,AGraphBackend, ::testing::Range(0, 13, 1));
+INSTANTIATE_TEST_CASE_P(,AGraphBackend, ::testing::Range(0, N_OPS, 1));
 
 } // namespace
