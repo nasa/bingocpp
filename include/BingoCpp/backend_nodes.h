@@ -5,232 +5,342 @@
 #include "acyclic_graph.h"
 
 namespace backendnodes {
-  typedef Eigen::ArrayXXd (
+  typedef void (
     *forward_operator_function)(
-      int, int, const Eigen::ArrayXXd&, const Eigen::VectorXd&, Eigen::ArrayXXd&
+      const Eigen::ArrayX3i&, const Eigen::ArrayXXd&,
+      const Eigen::VectorXd&, std::vector<Eigen::ArrayXXd>&, std::size_t
   );
   typedef void (
-    *reverse_operator_function)(
-      int, int, int, const Eigen::ArrayXXd&, Eigen::ArrayXXd&
+    *derivative_operator_function)(
+      const Eigen::ArrayX3i &, const int,
+      const std::vector<Eigen::ArrayXXd> &,
+      std::vector<Eigen::ArrayXXd> &, int
   );
 
   inline
   namespace { 
-    Eigen::ArrayXXd loadx_forward_eval(int param1, int param2, 
-                                      const Eigen::ArrayXXd &x, 
-                                      const Eigen::VectorXd &constants, 
-                                      Eigen::ArrayXXd &forward_eval) {
-      return x.col(param1).transpose();
-    }
-    void loadx_reverse_eval(int reverse_index, int param1, int param2,
-                                      const Eigen::ArrayXXd &forward_eval,
-                                      Eigen::ArrayXXd &reverse_eval) {
-      return;
+    void x_load_evaluate(const Eigen::ArrayX3i &stack,
+                          const Eigen::ArrayXXd &x,
+                          const Eigen::VectorXd &constants,
+                          std::vector<Eigen::ArrayXXd> &buffer,
+                          std::size_t result_location) {
+      buffer[result_location] = x.col(stack(result_location, 1));
     }
 
-    Eigen::ArrayXXd loadc_forward_eval(int param1, int param2, 
-                                      const Eigen::ArrayXXd &x, 
-                                      const Eigen::VectorXd &constants, 
-                                      Eigen::ArrayXXd &forward_eval) {
-      return (Eigen::ArrayXd::Ones(x.rows()) * constants[param1]).transpose();
-    }
-    void loadc_reverse_eval(int reverse_index, int param1, int param2,
-                                      const Eigen::ArrayXXd &forward_eval,
-                                      Eigen::ArrayXXd &reverse_eval) {
-      return;
+    void x_load_deriv_evaluate(const Eigen::ArrayX3i &stack,
+                                const int command_index,
+                                const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                                std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                                int dependency) {
     }
 
-    Eigen::ArrayXXd add_forward_eval(int param1, int param2, 
-                                    const Eigen::ArrayXXd &x, 
-                                    const Eigen::VectorXd &constants, 
-                                    Eigen::ArrayXXd &forward_eval) {
-      return forward_eval.row(param1) + forward_eval.row(param2); 
-    } 
-    void add_reverse_eval(int reverse_index, int param1, int param2, 
-                          const Eigen::ArrayXXd &forward_eval, 
-                          Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index);
-      reverse_eval.row(param2) += reverse_eval.row(reverse_index);
-    } 
 
-    Eigen::ArrayXXd subtract_forward_eval(int param1, int param2, 
-                                          const Eigen::ArrayXXd &x,
-                                          const Eigen::VectorXd &constants, 
-                                          Eigen::ArrayXXd &forward_eval) {
-      return forward_eval.row(param1) - forward_eval.row(param2); 
-    } 
-    void subtract_forward_eval(int reverse_index, int param1, int param2, 
-                              const Eigen::ArrayXXd &forward_eval, 
-                              Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index);
-      reverse_eval.row(param2) -= reverse_eval.row(reverse_index);
+    void c_load_evaluate(const Eigen::ArrayX3i &stack,
+                          const Eigen::ArrayXXd &x,
+                          const Eigen::VectorXd &constants,
+                          std::vector<Eigen::ArrayXXd> &buffer,
+                          std::size_t result_location) {
+      if (stack(result_location, 0) != -1) {
+        buffer[result_location] = Eigen::ArrayXXd::Constant(x.rows(), 1,
+                                  constants[stack(result_location, 1)]);
+
+      } else {
+        buffer[result_location] = Eigen::ArrayXXd::Zero(x.rows(), 1);
+      }
     }
 
-    Eigen::ArrayXXd multiply_forward_eval(int param1, int param2, 
-                                    const Eigen::ArrayXXd &x, 
-                                    const Eigen::VectorXd &constants, 
-                                    Eigen::ArrayXXd &forward_eval) {
-      return forward_eval.row(param1) * forward_eval.row(param2); 
-    } 
-    void multiply_reverse_eval(int reverse_index, int param1, int param2, 
-                              const Eigen::ArrayXXd &forward_eval, 
-                              Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index)*forward_eval.row(param2);
-      reverse_eval.row(param2) += reverse_eval.row(reverse_index)*forward_eval.row(param1);
-    } 
-
-    Eigen::ArrayXXd divide_forward_eval(int param1, int param2, 
-                                        const Eigen::ArrayXXd &x, 
-                                        const Eigen::VectorXd &constants, 
-                                        Eigen::ArrayXXd &forward_eval) {
-      return forward_eval.row(param1) / forward_eval.row(param2); 
-    } 
-    void divide_reverse_eval(int reverse_index, int param1, int param2, 
-                          const Eigen::ArrayXXd &forward_eval, 
-                          Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index)/forward_eval.row(param2);
-      reverse_eval.row(param2) -= reverse_eval.row(reverse_index)*forward_eval.row(reverse_index)/forward_eval.row(param2);
+    void c_load_deriv_evaluate(const Eigen::ArrayX3i &stack,
+                                const int command_index,
+                                const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                                std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                                int dependency) {
     }
 
-    Eigen::ArrayXXd sin_forward_eval(int param1, int param2, 
-                                        const Eigen::ArrayXXd &x, 
-                                        const Eigen::VectorXd &constants, 
-                                        Eigen::ArrayXXd &forward_eval) {
-      return forward_eval.row(param1).sin(); 
-    } 
-    void sin_reverse_eval(int reverse_index, int param1, int param2, 
-                          const Eigen::ArrayXXd &forward_eval, 
-                          Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index)*forward_eval.row(param1).cos();
+
+    void addition_evaluate(const Eigen::ArrayX3i &stack,
+                            const Eigen::ArrayXXd &x,
+                            const Eigen::VectorXd &constants,
+                            std::vector<Eigen::ArrayXXd> &buffer,
+                            std::size_t result_location) {
+      buffer[result_location] = buffer[stack(result_location, 1)] +
+                                buffer[stack(result_location, 2)];
     }
 
-    Eigen::ArrayXXd cos_forward_eval(int param1, int param2, 
-                                        const Eigen::ArrayXXd &x, 
-                                        const Eigen::VectorXd &constants, 
-                                        Eigen::ArrayXXd &forward_eval) {
-      return forward_eval.row(param1).cos(); 
-    } 
-    void cos_reverse_eval(int reverse_index, int param1, int param2, 
-                          const Eigen::ArrayXXd &forward_eval, 
-                          Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) -= reverse_eval.row(reverse_index)
-                                  *forward_eval.row(param1).sin();
+    void addition_deriv_evaluate(const Eigen::ArrayX3i &stack,
+                                  const int command_index,
+                                  const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                                  std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                                  int dependency) {
+      if (stack(dependency, 1) == command_index) {
+        reverse_buffer[command_index] += reverse_buffer[dependency];
+      }
+
+      if (stack(dependency, 2) == command_index) {
+        reverse_buffer[command_index] += reverse_buffer[dependency];
+      }
     }
 
-    Eigen::ArrayXXd exp_forward_eval(int param1, int param2,
-                                    const Eigen::ArrayXXd &x,
-                                    const Eigen::VectorXd &constants,
-                                    Eigen::ArrayXXd &forward_eval) {
-      return forward_eval.row(param1).exp();
-    }
-    void exp_reverse_eval(int reverse_index, int param1, int param2, 
-                          const Eigen::ArrayXXd &forward_eval, 
-                          Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index)
-                                 *forward_eval.row(reverse_index);
+
+    void subtraction_evaluate(const Eigen::ArrayX3i &stack,
+                              const Eigen::ArrayXXd &x,
+                              const Eigen::VectorXd &constants,
+                              std::vector<Eigen::ArrayXXd> &buffer,
+                              std::size_t result_location) {
+      buffer[result_location] = buffer[stack(result_location, 1)] -
+                                buffer[stack(result_location, 2)];
     }
 
-    Eigen::ArrayXXd log_forward_eval(int param1, int param2,
-                                    const Eigen::ArrayXXd &x,
-                                    const Eigen::VectorXd &constants,
-                                    Eigen::ArrayXXd &forward_eval) {
-      return forward_eval.row(param1).abs().log();
-    }
-    void log_reverse_eval(int reverse_index, int param1, int param2, 
-                          const Eigen::ArrayXXd &forward_eval, 
-                          Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index)/forward_eval.row(param1);
+    void subtraction_deriv_evaluate(const Eigen::ArrayX3i &stack,
+                                    const int command_index,
+                                    const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                                    std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                                    int dependency) {
+      if (stack(dependency, 1) == command_index) {
+        reverse_buffer[command_index] += reverse_buffer[dependency];
+      }
+
+      if (stack(dependency, 2) == command_index) {
+        reverse_buffer[command_index] -= reverse_buffer[dependency];
+      }
     }
 
-    Eigen::ArrayXXd pow_forward_eval(int param1, int param2,
-                                    const Eigen::ArrayXXd &x,
-                                    const Eigen::VectorXd &constants,
-                                    Eigen::ArrayXXd &forward_eval) {
-      return forward_eval.row(param1).abs().pow(forward_eval.row(param2));
-    }
-    void pow_reverse_eval(int reverse_index, int param1, int param2, 
-                          const Eigen::ArrayXXd &forward_eval, 
-                          Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index)
-                                 *forward_eval.row(reverse_index)
-                                 *forward_eval.row(param2)
-                                 /forward_eval.row(param1);
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index)
-                                 *forward_eval.row(reverse_index)
-                                 *forward_eval.row(param1).abs().log();
+
+    void multiplication_evaluate(const Eigen::ArrayX3i &stack,
+                                  const Eigen::ArrayXXd &x,
+                                  const Eigen::VectorXd &constants,
+                                  std::vector<Eigen::ArrayXXd> &buffer,
+                                  std::size_t result_location) {
+      buffer[result_location] = buffer[stack(result_location, 1)] *
+                                buffer[stack(result_location, 2)];
     }
 
-    Eigen::ArrayXXd abs_forward_eval(int param1, int param2,
-                                    const Eigen::ArrayXXd &x,
-                                    const Eigen::VectorXd &constants,
-                                    Eigen::ArrayXXd &forward_eval) {
-      return forward_eval.row(param1).abs();
-    }
-    void abs_reverse_eval(int reverse_index, int param1, int param2, 
-                          const Eigen::ArrayXXd &forward_eval, 
-                          Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index)
-                                 *forward_eval.row(reverse_index).sign();
+    void multiplication_deriv_evaluate(const Eigen::ArrayX3i &stack,
+                                        const int command_index,
+                                        const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                                        std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                                        int dependency) {
+      if (stack(dependency, 1) == command_index) {
+        reverse_buffer[command_index] += reverse_buffer[dependency] *
+                                        forward_buffer[stack(dependency, 2)];
+      }
+
+      if (stack(dependency, 2) == command_index) {
+        reverse_buffer[command_index] += reverse_buffer[dependency] *
+                                        forward_buffer[stack(dependency, 1)];
+      }
     }
 
-    Eigen::ArrayXXd sqrt_forward_eval(int param1, int param2,
-                                    const Eigen::ArrayXXd &x,
-                                    const Eigen::VectorXd &constants,
-                                    Eigen::ArrayXXd &forward_eval) {
-      return forward_eval.row(param1).abs().sqrt();
+    void division_evaluate(const Eigen::ArrayX3i &stack,
+                            const Eigen::ArrayXXd &x,
+                            const Eigen::VectorXd &constants,
+                            std::vector<Eigen::ArrayXXd> &buffer,
+                            std::size_t result_location) {
+      buffer[result_location] = buffer[stack(result_location, 1)] /
+                                buffer[stack(result_location, 2)];
     }
-    void sqrt_reverse_eval(int reverse_index, int param1, int param2, 
-                          const Eigen::ArrayXXd &forward_eval, 
-                          Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += 0.5*reverse_eval.row(reverse_index)
-                                    *forward_eval.row(reverse_index).sign();
+
+    void division_deriv_evaluate(const Eigen::ArrayX3i &stack,
+                                  const int command_index,
+                                  const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                                  std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                                  int dependency) {
+      if (stack(dependency, 1) == command_index) {
+        reverse_buffer[command_index] += reverse_buffer[dependency] /
+                                        forward_buffer[stack(dependency, 2)];
+      }
+
+      if (stack(dependency, 2) == command_index) {
+        reverse_buffer[command_index] += reverse_buffer[dependency] *
+                                        (-forward_buffer[dependency] /
+                                          forward_buffer[stack(dependency, 2)]);
+      }
+    }
+
+
+    void sin_evaluate(const Eigen::ArrayX3i &stack,
+                      const Eigen::ArrayXXd &x,
+                      const Eigen::VectorXd &constants,
+                      std::vector<Eigen::ArrayXXd> &buffer,
+                      std::size_t result_location) {
+      buffer[result_location] = buffer[stack(result_location, 1)].sin();
+    }
+
+    void sin_deriv_evaluate(const Eigen::ArrayX3i &stack,
+                            const int command_index,
+                            const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                            std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                            int dependency) {
+      reverse_buffer[command_index] += reverse_buffer[dependency] *
+                                      forward_buffer[stack(dependency, 1)].cos();
+    }
+
+
+    void cos_evaluate(const Eigen::ArrayX3i &stack,
+                      const Eigen::ArrayXXd &x,
+                      const Eigen::VectorXd &constants,
+                      std::vector<Eigen::ArrayXXd> &buffer,
+                      std::size_t result_location) {
+      buffer[result_location] = buffer[stack(result_location, 1)].cos();
+    }
+
+    void cos_deriv_evaluate(const Eigen::ArrayX3i &stack,
+                            const int command_index,
+                            const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                            std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                            int dependency) {
+      reverse_buffer[command_index] -= reverse_buffer[dependency] *
+                                      forward_buffer[stack(dependency, 1)].sin();
+    }
+
+
+    void exp_evaluate(const Eigen::ArrayX3i &stack,
+                      const Eigen::ArrayXXd &x,
+                      const Eigen::VectorXd &constants,
+                      std::vector<Eigen::ArrayXXd> &buffer,
+                      std::size_t result_location) {
+      buffer[result_location] = buffer[stack(result_location, 1)].exp();
+    }
+
+    void exp_deriv_evaluate(const Eigen::ArrayX3i &stack,
+                            const int command_index,
+                            const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                            std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                            int dependency) {
+      reverse_buffer[command_index] += reverse_buffer[dependency] *
+                                      forward_buffer[dependency];
+    }
+
+
+    void log_evaluate(const Eigen::ArrayX3i &stack,
+                      const Eigen::ArrayXXd &x,
+                      const Eigen::VectorXd &constants,
+                      std::vector<Eigen::ArrayXXd> &buffer,
+                      std::size_t result_location) {
+      buffer[result_location] = (buffer[stack(result_location, 1)].abs()).log();
+    }
+
+    void log_deriv_evaluate(const Eigen::ArrayX3i &stack,
+                            const int command_index,
+                            const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                            std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                            int dependency) {
+      reverse_buffer[command_index] += reverse_buffer[dependency] /
+                                      forward_buffer[stack(dependency, 1)];
+    }
+
+    void power_evaluate(const Eigen::ArrayX3i &stack,
+                        const Eigen::ArrayXXd &x,
+                        const Eigen::VectorXd &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location) {
+      buffer[result_location] = (buffer[stack(result_location, 1)].abs()).pow(
+                                  buffer[stack(result_location, 2)]);
+    }
+
+    void power_deriv_evaluate(const Eigen::ArrayX3i &stack,
+                              const int command_index,
+                              const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                              std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                              int dependency) {
+      if (stack(dependency, 1) == command_index) {
+        reverse_buffer[command_index] += forward_buffer[dependency] *
+                                        reverse_buffer[dependency] *
+                                        forward_buffer[stack(dependency, 2)] /
+                                        forward_buffer[stack(dependency, 1)];
+      }
+
+      if (stack(dependency, 2) == command_index) {
+        reverse_buffer[command_index] += forward_buffer[dependency] *
+                                        reverse_buffer[dependency] *
+                                        (forward_buffer[stack(dependency, 1)].abs()).log();
+      }
+    }
+
+
+    void absolute_evaluate(const Eigen::ArrayX3i &stack,
+                            const Eigen::ArrayXXd &x,
+                            const Eigen::VectorXd &constants,
+                            std::vector<Eigen::ArrayXXd> &buffer,
+                            std::size_t result_location) {
+      buffer[result_location] = buffer[stack(result_location, 1)].abs();
+    }
+
+    void absolute_deriv_evaluate(const Eigen::ArrayX3i &stack,
+                                  const int command_index,
+                                  const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                                  std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                                  int dependency) {
+      reverse_buffer[command_index] += reverse_buffer[dependency] *
+                                      forward_buffer[stack(dependency, 1)].sign();
+    }
+
+    void sqrt_evaluate(const Eigen::ArrayX3i &stack,
+                        const Eigen::ArrayXXd &x,
+                        const Eigen::VectorXd &constants,
+                        std::vector<Eigen::ArrayXXd> &buffer,
+                        std::size_t result_location) {
+      buffer[result_location] = (buffer[stack(result_location, 1)].abs()).sqrt();
+    }
+
+    void sqrt_deriv_evaluate(const Eigen::ArrayX3i &stack,
+                              const int command_index,
+                              const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                              std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                              int dependency) {
+      reverse_buffer[command_index] += 0.5 * reverse_buffer[dependency] /
+                                      forward_buffer[dependency] *
+                                      forward_buffer[stack(dependency, 1)].sign();
     }
   } //namespace
 
   const std::vector<forward_operator_function> forward_eval_map {
-    loadx_forward_eval,
-    loadc_forward_eval,
-    add_forward_eval,
-    subtract_forward_eval,
-    multiply_forward_eval,
-    divide_forward_eval,
-    sin_forward_eval,
-    cos_forward_eval,
-    exp_forward_eval,
-    log_forward_eval,
-    pow_forward_eval,
-    abs_forward_eval,
-    sqrt_forward_eval
+    x_load_evaluate,
+    c_load_evaluate,
+    addition_evaluate,
+    subtraction_evaluate,
+    multiplication_evaluate,
+    division_evaluate,
+    sin_evaluate,
+    cos_evaluate,
+    exp_evaluate,
+    log_evaluate,
+    power_evaluate,
+    absolute_evaluate,
+    sqrt_evaluate
   };
 
-  const std::vector<reverse_operator_function> reverse_eval_map {
-    loadx_reverse_eval,
-    loadc_reverse_eval,
-    add_reverse_eval,
-    multiply_reverse_eval,
-    divide_reverse_eval,
-    sin_reverse_eval,
-    cos_reverse_eval,
-    exp_reverse_eval,
-    log_reverse_eval,
-    pow_reverse_eval,
-    abs_reverse_eval,
-    sqrt_reverse_eval
+  const std::vector<derivative_operator_function> derivative_eval_map {
+    x_load_deriv_evaluate,
+    c_load_deriv_evaluate,
+    addition_deriv_evaluate,
+    subtraction_deriv_evaluate,
+    multiplication_deriv_evaluate,
+    division_deriv_evaluate,
+    sin_deriv_evaluate,
+    cos_deriv_evaluate,
+    exp_deriv_evaluate,
+    log_deriv_evaluate,
+    power_deriv_evaluate,
+    absolute_deriv_evaluate,
+    sqrt_deriv_evaluate
   };
 
   inline 
-  Eigen::ArrayXXd forward_eval_function(int node, int param1, int param2,
-                                         const Eigen::ArrayXXd &x, 
-                                         const Eigen::VectorXd &constants,
-                                         Eigen::ArrayXXd &forward_eval) {
-    return forward_eval_map.at(node)(param1, param2, x, constants, forward_eval);
+  void forward_eval_function(int node, const Eigen::ArrayX3i &stack,
+                                        const Eigen::ArrayXXd &x,
+                                        const Eigen::VectorXd &constants,
+                                        std::vector<Eigen::ArrayXXd> &buffer,
+                                        std::size_t result_location) {
+    forward_eval_map.at(node)(stack, x, constants, buffer, result_location);
   }
 
   inline
-  void reverse_eval_function(int node, int reverse_index, int param1, int param2,
-                                        const Eigen::ArrayXXd &forward_eval,
-                                        Eigen::ArrayXXd &reverse_eval) {
-    reverse_eval_map.at(node)(reverse_index, param1, param2, forward_eval, reverse_eval);
+  void derivative_eval_function(int node, const Eigen::ArrayX3i &stack,
+                              const int command_index,
+                              const std::vector<Eigen::ArrayXXd> &forward_buffer,
+                              std::vector<Eigen::ArrayXXd> &reverse_buffer,
+                              int dependency) {
+    derivative_eval_map.at(node)(stack, command_index, forward_buffer, reverse_buffer, dependency);
   }
 } //backendnodes
 

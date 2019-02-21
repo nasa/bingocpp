@@ -73,17 +73,14 @@ Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3i &stack,
                                  const Eigen::ArrayXXd &x,
                                  const Eigen::VectorXd &constants,
                                  const std::vector<bool> &mask) {
-  Eigen::ArrayXXd forward_eval = Eigen::ArrayXXd(stack.rows(), x.rows());
+  std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
+
   for (std::size_t i = 0; i < stack.rows(); ++i) {
-    if (mask[i]) {
-      int node = stack(i, 0);
-      int param1 = stack(i, 1);
-      int param2 = stack(i, 2);
-      forward_eval.row(i) = backendnodes::forward_eval_function(
-        node, param1, param2, x, constants, forward_eval);
-    }
+    oper_interface.operator_map[stack(i, 0)]->evaluate(
+      stack, x, constants, forward_eval, i);
   }
-  return (forward_eval.row(forward_eval.rows() - 1)).transpose();
+
+  return forward_eval.back();
 }
 
 
