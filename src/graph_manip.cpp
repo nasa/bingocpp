@@ -294,6 +294,14 @@ std::string AcyclicGraph::print_stack() {
   return out.str();
 }
 
+bool AcyclicGraph::has_arity_2(int node) {
+  return is_arity_2_map.at(node);
+}
+
+bool AcyclicGraph::is_terminal(int node) {
+  return is_terminal_map.at(node);
+}
+
 AcyclicGraphManipulator::AcyclicGraphManipulator(int nvars, int ag_size,
     int nloads, float float_lim, float terminal_prob, int opt_rate) {
   this->nvars = nvars;
