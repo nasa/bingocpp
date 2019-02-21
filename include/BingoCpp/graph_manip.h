@@ -81,6 +81,9 @@ class AcyclicGraph {
   //! int genetic_age
   /*! holds genetic age of individual */
   int genetic_age;
+
+  
+    
   //! \brief Default constructor
   AcyclicGraph();
   //! \brief Copy constructor
@@ -142,6 +145,13 @@ class AcyclicGraph {
    *  \return the string to display the stack
    */
   std::string print_stack();
+
+  static bool has_arity_2(int node);
+  static bool is_terminal(int node);
+
+ private:
+  static const bool is_arity_2_map[13]; 
+  static const bool is_terminal_map[13];
 };
 
 /*! \class AcyclicGraphManipulator

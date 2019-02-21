@@ -51,6 +51,38 @@ AcyclicGraph AcyclicGraph::copy() {
   return temp;
 }
 
+const bool AcyclicGraph::is_arity_2_map[13] = {
+  false,
+  false,
+  true,
+  true,
+  true,
+  true,
+  false,
+  false,
+  false,
+  false,
+  true,
+  false,
+  false
+};
+
+const bool AcyclicGraph::is_terminal_map[13] = {
+  true,
+  true,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false
+};
+
 bool AcyclicGraph::needs_optimization() {
   if (opt_rate == 0) {
     for (int i = 0; i < simple_stack.rows(); ++i) {
@@ -292,6 +324,14 @@ std::string AcyclicGraph::print_stack() {
   }
 
   return out.str();
+}
+
+bool AcyclicGraph::has_arity_2(int node) {
+  return is_arity_2_map[node];
+}
+
+bool AcyclicGraph::is_terminal(int node) {
+  return is_terminal_map[node];
 }
 
 AcyclicGraphManipulator::AcyclicGraphManipulator(int nvars, int ag_size,
