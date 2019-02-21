@@ -46,7 +46,7 @@ void C_Load::evaluate(const Eigen::ArrayX3i &stack,
                       const Eigen::VectorXd &constants,
                       std::vector<Eigen::ArrayXXd> &buffer,
                       std::size_t result_location) {
-  if (stack(result_location, 0) != -1) {
+  if (stack(result_location, 1) != -1) {
     buffer[result_location] = Eigen::ArrayXXd::Constant(x.rows(), 1,
                               constants[stack(result_location, 1)]);
 
