@@ -14,6 +14,7 @@ namespace backendnodes {
       int, int, int, const Eigen::ArrayXXd&, Eigen::ArrayXXd&
   );
 
+  inline
   namespace { 
     Eigen::ArrayXXd loadx_forward_eval(int param1, int param2, 
                                       const Eigen::ArrayXXd &x, 
@@ -56,7 +57,7 @@ namespace backendnodes {
                                           const Eigen::ArrayXXd &x,
                                           const Eigen::VectorXd &constants, 
                                           Eigen::ArrayXXd &forward_eval) {
-      return forward_eval.row(param1) + forward_eval.row(param2); 
+      return forward_eval.row(param1) - forward_eval.row(param2); 
     } 
     void subtract_forward_eval(int reverse_index, int param1, int param2, 
                               const Eigen::ArrayXXd &forward_eval, 
@@ -88,7 +89,7 @@ namespace backendnodes {
                           const Eigen::ArrayXXd &forward_eval, 
                           Eigen::ArrayXXd &reverse_eval) {
       reverse_eval.row(param1) += reverse_eval.row(reverse_index)/forward_eval.row(param2);
-      reverse_eval.row(param2) += reverse_eval.row(reverse_index)/forward_eval.row(param1);
+      reverse_eval.row(param2) -= reverse_eval.row(reverse_index)*forward_eval.row(reverse_index)/forward_eval.row(param2);
     }
 
     Eigen::ArrayXXd sin_forward_eval(int param1, int param2, 
@@ -112,7 +113,8 @@ namespace backendnodes {
     void cos_reverse_eval(int reverse_index, int param1, int param2, 
                           const Eigen::ArrayXXd &forward_eval, 
                           Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index)*forward_eval.row(param1).sin();
+      reverse_eval.row(param1) -= reverse_eval.row(reverse_index)
+                                  *forward_eval.row(param1).sin();
     }
 
     Eigen::ArrayXXd exp_forward_eval(int param1, int param2,
@@ -124,7 +126,8 @@ namespace backendnodes {
     void exp_reverse_eval(int reverse_index, int param1, int param2, 
                           const Eigen::ArrayXXd &forward_eval, 
                           Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index)*forward_eval.row(reverse_index);
+      reverse_eval.row(param1) += reverse_eval.row(reverse_index)
+                                 *forward_eval.row(reverse_index);
     }
 
     Eigen::ArrayXXd log_forward_eval(int param1, int param2,
@@ -136,7 +139,7 @@ namespace backendnodes {
     void log_reverse_eval(int reverse_index, int param1, int param2, 
                           const Eigen::ArrayXXd &forward_eval, 
                           Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index)/forward_eval.row(param1).exp();
+      reverse_eval.row(param1) += reverse_eval.row(reverse_index)/forward_eval.row(param1);
     }
 
     Eigen::ArrayXXd pow_forward_eval(int param1, int param2,
@@ -148,8 +151,13 @@ namespace backendnodes {
     void pow_reverse_eval(int reverse_index, int param1, int param2, 
                           const Eigen::ArrayXXd &forward_eval, 
                           Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index)*forward_eval.row(reverse_index)*forward_eval.row(param2)/forward_eval.row(param1);
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index)*forward_eval.row(reverse_index)*forward_eval.row(param1).abs().log();
+      reverse_eval.row(param1) += reverse_eval.row(reverse_index)
+                                 *forward_eval.row(reverse_index)
+                                 *forward_eval.row(param2)
+                                 /forward_eval.row(param1);
+      reverse_eval.row(param1) += reverse_eval.row(reverse_index)
+                                 *forward_eval.row(reverse_index)
+                                 *forward_eval.row(param1).abs().log();
     }
 
     Eigen::ArrayXXd abs_forward_eval(int param1, int param2,
@@ -161,7 +169,8 @@ namespace backendnodes {
     void abs_reverse_eval(int reverse_index, int param1, int param2, 
                           const Eigen::ArrayXXd &forward_eval, 
                           Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += reverse_eval.row(reverse_index)*forward_eval.row(reverse_index).sign();
+      reverse_eval.row(param1) += reverse_eval.row(reverse_index)
+                                 *forward_eval.row(reverse_index).sign();
     }
 
     Eigen::ArrayXXd sqrt_forward_eval(int param1, int param2,
@@ -173,11 +182,12 @@ namespace backendnodes {
     void sqrt_reverse_eval(int reverse_index, int param1, int param2, 
                           const Eigen::ArrayXXd &forward_eval, 
                           Eigen::ArrayXXd &reverse_eval) {
-      reverse_eval.row(param1) += 0.5*reverse_eval.row(reverse_index)*forward_eval.row(reverse_index).sign();
+      reverse_eval.row(param1) += 0.5*reverse_eval.row(reverse_index)
+                                    *forward_eval.row(reverse_index).sign();
     }
   } //namespace
 
-  std::vector<forward_operator_function> forward_eval_map {
+  const std::vector<forward_operator_function> forward_eval_map {
     loadx_forward_eval,
     loadc_forward_eval,
     add_forward_eval,
@@ -193,7 +203,7 @@ namespace backendnodes {
     sqrt_forward_eval
   };
 
-  std::vector<reverse_operator_function> reverse_eval_map {
+  const std::vector<reverse_operator_function> reverse_eval_map {
     loadx_reverse_eval,
     loadc_reverse_eval,
     add_reverse_eval,
@@ -208,6 +218,7 @@ namespace backendnodes {
     sqrt_reverse_eval
   };
 
+  inline 
   Eigen::ArrayXXd forward_eval_function(int node, int param1, int param2,
                                          const Eigen::ArrayXXd &x, 
                                          const Eigen::VectorXd &constants,
@@ -215,6 +226,7 @@ namespace backendnodes {
     return forward_eval_map.at(node)(param1, param2, x, constants, forward_eval);
   }
 
+  inline
   void reverse_eval_function(int node, int reverse_index, int param1, int param2,
                                         const Eigen::ArrayXXd &forward_eval,
                                         Eigen::ArrayXXd &reverse_eval) {
