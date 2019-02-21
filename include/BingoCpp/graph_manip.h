@@ -146,7 +146,7 @@ class AcyclicGraph {
    */
   std::string print_stack();
 
-  static bool has_arity_2(int node);
+  static bool has_arity_two(int node);
   static bool is_terminal(int node);
 
  private:

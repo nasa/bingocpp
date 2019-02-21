@@ -326,7 +326,7 @@ std::string AcyclicGraph::print_stack() {
   return out.str();
 }
 
-bool AcyclicGraph::has_arity_2(int node) {
+bool AcyclicGraph::has_arity_two(int node) {
   return is_arity_2_map[node];
 }
 
