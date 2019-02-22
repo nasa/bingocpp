@@ -5,29 +5,23 @@
 #include <Eigen/Dense>
 
 namespace backendnodes {
-  typedef void (
+  typedef Eigen::ArrayXXd (
     *forward_operator_function)(
-      const Eigen::ArrayX3i&, const Eigen::ArrayXXd&,
-      const Eigen::VectorXd&, std::vector<Eigen::ArrayXXd>&, std::size_t
+      int, int, const Eigen::ArrayXXd&, const Eigen::VectorXd&, Eigen::ArrayXXd&
   );
   typedef void (
-    *derivative_operator_function)(
-      const Eigen::ArrayX3i &, const int,
-      const std::vector<Eigen::ArrayXXd> &,
-      std::vector<Eigen::ArrayXXd> &, int
+    *reverse_operator_function)(
+      int, int, int, const Eigen::ArrayXXd&, Eigen::ArrayXXd&
   );
   
-  void forward_eval_function(int node, const Eigen::ArrayX3i &stack,
-                                        const Eigen::ArrayXXd &x,
-                                        const Eigen::VectorXd &constants,
-                                        std::vector<Eigen::ArrayXXd> &buffer,
-                                        std::size_t result_location);
+  Eigen::ArrayXXd forward_eval_function(int node, int param1, int param2,
+                                         const Eigen::ArrayXXd &x, 
+                                         const Eigen::VectorXd &constants,
+                                         Eigen::ArrayXXd &forward_eval);
 
-  void derivative_eval_function(int node, const Eigen::ArrayX3i &stack,
-                              const int command_index,
-                              const std::vector<Eigen::ArrayXXd> &forward_buffer,
-                              std::vector<Eigen::ArrayXXd> &reverse_buffer,
-                              int dependency);
+  void reverse_eval_function(int node, int reverse_index, int param1, int param2,
+                                        const Eigen::ArrayXXd &forward_eval,
+                                        Eigen::ArrayXXd &reverse_eval);
 } //backendnodes
 
 #endif

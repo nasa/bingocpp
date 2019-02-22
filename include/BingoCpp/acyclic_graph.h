@@ -55,11 +55,11 @@ bool IsCpp();
                            specified command.
  *
  */
-void ReverseSingleCommand(const Eigen::ArrayX3i &stack,
-                          const int command_index,
-                          const std::vector<Eigen::ArrayXXd> &forward_buffer,
-                          std::vector<Eigen::ArrayXXd> &reverse_buffer,
-                          const std::set<int> &dependencies);
+Eigen::ArrayXXd reverse_eval_with_mask(const std::pair<int, int> deriv_shape,
+                                       const int deriv_wrt_node,
+                                       Eigen::ArrayXXd &forward_eval,
+                                       const Eigen::ArrayX3i &stack,
+                                       const std::vector<bool> &used_commands_mask);
 
 
 /*!
