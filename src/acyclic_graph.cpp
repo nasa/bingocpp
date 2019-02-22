@@ -19,15 +19,18 @@
 
 #include "BingoCpp/acyclic_graph.h"
 #include "BingoCpp/acyclic_graph_nodes.h"
+#include "BingoCpp/graph_manip.h"
 #include "BingoCpp/backend_nodes.h"
 
-// create an instance of the Operator_Interface map
-OperatorInterface oper_interface;
 
 bool IsCpp() {
     return true;
 }
 
+int get_arity(int node) {
+  if (node == 0 || node == 1) return 0;
+  return AcyclicGraph::has_arity_two(node) ? 2 : 1;
+}
 
 void ReverseSingleCommand(const Eigen::ArrayX3i &stack,
                           const int command_index,
@@ -36,9 +39,9 @@ void ReverseSingleCommand(const Eigen::ArrayX3i &stack,
                           const std::set<int> &dependencies) {
   // Computes reverse autodiff partial of a stack command.
   for (auto const& dependency : dependencies) {
-    oper_interface.operator_map[stack(dependency, 0)]->deriv_evaluate(
-      stack, command_index, forward_buffer, reverse_buffer,
-      dependency);
+    backendnodes::derivative_eval_function(stack(dependency, 0), stack, 
+                                           command_index, forward_buffer,
+                                           reverse_buffer, dependency);
   }
 }
 
@@ -51,8 +54,8 @@ Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3i & stack,
   std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
 
   for (std::size_t i = 0; i < stack.rows(); ++i) {
-    oper_interface.operator_map[stack(i, 0)]->evaluate(
-      stack, x, constants, forward_eval, i);
+    backendnodes::forward_eval_function(stack(i, 0), stack, 
+                                        x, constants, forward_eval, i);
   }
 
   return forward_eval.back();
@@ -73,17 +76,16 @@ Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3i &stack,
                                  const Eigen::ArrayXXd &x,
                                  const Eigen::VectorXd &constants,
                                  const std::vector<bool> &mask) {
-  Eigen::ArrayXXd forward_eval = Eigen::ArrayXXd(stack.rows(), x.rows());
+  std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
+
   for (std::size_t i = 0; i < stack.rows(); ++i) {
     if (mask[i]) {
-      int node = stack(i, 0);
-      int param1 = stack(i, 1);
-      int param2 = stack(i, 2);
-      forward_eval.row(i) = backendnodes::forward_eval_function(
-        node, param1, param2, x, constants, forward_eval);
+      backendnodes::forward_eval_function(stack(i, 0), stack, 
+                                          x, constants, forward_eval, i);
     }
   }
-  return (forward_eval.row(forward_eval.rows() - 1)).transpose();
+
+  return forward_eval.back();
 }
 
 
@@ -99,6 +101,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
   int deriv_size;
   int deriv_operator_number;
 
+
   if (param_x_or_c) {  // true = x
     deriv_size = x.cols();
     deriv_operator_number = 0;
@@ -112,15 +115,14 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
 
   // forward eval with dependencies
   for (std::size_t i = 0; i < stack.rows(); ++i) {
-    oper_interface.operator_map[stack(i, 0)]->evaluate(
-      stack, x, constants, forward_eval, i);
+     backendnodes::forward_eval_function(stack(i, 0), stack, 
+                                          x, constants, forward_eval, i);
 
     if (stack(i, 0) == deriv_operator_number) {
       param_dependencies[stack(i, 1)].insert(i);
     }
 
-    for (int j = 0; j < oper_interface.operator_map[stack(i, 0)]->get_arity();
-         ++j) {
+    for (int j = 0; j < get_arity(stack(i, 0)); ++j) {
       stack_dependencies[stack(i, j + 1)].insert(i);
     }
   }
@@ -189,13 +191,12 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
   // forward eval with dependencies
   for (std::size_t i = 0; i < stack.rows(); ++i) {
     if (mask[i]) {
-      oper_interface.operator_map[stack(i, 0)]->evaluate(
-        stack, x, constants, forward_eval, i);
+      backendnodes::forward_eval_function(stack(i, 0), stack, 
+                                          x, constants, forward_eval, i);
       if (stack(i, 0) == deriv_operator_number) {
         param_dependencies[stack(i, 1)].insert(i);
       }
-      for (int j = 0; j < oper_interface.operator_map[stack(i, 0)]->get_arity();
-           ++j) {
+      for (int j = 0; j < get_arity(stack(i, 0)); ++j) {
         stack_dependencies[stack(i, j + 1)].insert(i);
       }
     }
@@ -222,27 +223,26 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
 
 
 
-void PrintStack(const Eigen::ArrayX3i & stack) {
-  // Prints a stack to std::cout.
-  for (std::size_t i = 0; i < stack.rows(); ++i) {
-    //this is the operator
-    std::cout << "(" << i << ") = " <<
-              oper_interface.operator_map[stack(i, 0)]->get_print() << " : ";
+// void PrintStack(const Eigen::ArrayX3i & stack) {
+//   // Prints a stack to std::cout.
+//   for (std::size_t i = 0; i < stack.rows(); ++i) {
+//     //this is the operator
+//     std::cout << "(" << i << ") = " <<
+//               oper_interface.operator_map[stack(i, 0)]->get_print() << " : ";
 
-    // Hard code for those with arity == 0
-    if (oper_interface.operator_map[stack(i, 0)]->get_arity() == 0) {
-      std::cout << " (" << stack(i, 1) << ")";
-    }
+//     // Hard code for those with arity == 0
+//     if (get_arity(stack(i, 0)]->get_arity() == 0) {
+//       std::cout << " (" << stack(i, 1) << ")";
+//     }
 
-    // loop through the rest dependent on their arity
-    for (int j = 0; j < oper_interface.operator_map[stack(i, 0)]->get_arity();
-         ++j) {
-      std::cout << " (" << stack(i, j) << ")";
-    }
+//     // loop through the rest dependent on their arity
+//     for (int j = 0; j < get_arity(stack(i, 0)); ++j) {
+//       std::cout << " (" << stack(i, j) << ")";
+//     }
 
-    std::cout << std::endl;
-  }
-}
+//     std::cout << std::endl;
+//   }
+// }
 
 
 
@@ -255,8 +255,7 @@ Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i & stack) {
   // TODO(gbomarito)  would size_t be faster?
   for (int i = 0, j = 0; i < stack.rows(); ++i) {
     if (used_command[i]) {
-      for (std::size_t k = 0; k < oper_interface.operator_map[new_stack(j, 0)]
-           ->get_arity(); ++k) {
+      for (std::size_t k = 0; k < get_arity(new_stack(j, 0)); ++k) {
         new_stack(j, k + 1) = reduced_param_map[new_stack(j, k + 1)];
       }
 
@@ -277,8 +276,7 @@ std::vector<bool> FindUsedCommands(const Eigen::ArrayX3i & stack) {
 
   for (int i = stack.rows() - 1; i >= 0; --i) {
     if (used_command[i]) {
-      for (std::size_t j = 0; j < oper_interface.operator_map[stack(i, 0)]
-           ->get_arity(); ++j) {
+      for (std::size_t j = 0; j < get_arity(stack(i, 0)); ++j) {
         used_command[stack(i, j + 1)] = true;
       }
     }
@@ -286,3 +284,5 @@ std::vector<bool> FindUsedCommands(const Eigen::ArrayX3i & stack) {
 
   return used_command;
 }
+
+

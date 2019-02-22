@@ -82,42 +82,8 @@ class AcyclicGraph {
   /*! holds genetic age of individual */
   int genetic_age;
 
-  //! std::vector<bool> is_arity_2_map
-  /*! stores whether each function has arity 2*/
-  const std::vector<bool> is_arity_2_map {
-    false,
-    false,
-    true,
-    true,
-    true,
-    true,
-    false,
-    false,
-    false,
-    false,
-    true,
-    false,
-    false,
-  };
-
-  //! std::vector<bool> is_terminal_map
-  /*! stores whether each function has arity 2*/
-  const std::vector<bool> is_terminal_map {
-    true,
-    true,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false
-  };
-
+  
+    
   //! \brief Default constructor
   AcyclicGraph();
   //! \brief Copy constructor
@@ -180,8 +146,12 @@ class AcyclicGraph {
    */
   std::string print_stack();
 
-  bool has_arity_2(int node);
-  bool is_terminal(int node);
+  static bool has_arity_two(int node);
+  static bool is_terminal(int node);
+
+ private:
+  static const bool is_arity_2_map[13]; 
+  static const bool is_terminal_map[13];
 };
 
 /*! \class AcyclicGraphManipulator
