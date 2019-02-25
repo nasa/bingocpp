@@ -252,8 +252,6 @@ TEST(AcyclicGraphNodesTest, Multiplication) {
     ASSERT_DOUBLE_EQ(d_xx.first(i), a_true_xx(i));
   }
 
-  std::cout<<"d_xc"<<std::endl << d_xc.second << ", \n";
-  std::cout<<"d_true"<<std::endl << d_true << ", \n";
   for (size_t i = 0; i < x.size(); ++i) {
     ASSERT_DOUBLE_EQ(d_xc.second(i), d_true(i));
     ASSERT_DOUBLE_EQ(d_cx.second(i), d_true(i));

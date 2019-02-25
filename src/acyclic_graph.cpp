@@ -44,7 +44,8 @@ Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i & stack,
                                     const Eigen::ArrayXXd & x,
                                     const Eigen::VectorXd &constants) {
   std::vector<bool> mask = FindUsedCommands(stack);
-  return EvaluateWithMask(stack, x, constants, mask);
+  Eigen::ArrayXXd forward_eval = EvaluateWithMask(stack, x, constants, mask);
+  return get_result(forward_eval);
 }
 
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
@@ -52,19 +53,16 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
   const Eigen::ArrayXXd &x,
   const Eigen::VectorXd &constants,
   const bool param_x_or_c) {
-  // Evaluates a stack and its derivative, but only the utilized commands.
   std::vector<bool> mask = FindUsedCommands(stack);
   return EvaluateWithDerivativeAndMask(stack, x, constants, mask, param_x_or_c);
 }
 
 std::vector<bool> FindUsedCommands(const Eigen::ArrayX3i & stack) {
-  // Finds which commands are utilized in a stack.
   std::vector<bool> used_command(stack.rows());
   used_command.back() = true;
-
   for (int i = stack.rows() - 1; i >= 0; --i) {
     if (used_command[i]) {
-      for (std::size_t j = 0; j < get_arity(stack(i, 0)); ++j) {
+      for (int j = 0; j < get_arity(stack(i, 0)); ++j) {
         used_command[stack(i, j + 1)] = true;
       }
     }
@@ -78,7 +76,7 @@ Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3i &stack,
                                  const std::vector<bool> &mask) {
   Eigen::ArrayXXd forward_eval = Eigen::ArrayXXd(stack.rows(), x.rows());
 
-  for (std::size_t i = 0; i < stack.rows(); ++i) {
+  for (int i = 0; i < stack.rows(); ++i) {
     if (mask[i]) {
       int node = stack(i, NODE_IDX);
       int op1 = stack(i, OP_1);
@@ -87,8 +85,7 @@ Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3i &stack,
         node, op1, op2, x, constants, forward_eval);
     }
   }
-
-  return get_result(forward_eval);
+  return forward_eval;
 }
 
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
@@ -106,7 +103,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
     deriv_shape = std::make_pair(x.rows(), x.cols());
     deriv_wrt_node = 0;
   } else {  // false = c
-    deriv_shape = std::make_pair(x.rows(), x.cols());
+    deriv_shape = std::make_pair(x.rows(), constants.size());
     deriv_wrt_node = 1;
   }
 
@@ -114,7 +111,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
                                                       deriv_wrt_node,
                                                       forward_eval, stack,
                                                       mask);
-  return std::make_pair(forward_eval, derivative);
+  return std::make_pair(get_result(forward_eval), derivative);
 }
 
 
@@ -123,7 +120,11 @@ Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3i & stack,
                          const Eigen::VectorXd &constants) {
   std::vector<bool> use_all_mask(stack.rows());
   std::fill(use_all_mask.begin(), use_all_mask.end(), true);
-  return EvaluateWithMask(stack, x, constants, use_all_mask);
+  Eigen::ArrayXXd forward_eval = EvaluateWithMask(stack, 
+                                                  x, 
+                                                  constants, 
+                                                  use_all_mask);
+  return get_result(forward_eval);  
 }
 
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
@@ -158,18 +159,15 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
 // }
 
 Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i & stack) {
-  // Simplifies a stack.
   std::vector<bool> used_command = FindUsedCommands(stack);
   std::map<int, int> reduced_param_map;
   Eigen::ArrayX3i new_stack(used_command.size(), 3);
 
-  // TODO(gbomarito)  would size_t be faster?
   for (int i = 0, j = 0; i < stack.rows(); ++i) {
     if (used_command[i]) {
-      for (std::size_t k = 0; k < get_arity(new_stack(j, 0)); ++k) {
+      for (int k = 0; k < get_arity(new_stack(j, 0)); ++k) {
         new_stack(j, k + 1) = reduced_param_map[new_stack(j, k + 1)];
       }
-
       reduced_param_map[i] = j;
       ++j;
     }
@@ -182,19 +180,19 @@ Eigen::ArrayXXd reverse_eval_with_mask(const std::pair<int, int> deriv_shape,
                                        const int deriv_wrt_node,
                                        Eigen::ArrayXXd &forward_eval,
                                        const Eigen::ArrayX3i &stack,
-                                       const std::vector<bool> &used_commands_mask) {
-  Eigen::ArrayXXd derivative = Eigen::ArrayXXd::Zero(deriv_shape.first,
-                                               deriv_shape.second);
-  Eigen::ArrayXXd reverse_eval = Eigen::ArrayXd::Zero(stack.rows());
-  reverse_eval(reverse_eval.rows()-1) = 1.0;
-  
-  for (int i=stack.rows()-1; i>=0; i--) {
-    if (used_commands_mask[i]) {
+                                       const std::vector<bool> &mask) {
+  Eigen::ArrayXXd derivative 
+      = Eigen::ArrayXXd::Zero(deriv_shape.first, deriv_shape.second);
+  Eigen::ArrayXXd reverse_eval 
+      = Eigen::ArrayXXd::Zero(stack.rows(), derivative.cols());
+  reverse_eval.row(stack.rows()-1) = Eigen::ArrayXd::Ones(derivative.rows());
+  for (int i= stack.rows() -1; i>=0; i--) {
+    if (mask[i]) {
       int node = stack(i, NODE_IDX);
       int param1 = stack(i, OP_1);
       int param2 = stack(i, OP_2);
       if (node == deriv_wrt_node)  {
-        derivative.col(param1) += (Eigen::ArrayXd::Ones(derivative.rows())*reverse_eval(i, 0));
+        derivative.col(param1) += reverse_eval.row(i);
       } else {
         backendnodes::reverse_eval_function(node, i, param1, param2,
                                             forward_eval,
