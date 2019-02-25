@@ -165,6 +165,7 @@ Eigen::ArrayXXd AcyclicGraph::evaluate(Eigen::ArrayXXd &eval_x) {
 
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> AcyclicGraph::evaluate_deriv(
   Eigen::ArrayXXd &eval_x) {
+    printf("here\n");
   return EvaluateWithDerivative(simple_stack, eval_x, constants);
 }
 
