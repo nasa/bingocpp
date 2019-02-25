@@ -95,6 +95,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
     const std::vector<bool> &mask,
     const bool param_x_or_c) {
   
+  // printf("1\n");
   Eigen::ArrayXXd forward_eval = EvaluateWithMask(stack, x, constants, mask);
 
   std::pair<int, int> deriv_shape;
@@ -107,10 +108,12 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
     deriv_wrt_node = 1;
   }
 
+  // printf("2\n");
   Eigen::ArrayXXd derivative = reverse_eval_with_mask(deriv_shape,
                                                       deriv_wrt_node,
                                                       forward_eval, stack,
                                                       mask);
+  // printf("3\n");
   return std::make_pair(get_result(forward_eval), derivative);
 }
 
@@ -184,7 +187,7 @@ Eigen::ArrayXXd reverse_eval_with_mask(const std::pair<int, int> deriv_shape,
   Eigen::ArrayXXd derivative 
       = Eigen::ArrayXXd::Zero(deriv_shape.first, deriv_shape.second);
   Eigen::ArrayXXd reverse_eval 
-      = Eigen::ArrayXXd::Zero(stack.rows(), derivative.cols());
+      = Eigen::ArrayXXd::Zero(stack.rows(), deriv_shape.first);
   reverse_eval.row(stack.rows()-1) = Eigen::ArrayXd::Ones(derivative.rows());
   for (int i= stack.rows() -1; i>=0; i--) {
     if (mask[i]) {
