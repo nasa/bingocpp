@@ -2,10 +2,9 @@
 #include <vector>
 
 #include <Eigen/Dense>
-
 #include "gtest/gtest.h"
-#include "BingoCpp/acyclic_graph.h"
-#include "BingoCpp/graph_manip.h"
+
+#include "BingoCpp/backend.h"
 #include "testing_utils.h"
 
 namespace {

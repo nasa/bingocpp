@@ -43,13 +43,13 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
-#include <Eigen/Dense>
-
 #include <iostream>
 #include <chrono>
 
+#include <Eigen/Dense>
+
 #include "BingoCpp/version.h"
-#include "BingoCpp/acyclic_graph.h"
+#include "BingoCpp/backend.h"
 
 
 int test_eig() {

@@ -12,7 +12,7 @@
 #include <iomanip>
 #include <Eigen/Core>
 
-#include "BingoCpp/acyclic_graph.h"
+#include "BingoCpp/backend.h"
 
 #define EVALUATE "pure c++: evaluate"
 #define X_DERIVATIVE "pure c++: x derivative"

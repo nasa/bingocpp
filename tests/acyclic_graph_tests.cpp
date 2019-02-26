@@ -10,11 +10,11 @@
 
 #include <stdio.h>
 #include <math.h>
-
 #include <iostream>
 
 #include "gtest/gtest.h"
-#include "BingoCpp/acyclic_graph.h"
+
+#include "BingoCpp/backend.h"
 
 namespace {
 

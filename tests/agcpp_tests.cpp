@@ -10,13 +10,14 @@
 
 #include <stdio.h>
 #include <math.h>
-
 #include <iostream>
 #include <set>
 #include <string>
 #include <sstream>
 
 #include "gtest/gtest.h"
+
+#include "BingoCpp/acyclic_graph.h"
 #include "BingoCpp/graph_manip.h"
 
 class AgcppTest : public::testing::Test {

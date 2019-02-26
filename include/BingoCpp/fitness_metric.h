@@ -10,7 +10,7 @@
 #ifndef INCLUDE_BINGOCPP_FITNESS_METRIC_H_
 #define INCLUDE_BINGOCPP_FITNESS_METRIC_H_
 
-#include "BingoCpp/graph_manip.h"
+#include "BingoCpp/acyclic_graph.h"
 #include "BingoCpp/training_data.h"
 #include <Eigen/Dense>
 #include <Eigen/Core>

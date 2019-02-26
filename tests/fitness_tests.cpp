@@ -10,12 +10,14 @@
 
 #include <iostream>
 
-#include "gtest/gtest.h"
-#include "BingoCpp/fitness_metric.h"
-#include "BingoCpp/acyclic_graph_nodes.h"
 #include <Eigen/Dense>
 #include <Eigen/Core>
+#include "gtest/gtest.h"
 #include <unsupported/Eigen/NonLinearOptimization>
+
+#include "BingoCpp/fitness_metric.h"
+#include "BingoCpp/graph_manip.h"
+#include "BingoCpp/acyclic_graph.h"
 
 
 TEST(FitnessTest, optimize_constants) {
