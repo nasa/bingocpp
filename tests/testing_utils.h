@@ -52,8 +52,6 @@ namespace testutils {
         matrix_diff(row, col) = difference(array1(row, col), array2(row, col));
       }
     }
-    printf("\nmatrix\n");
-    std::cout<<matrix_diff<<std::endl;
     double frobenius_norm = matrix_diff.norm();
     return (frobenius_norm < TESTING_TOL ? true : false);
   }
