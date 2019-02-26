@@ -49,9 +49,11 @@ namespace testutils {
     Eigen::MatrixXd matrix_diff = Eigen::MatrixXd(rows_array1, cols_array1);
     for (int row = 0; row < rows_array1; row++) {
       for (int col = 0; col < cols_array1; col++) {
-        matrix_diff(row, col) = difference(array1(row, col), array1(row, col));
+        matrix_diff(row, col) = difference(array1(row, col), array2(row, col));
       }
     }
+    printf("\nmatrix\n");
+    std::cout<<matrix_diff<<std::endl;
     double frobenius_norm = matrix_diff.norm();
     return (frobenius_norm < TESTING_TOL ? true : false);
   }
