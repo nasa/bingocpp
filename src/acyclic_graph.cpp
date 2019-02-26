@@ -44,8 +44,8 @@ Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i & stack,
                                     const Eigen::ArrayXXd & x,
                                     const Eigen::VectorXd &constants) {
   std::vector<bool> mask = FindUsedCommands(stack);
-  Eigen::ArrayXXd forward_eval = EvaluateWithMask(stack, x, constants, mask);
-  return get_result(forward_eval);
+  std::vector<Eigen::ArrayXXd> forward_eval = EvaluateWithMask(stack, x, constants, mask);
+  return forward_eval.back();
 }
 
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
@@ -70,18 +70,18 @@ std::vector<bool> FindUsedCommands(const Eigen::ArrayX3i & stack) {
   return used_command;
 }
 
-Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3i &stack,
-                                 const Eigen::ArrayXXd &x,
-                                 const Eigen::VectorXd &constants,
-                                 const std::vector<bool> &mask) {
-  Eigen::ArrayXXd forward_eval = Eigen::ArrayXXd(stack.rows(), x.rows());
+std::vector<Eigen::ArrayXXd> EvaluateWithMask(const Eigen::ArrayX3i &stack,
+                                              const Eigen::ArrayXXd &x,
+                                              const Eigen::VectorXd &constants,
+                                              const std::vector<bool> &mask) {
+  std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
 
   for (int i = 0; i < stack.rows(); ++i) {
     if (mask[i]) {
       int node = stack(i, NODE_IDX);
       int op1 = stack(i, OP_1);
       int op2 = stack(i, OP_2);
-      forward_eval.row(i) = backendnodes::forward_eval_function(
+      forward_eval.at(i) = backendnodes::forward_eval_function(
         node, op1, op2, x, constants, forward_eval);
     }
   }
@@ -94,9 +94,8 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
     const Eigen::VectorXd &constants,
     const std::vector<bool> &mask,
     const bool param_x_or_c) {
-  
-  // printf("1\n");
-  Eigen::ArrayXXd forward_eval = EvaluateWithMask(stack, x, constants, mask);
+  std::vector<Eigen::ArrayXXd> forward_eval = EvaluateWithMask(
+    stack, x, constants, mask);
 
   std::pair<int, int> deriv_shape;
   int deriv_wrt_node;
@@ -108,13 +107,9 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
     deriv_wrt_node = 1;
   }
 
-  // printf("2\n");
-  Eigen::ArrayXXd derivative = reverse_eval_with_mask(deriv_shape,
-                                                      deriv_wrt_node,
-                                                      forward_eval, stack,
-                                                      mask);
-  // printf("3\n");
-  return std::make_pair(get_result(forward_eval), derivative);
+  Eigen::ArrayXXd derivative = reverse_eval_with_mask(
+    deriv_shape, deriv_wrt_node, forward_eval, stack, mask);
+  return std::make_pair(forward_eval.back(), derivative);
 }
 
 
@@ -123,11 +118,9 @@ Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3i & stack,
                          const Eigen::VectorXd &constants) {
   std::vector<bool> use_all_mask(stack.rows());
   std::fill(use_all_mask.begin(), use_all_mask.end(), true);
-  Eigen::ArrayXXd forward_eval = EvaluateWithMask(stack, 
-                                                  x, 
-                                                  constants, 
-                                                  use_all_mask);
-  return get_result(forward_eval);  
+  std::vector<Eigen::ArrayXXd> forward_eval = EvaluateWithMask(
+    stack, x, constants, use_all_mask);
+  return forward_eval.back();  
 }
 
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
@@ -175,27 +168,31 @@ Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i & stack) {
       ++j;
     }
   }
-
   return new_stack;
 }
 
 Eigen::ArrayXXd reverse_eval_with_mask(const std::pair<int, int> deriv_shape,
                                        const int deriv_wrt_node,
-                                       Eigen::ArrayXXd &forward_eval,
+                                       const std::vector<Eigen::ArrayXXd> &forward_eval,
                                        const Eigen::ArrayX3i &stack,
                                        const std::vector<bool> &mask) {
-  Eigen::ArrayXXd derivative 
-      = Eigen::ArrayXXd::Zero(deriv_shape.first, deriv_shape.second);
-  Eigen::ArrayXXd reverse_eval 
-      = Eigen::ArrayXXd::Zero(stack.rows(), deriv_shape.first);
-  reverse_eval.row(stack.rows()-1) = Eigen::ArrayXd::Ones(derivative.rows());
-  for (int i= stack.rows() -1; i>=0; i--) {
+  int num_samples = deriv_shape.first;
+  int num_features = deriv_shape.second;
+  int stack_depth = stack.rows();
+
+  Eigen::ArrayXXd derivative = Eigen::ArrayXXd::Zero( num_samples, num_features);
+  std::vector<Eigen::ArrayXXd> reverse_eval(stack_depth); 
+  std::fill(reverse_eval.begin(), reverse_eval.end(), 
+    Eigen::ArrayXd::Zero(num_samples));
+  reverse_eval.at(stack_depth-1) = Eigen::ArrayXd::Ones(num_samples);
+
+  for (int i = stack_depth - 1; i >= 0; i--) {
     if (mask[i]) {
       int node = stack(i, NODE_IDX);
       int param1 = stack(i, OP_1);
       int param2 = stack(i, OP_2);
       if (node == deriv_wrt_node)  {
-        derivative.col(param1) += reverse_eval.row(i);
+        derivative.col(param1) += reverse_eval.at(i);
       } else {
         backendnodes::reverse_eval_function(node, i, param1, param2,
                                             forward_eval,

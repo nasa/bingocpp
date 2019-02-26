@@ -7,21 +7,23 @@
 namespace backendnodes {
   typedef Eigen::ArrayXXd (
     *forward_operator_function)(
-      int, int, const Eigen::ArrayXXd&, const Eigen::VectorXd&, Eigen::ArrayXXd&
+      int, int, const Eigen::ArrayXXd&,
+      const Eigen::VectorXd&, std::vector<Eigen::ArrayXXd>&
   );
   typedef void (
     *reverse_operator_function)(
-      int, int, int, const Eigen::ArrayXXd&, Eigen::ArrayXXd&
+      int, int, int,
+      const std::vector<Eigen::ArrayXXd>&, std::vector<Eigen::ArrayXXd>&
   );
   
   Eigen::ArrayXXd forward_eval_function(int node, int param1, int param2,
-                                         const Eigen::ArrayXXd &x, 
-                                         const Eigen::VectorXd &constants,
-                                         Eigen::ArrayXXd &forward_eval);
+                                        const Eigen::ArrayXXd &x, 
+                                        const Eigen::VectorXd &constants,
+                                        std::vector<Eigen::ArrayXXd> &forward_eval);
 
   void reverse_eval_function(int node, int reverse_index, int param1, int param2,
-                                        const Eigen::ArrayXXd &forward_eval,
-                                        Eigen::ArrayXXd &reverse_eval);
+                             const std::vector<Eigen::ArrayXXd> &forward_eval,
+                             std::vector<Eigen::ArrayXXd> &reverse_eval);
 } //backendnodes
 
 #endif

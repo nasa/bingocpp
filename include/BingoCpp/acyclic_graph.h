@@ -57,7 +57,7 @@ bool IsCpp();
  */
 Eigen::ArrayXXd reverse_eval_with_mask(const std::pair<int, int> deriv_shape,
                                        const int deriv_wrt_node,
-                                       Eigen::ArrayXXd &forward_eval,
+                                       const std::vector<Eigen::ArrayXXd> &forward_eval,
                                        const Eigen::ArrayX3i &stack,
                                        const std::vector<bool> &used_commands_mask);
 
@@ -113,10 +113,10 @@ Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i &stack,
  *
  * \return The value of the last command in the stack. (Eigen::ArrayXXd)
  */
-Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3i &stack,
-                                 const Eigen::ArrayXXd &x,
-                                 const Eigen::VectorXd &constants,
-                                 const std::vector<bool> &mask);
+std::vector<Eigen::ArrayXXd> EvaluateWithMask(const Eigen::ArrayX3i &stack,
+                                              const Eigen::ArrayXXd &x,
+                                              const Eigen::VectorXd &constants,
+                                              const std::vector<bool> &mask);
 
 
 
