@@ -11,14 +11,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <Eigen/Dense>
-
-#include <set>
-#include <map>
 #include <iostream>
 
+#include <Eigen/Dense>
+
 #include "BingoCpp/acyclic_graph.h"
-#include "BingoCpp/acyclic_graph_nodes.h"
 #include "BingoCpp/graph_manip.h"
 #include "BingoCpp/backend_nodes.h"
 
@@ -36,9 +33,7 @@ int get_arity(int node) {
   return AcyclicGraph::has_arity_two(node) ? 2 : 1;
 }
 
-Eigen::ArrayXXd get_result(Eigen::ArrayXXd &forward_eval) {
-  return forward_eval.row(forward_eval.rows()-1).transpose();
-}
+
 
 Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i & stack,
                                     const Eigen::ArrayXXd & x,
@@ -81,7 +76,7 @@ std::vector<Eigen::ArrayXXd> EvaluateWithMask(const Eigen::ArrayX3i &stack,
       int node = stack(i, NODE_IDX);
       int op1 = stack(i, OP_1);
       int op2 = stack(i, OP_2);
-      forward_eval.at(i) = backendnodes::forward_eval_function(
+      forward_eval[i] = backendnodes::forward_eval_function(
         node, op1, op2, x, constants, forward_eval);
     }
   }
@@ -179,12 +174,13 @@ Eigen::ArrayXXd reverse_eval_with_mask(const std::pair<int, int> deriv_shape,
   int num_samples = deriv_shape.first;
   int num_features = deriv_shape.second;
   int stack_depth = stack.rows();
+  Eigen::ArrayXXd zero = Eigen::ArrayXd::Zero(num_samples);
+  Eigen::ArrayXXd ones = Eigen::ArrayXd::Ones(num_samples);
 
-  Eigen::ArrayXXd derivative = Eigen::ArrayXXd::Zero( num_samples, num_features);
+  Eigen::ArrayXXd derivative = Eigen::ArrayXXd::Zero(num_samples, num_features);
   std::vector<Eigen::ArrayXXd> reverse_eval(stack_depth); 
-  std::fill(reverse_eval.begin(), reverse_eval.end(), 
-    Eigen::ArrayXd::Zero(num_samples));
-  reverse_eval.at(stack_depth-1) = Eigen::ArrayXd::Ones(num_samples);
+  std::fill(reverse_eval.begin(), reverse_eval.end(), zero); 
+  reverse_eval[stack_depth-1] = ones;
 
   for (int i = stack_depth - 1; i >= 0; i--) {
     if (mask[i]) {
@@ -192,7 +188,7 @@ Eigen::ArrayXXd reverse_eval_with_mask(const std::pair<int, int> deriv_shape,
       int param1 = stack(i, OP_1);
       int param2 = stack(i, OP_2);
       if (node == deriv_wrt_node)  {
-        derivative.col(param1) += reverse_eval.at(i);
+        derivative.col(param1) += reverse_eval[i];
       } else {
         backendnodes::reverse_eval_function(node, i, param1, param2,
                                             forward_eval,

@@ -34,13 +34,13 @@ namespace backendnodes {
                                      const Eigen::ArrayXXd &x, 
                                      const Eigen::VectorXd &constants, 
                                      std::vector<Eigen::ArrayXXd> &forward_eval) {
-      return forward_eval.at(param1) + forward_eval.at(param2); 
+      return forward_eval[param1] + forward_eval[param2]; 
     } 
     void add_reverse_eval(int reverse_index, int param1, int param2, 
                           const std::vector<Eigen::ArrayXXd> &forward_eval, 
                           std::vector<Eigen::ArrayXXd> &reverse_eval) {
-      reverse_eval.at(param1) += reverse_eval.at(reverse_index);
-      reverse_eval.at(param2) += reverse_eval.at(reverse_index);
+      reverse_eval[param1] += reverse_eval[reverse_index];
+      reverse_eval[param2] += reverse_eval[reverse_index];
     } 
 
     // Subtraction
@@ -48,13 +48,13 @@ namespace backendnodes {
                                           const Eigen::ArrayXXd &x,
                                           const Eigen::VectorXd &constants, 
                                           std::vector<Eigen::ArrayXXd> &forward_eval) {
-      return forward_eval.at(param1) - forward_eval.at(param2); 
+      return forward_eval[param1] - forward_eval[param2]; 
     } 
     void subtract_reverse_eval(int reverse_index, int param1, int param2, 
                                const std::vector<Eigen::ArrayXXd> &forward_eval, 
                                std::vector<Eigen::ArrayXXd> &reverse_eval) {
-      reverse_eval.at(param1) += reverse_eval.at(reverse_index);
-      reverse_eval.at(param2) -= reverse_eval.at(reverse_index);
+      reverse_eval[param1] += reverse_eval[reverse_index];
+      reverse_eval[param2] -= reverse_eval[reverse_index];
     }
 
     // Multiplication
@@ -62,15 +62,15 @@ namespace backendnodes {
                                           const Eigen::ArrayXXd &x, 
                                           const Eigen::VectorXd &constants, 
                                           std::vector<Eigen::ArrayXXd> &forward_eval) {
-      return forward_eval.at(param1) * forward_eval.at(param2); 
+      return forward_eval[param1] * forward_eval[param2]; 
     } 
     void multiply_reverse_eval(int reverse_index, int param1, int param2, 
                                const std::vector<Eigen::ArrayXXd> &forward_eval, 
                                std::vector<Eigen::ArrayXXd> &reverse_eval) {
-      reverse_eval.at(param1) += reverse_eval.at(reverse_index)
-                                 *forward_eval.at(param2);
-      reverse_eval.at(param2) += reverse_eval.at(reverse_index)
-                                 *forward_eval.at(param1);
+      reverse_eval[param1] += reverse_eval[reverse_index]
+                                 *forward_eval[param2];
+      reverse_eval[param2] += reverse_eval[reverse_index]
+                                 *forward_eval[param1];
     } 
 
     // Division
@@ -78,16 +78,16 @@ namespace backendnodes {
                                         const Eigen::ArrayXXd &x, 
                                         const Eigen::VectorXd &constants, 
                                         std::vector<Eigen::ArrayXXd> &forward_eval) {
-      return forward_eval.at(param1) / forward_eval.at(param2); 
+      return forward_eval[param1] / forward_eval[param2]; 
     } 
     void divide_reverse_eval(int reverse_index, int param1, int param2, 
                              const std::vector<Eigen::ArrayXXd> &forward_eval, 
                              std::vector<Eigen::ArrayXXd> &reverse_eval) {
-      reverse_eval.at(param1) += reverse_eval.at(reverse_index)
-                                 /forward_eval.at(param2);
-      reverse_eval.at(param2) -= reverse_eval.at(reverse_index)
-                                 *forward_eval.at(reverse_index)
-                                 /forward_eval.at(param2);
+      reverse_eval[param1] += reverse_eval[reverse_index]
+                                 /forward_eval[param2];
+      reverse_eval[param2] -= reverse_eval[reverse_index]
+                                 *forward_eval[reverse_index]
+                                 /forward_eval[param2];
     }
 
     // Sine
@@ -100,8 +100,8 @@ namespace backendnodes {
     void sin_reverse_eval(int reverse_index, int param1, int param2, 
                           const std::vector<Eigen::ArrayXXd> &forward_eval, 
                           std::vector<Eigen::ArrayXXd> &reverse_eval) {
-      reverse_eval.at(param1) += reverse_eval.at(reverse_index)
-                                 *forward_eval.at(param1).cos();
+      reverse_eval[param1] += reverse_eval[reverse_index]
+                                 *forward_eval[param1].cos();
     }
 
     // Cosine
@@ -109,13 +109,13 @@ namespace backendnodes {
                                      const Eigen::ArrayXXd &x, 
                                      const Eigen::VectorXd &constants, 
                                      std::vector<Eigen::ArrayXXd> &forward_eval) {
-      return forward_eval.at(param1).cos(); 
+      return forward_eval[param1].cos(); 
     } 
     void cos_reverse_eval(int reverse_index, int param1, int param2, 
                           const std::vector<Eigen::ArrayXXd> &forward_eval, 
                           std::vector<Eigen::ArrayXXd> &reverse_eval) {
-      reverse_eval.at(param1) -= reverse_eval.at(reverse_index)
-                                 *forward_eval.at(param1).sin();
+      reverse_eval[param1] -= reverse_eval[reverse_index]
+                                 *forward_eval[param1].sin();
     }
 
     // Exponential 
@@ -123,13 +123,13 @@ namespace backendnodes {
                                      const Eigen::ArrayXXd &x,
                                      const Eigen::VectorXd &constants,
                                      std::vector<Eigen::ArrayXXd> &forward_eval) {
-      return forward_eval.at(param1).exp();
+      return forward_eval[param1].exp();
     }
     void exp_reverse_eval(int reverse_index, int param1, int param2, 
                           const std::vector<Eigen::ArrayXXd> &forward_eval, 
                           std::vector<Eigen::ArrayXXd> &reverse_eval) {
-      reverse_eval.at(param1) += reverse_eval.at(reverse_index)
-                                 *forward_eval.at(reverse_index);
+      reverse_eval[param1] += reverse_eval[reverse_index]
+                                 *forward_eval[reverse_index];
     }
 
     // Logarithm
@@ -137,13 +137,13 @@ namespace backendnodes {
                                      const Eigen::ArrayXXd &x,
                                      const Eigen::VectorXd &constants,
                                      std::vector<Eigen::ArrayXXd> &forward_eval) {
-      return forward_eval.at(param1).abs().log();
+      return forward_eval[param1].abs().log();
     }
     void log_reverse_eval(int reverse_index, int param1, int param2, 
                           const std::vector<Eigen::ArrayXXd> &forward_eval, 
                           std::vector<Eigen::ArrayXXd> &reverse_eval) {
-      reverse_eval.at(param1) += reverse_eval.at(reverse_index)
-                                 /forward_eval.at(param1);
+      reverse_eval[param1] += reverse_eval[reverse_index]
+                                 /forward_eval[param1];
     }
 
     // Power
@@ -151,18 +151,18 @@ namespace backendnodes {
                                      const Eigen::ArrayXXd &x,
                                      const Eigen::VectorXd &constants,
                                      std::vector<Eigen::ArrayXXd> &forward_eval) {
-      return forward_eval.at(param1).abs().pow(forward_eval.at(param2));
+      return forward_eval[param1].abs().pow(forward_eval[param2]);
     }
     void pow_reverse_eval(int reverse_index, int param1, int param2, 
                           const std::vector<Eigen::ArrayXXd> &forward_eval, 
                           std::vector<Eigen::ArrayXXd> &reverse_eval) {
-      reverse_eval.at(param1) += reverse_eval.at(reverse_index)
-                                 *forward_eval.at(reverse_index)
-                                 *forward_eval.at(param2)
-                                 /forward_eval.at(param1);
-      reverse_eval.at(param2) += reverse_eval.at(reverse_index)
-                                 *forward_eval.at(reverse_index)
-                                 *(forward_eval.at(param1).abs().log());
+      reverse_eval[param1] += reverse_eval[reverse_index]
+                                 *forward_eval[reverse_index]
+                                 *forward_eval[param2]
+                                 /forward_eval[param1];
+      reverse_eval[param2] += reverse_eval[reverse_index]
+                                 *forward_eval[reverse_index]
+                                 *(forward_eval[param1].abs().log());
     }
 
     // Absolute Value
@@ -170,13 +170,13 @@ namespace backendnodes {
                                      const Eigen::ArrayXXd &x,
                                      const Eigen::VectorXd &constants,
                                      std::vector<Eigen::ArrayXXd> &forward_eval) {
-      return forward_eval.at(param1).abs();
+      return forward_eval[param1].abs();
     }
     void abs_reverse_eval(int reverse_index, int param1, int param2, 
                           const std::vector<Eigen::ArrayXXd> &forward_eval, 
                           std::vector<Eigen::ArrayXXd> &reverse_eval) {
-      reverse_eval.at(param1) += reverse_eval.at(reverse_index)
-                                 *forward_eval.at(param1).sign();
+      reverse_eval[param1] += reverse_eval[reverse_index]
+                                 *forward_eval[param1].sign();
     }
 
     // Sqruare root
@@ -184,14 +184,14 @@ namespace backendnodes {
                                       const Eigen::ArrayXXd &x,
                                       const Eigen::VectorXd &constants,
                                       std::vector<Eigen::ArrayXXd> &forward_eval) {
-      return forward_eval.at(param1).abs().sqrt();
+      return forward_eval[param1].abs().sqrt();
     }
     void sqrt_reverse_eval(int reverse_index, int param1, int param2, 
                            const std::vector<Eigen::ArrayXXd> &forward_eval, 
                            std::vector<Eigen::ArrayXXd> &reverse_eval) {
-      reverse_eval.at(param1) += 0.5*reverse_eval.at(reverse_index)
-                                 /forward_eval.at(reverse_index)
-                                 *forward_eval.at(param1).sign();
+      reverse_eval[param1] += 0.5*reverse_eval[reverse_index]
+                                 /forward_eval[reverse_index]
+                                 *forward_eval[param1].sign();
     }
   } //namespace
 
