@@ -14,8 +14,6 @@
 #include "BingoCpp/backend.h"
 #include "BingoCpp/acyclic_graph_nodes.h"
 
-OperatorInterface oper_interface;
-
 AcyclicGraph::AcyclicGraph() {
   stack = Eigen::ArrayX3i(0, 3);
   constants = Eigen::VectorXd(0);
@@ -201,7 +199,7 @@ std::string AcyclicGraph::latexstring() {
 
     switch ((int)simple_stack(i, 0)) {
       case 0:
-        stream << oper_interface.operator_map[simple_stack(i, 0)]->get_print()
+        stream << AcyclicGraph::get_print(simple_stack(i, 0))
                << "_" << simple_stack(i, 1);
         break;
 
@@ -240,8 +238,8 @@ std::string AcyclicGraph::latexstring() {
       case 8:
       case 9:
       case 12:
-        stream << "\\" << oper_interface.operator_map[simple_stack(i, 0)]
-               ->get_print() << "{" << strings[simple_stack(i, 1)] << "}";
+        stream << "\\" << AcyclicGraph::get_print(simple_stack(i, 0))
+               << "{" << strings[simple_stack(i, 1)] << "}";
         break;
 
       case 10:
@@ -293,12 +291,12 @@ std::string AcyclicGraph::print_stack() {
     out << "<= ";
 
     if (stack(i, 0) == 0)
-      out << oper_interface.operator_map[stack(i, 0)]->get_print()
+      out << AcyclicGraph::get_print(stack(i, 0))
           << stack(i, 1) << std::endl;
 
     else if (stack(i, 0) == 1) {
       if (stack(i, 1) == -1) {
-        out << oper_interface.operator_map[stack(i, 0)]->get_print();
+        out << AcyclicGraph::get_print(stack(i, 0));
 
       } else {
         out << constants[stack(i, 1)];
@@ -308,7 +306,7 @@ std::string AcyclicGraph::print_stack() {
 
     } else {
       out << "(" << stack(i, 1) << ") "
-          << oper_interface.operator_map[stack(i, 0)]->get_print()
+          << AcyclicGraph::get_print(stack(i, 0))
           << " (" << stack(i, 2) << ")\n";
     }
   }
@@ -320,12 +318,12 @@ std::string AcyclicGraph::print_stack() {
     out << "<= ";
 
     if (simple_stack(i, 0) == 0)
-      out << oper_interface.operator_map[simple_stack(i, 0)]->get_print()
+      out << AcyclicGraph::get_print(simple_stack(i, 0))
           << simple_stack(i, 1) << std::endl;
 
     else if (simple_stack(i, 0) == 1) {
       if (simple_stack(i, 1) == -1) {
-        out << oper_interface.operator_map[simple_stack(i, 0)]->get_print();
+        out << AcyclicGraph::get_print(simple_stack(i, 0));
 
       } else {
         out << constants[simple_stack(i, 1)];
@@ -335,7 +333,7 @@ std::string AcyclicGraph::print_stack() {
 
     } else {
       out << "(" << simple_stack(i, 1) << ") "
-          << oper_interface.operator_map[simple_stack(i, 0)]->get_print()
+          << AcyclicGraph::get_print(simple_stack(i, 0))
           << " (" << simple_stack(i, 2) << ")\n";
     }
   }
@@ -349,4 +347,8 @@ bool AcyclicGraph::has_arity_two(int node) {
 
 bool AcyclicGraph::is_terminal(int node) {
   return is_terminal_map[node];
+}
+
+const char *AcyclicGraph::get_print(int node) {
+  return stack_print_map[node];
 }

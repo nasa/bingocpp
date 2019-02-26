@@ -133,6 +133,7 @@ class AcyclicGraph {
 
   static bool has_arity_two(int node);
   static bool is_terminal(int node);
+  static const char *get_print(int node);
 
  private:
   static const bool is_arity_2_map[13]; 
