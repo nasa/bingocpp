@@ -23,6 +23,7 @@
 
 int cross_useful;
 int not_useful;
+using namespace bingo;
 
 class Island {
  public:

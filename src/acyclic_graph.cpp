@@ -14,6 +14,8 @@
 #include "BingoCpp/backend.h"
 #include "BingoCpp/acyclic_graph_nodes.h"
 
+namespace bingo {
+
 AcyclicGraph::AcyclicGraph() {
   stack = Eigen::ArrayX3i(0, 3);
   constants = Eigen::VectorXd(0);
@@ -352,3 +354,4 @@ bool AcyclicGraph::is_terminal(int node) {
 const char *AcyclicGraph::get_print(int node) {
   return stack_print_map[node];
 }
+} // namespace bingo 

@@ -7,6 +7,7 @@
 #include "BingoCpp/backend.h"
 #include "testing_utils.h"
 
+using namespace bingo;
 namespace {
 const int N_OPS = 13;
 

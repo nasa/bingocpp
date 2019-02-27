@@ -20,6 +20,7 @@
 #include "BingoCpp/acyclic_graph.h"
 #include "BingoCpp/graph_manip.h"
 
+using namespace bingo;
 class AgcppTest : public::testing::Test {
  public:
   AcyclicGraph indv;

@@ -16,6 +16,7 @@
 
 #include "BingoCpp/backend.h"
 
+using namespace bingo;
 namespace {
 
 class AcyclicGraphTest : public::testing::Test {
@@ -710,7 +711,7 @@ TEST_F(AcyclicGraphTest, maskderivative) {
 
 
 TEST_F(AcyclicGraphTest, utilization) {
-  std::vector<bool> used_commands = FindUsedCommands(stack);
+  std::vector<bool> used_commands = GetUtilizedCommands(stack);
   int num_used_commands = 0;
 
   for (auto const& command_is_used : used_commands) {

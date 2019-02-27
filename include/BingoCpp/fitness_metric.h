@@ -15,6 +15,8 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
+namespace bingo {
+
 struct FitnessMetric;
 
 /*! \struct LMFunctor
@@ -142,5 +144,5 @@ struct ImplicitRegression : FitnessMetric {
   Eigen::ArrayXXd evaluate_fitness_vector(AcyclicGraph &indv,
                                           TrainingData &train);
 };
-
+} // namespace bingo
 #endif

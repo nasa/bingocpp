@@ -14,6 +14,7 @@
 #include "BingoCpp/acyclic_graph.h"
 #include "BingoCpp/fitness_metric.h"
 
+namespace bingo {
 
 AcyclicGraphManipulator::AcyclicGraphManipulator(int nvars, int ag_size,
     int nloads, float float_lim, float terminal_prob, int opt_rate) {
@@ -483,3 +484,4 @@ std::vector<int> AcyclicGraphManipulator::rand_terminal() {
   temp.push_back(param);
   return temp;
 }
+} // namespace bingo

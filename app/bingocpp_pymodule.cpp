@@ -52,6 +52,7 @@ double add(double i, double j) {
 }
 
 namespace py = pybind11;
+using namespace bingo;
 
 PYBIND11_MODULE(bingocpp, m) {
   m.doc() = "pybind11 example plugin";  // optional module docstring
@@ -65,7 +66,7 @@ PYBIND11_MODULE(bingocpp, m) {
         &SimplifyAndEvaluateWithDerivative,
         "evaluate with derivative after simplification");
   m.def("get_utilized_commands",
-        &FindUsedCommands,
+        &GetUtilizedCommands,
         "get the commands that are utilized in a stack");
         
         

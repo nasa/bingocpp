@@ -8,9 +8,7 @@
 #include <utility>
 #include <vector>
 
-
-typedef Eigen::Ref<Eigen::ArrayXXd,
-        0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ArrayByRef;
+namespace bingo {
 
 /*!
  * \brief Identify whether a c++ backend is being used in python module.
@@ -19,33 +17,6 @@ typedef Eigen::Ref<Eigen::ArrayXXd,
  * \return true, the backend is c++ (bool)
  */
 bool IsCpp();
-
-/*!
- * \brief Computes reverse autodiff partial of a stack command.
- *
- * The partial derivative of the result with respect to the command at the
- * specified location in the stack is evaluated.  This requires the addition of
- * all the dependencies of the command using the chain rule.  References can be
- * made in to the forward buffer and later reverse buffer values; all are
- * referenced by index.
- *
- * \note Addition of new operators must edit this segment.
- *
- * \param[in] stack Description of an acyclic graph in stack format.
- * \param[in] command_index Index of command in the stack; also the location of
- *                          the result to be placed in the reverse buffer.
- * \param[in] forward_buffer Vector of Eigen arrays for the forward buffer.
- * \param[in\out] forward_buffer Vector of Eigen arrays for the forward buffer.
- * \param[in] dependencies Vector of indices of the stack which depend on the
-                           specified command.
- *
- */
-Eigen::ArrayXXd reverse_eval_with_mask(const std::pair<int, int> deriv_shape,
-                                       const int deriv_wrt_node,
-                                       const std::vector<Eigen::ArrayXXd> &forward_eval,
-                                       const Eigen::ArrayX3i &stack,
-                                       const std::vector<bool> &used_commands_mask);
-
 
 /*!
  * \brief Evaluates a stack at the given x using the given constants.
@@ -64,46 +35,6 @@ Eigen::ArrayXXd reverse_eval_with_mask(const std::pair<int, int> deriv_shape,
 Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3i &stack,
                          const Eigen::ArrayXXd &x,
                          const Eigen::VectorXd &constants);
-
-
-/*!
- * \brief Evaluates a stack, but only the commands that are utilized.
- *
- * An acyclic graph is given in stack form.  The stack is evaluated, but only
- * the commands which are utilized by the final result.
- *
- * \param[in] stack Description of an acyclic graph in stack format.
- * \param[in] x The input variables to the acyclic graph. (Eigen::ArrayXXd)
- * \param[in] constants Vector of the constants used in the stack.
- *
- * \return The value of the last command in the stack. (Eigen::ArrayXXd)
- */
-Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i &stack,
-                                    const Eigen::ArrayXXd &x,
-                                    const Eigen::VectorXd &constants);
-
-
-/*!
- * \brief Evaluates a stack at the given x using the given constants.
- *
- * An acyclic graph is given in stack form.  The stack is evaluated command by
- * command (but only the ones with a true value of the mask) putting the result
- * of each command into a local buffer.  References can be made in the satck to
- * columns of the x input as well as constants; both are referenced by index.
- *
- * \param[in] stack Description of an acyclic graph in stack format.
- * \param[in] x The input variables to the acyclic graph. (Eigen::ArrayXXd)
- * \param[in] constants Vector of the constants used in the stack.
- * \param[in] mask Vector of booleans detailing which commands are included.
- *
- * \return The value of the last command in the stack. (Eigen::ArrayXXd)
- */
-std::vector<Eigen::ArrayXXd> EvaluateWithMask(const Eigen::ArrayX3i &stack,
-                                              const Eigen::ArrayXXd &x,
-                                              const Eigen::VectorXd &constants,
-                                              const std::vector<bool> &mask);
-
-
 
 /*!
  * \brief Evaluates a stack and its derivative with the given x and constants.
@@ -129,7 +60,21 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
   const Eigen::VectorXd &constants,
   const bool param_x_or_c = true);
 
-
+/*!
+ * \brief Evaluates a stack, but only the commands that are utilized.
+ *
+ * An acyclic graph is given in stack form.  The stack is evaluated, but only
+ * the commands which are utilized by the final result.
+ *
+ * \param[in] stack Description of an acyclic graph in stack format.
+ * \param[in] x The input variables to the acyclic graph. (Eigen::ArrayXXd)
+ * \param[in] constants Vector of the constants used in the stack.
+ *
+ * \return The value of the last command in the stack. (Eigen::ArrayXXd)
+ */
+Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i &stack,
+                                    const Eigen::ArrayXXd &x,
+                                    const Eigen::VectorXd &constants);
 
 /*!
  * \brief Evaluates a stack and its derivative, but only the utilized commands.
@@ -151,51 +96,6 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
   const Eigen::VectorXd &constants,
   const bool param_x_or_c = true);
 
-
-
-/*!
- * \brief Evaluates a stack and its derivative with the given x and constants.
- *
- * An acyclic graph is given in stack form.  The stack is evaluated command by
- * command (but only the ones with a true value of the mask) putting the result
- * of each command into a local buffer.  References can be made in the satck to
- * columns of the x input as well as constants; both are referenced by index.
- * The stack is then processed in reverse (again considering only the ones with
- * a true value of the mask) to calculate the gradient of the stack with respect
- * to to the chosen parameter.  This reverse processing is standard reverse 
- * auto-differentiation.
- *
- * \param[in] stack Description of an acyclic graph in stack format.
- * \param[in] x The input variables to the acyclic graph. (Eigen::ArrayXXd)
- * \param[in] constants Vector of the constants used in the stack.
- * \param[in] mask Vector of booleans detailing which commands are included.
- * \param[in] param_x_or_c true: x derivative, false: c derivative
- *
- * \return The value of the last command in the stack and the gradient.
- *         (std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>)
- */
-std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
-  const Eigen::ArrayX3i &stack,
-  const Eigen::ArrayXXd &x,
-  const Eigen::VectorXd &constants,
-  const std::vector<bool> &mask,
-  const bool param_x_or_c=true);
-
-
-
-/*!
- * \brief Prints a stack to std::cout.
- *
- * An acyclic graph is given in stack form.  The stack is printed to std::cout
- * command by command in the following format:
- * (stack_location) = operation : (parameters)
- *
- * \param[in] stack Description of an acyclic graph in stack format.
- */
-void PrintStack(const Eigen::ArrayX3i &stack);
-
-
-
 /*!
  * \brief Simplifies a stack.
  *
@@ -208,8 +108,6 @@ void PrintStack(const Eigen::ArrayX3i &stack);
  */
 Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i &stack);
 
-
-
 /*!
  * \brief Finds which commands are utilized in a stack.
  *
@@ -220,9 +118,10 @@ Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i &stack);
  *
  * \return Vector describing which commands in the stack are used.
  */
-std::vector<bool> FindUsedCommands(const Eigen::ArrayX3i &stack);
+std::vector<bool> GetUtilizedCommands(const Eigen::ArrayX3i &stack);
 
 
 int get_arity(int node);
 
+} // namespace bingo
 #endif  

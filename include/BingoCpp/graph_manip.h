@@ -26,6 +26,8 @@
 #include "BingoCpp/backend.h"
 #include "BingoCpp/acyclic_graph.h"
 
+namespace bingo {
+
 /*! \class AcyclicGraphManipulator
  *
  *  Manipulates AGraph objects for generation, crossover, mutation, and distance
@@ -182,5 +184,5 @@ class AcyclicGraphManipulator {
 static void rand_init() {
   srand (time(NULL));
 }
-
+} // namespace bingo
 #endif

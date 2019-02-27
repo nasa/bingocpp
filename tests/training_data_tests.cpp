@@ -15,6 +15,8 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
+using namespace bingo;
+
 TEST(TrainingDataTest, ExplicitConstruct) {
   Eigen::ArrayXXd x(4, 3);
   Eigen::ArrayXXd y(4, 2);

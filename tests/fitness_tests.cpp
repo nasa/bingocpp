@@ -19,6 +19,7 @@
 #include "BingoCpp/graph_manip.h"
 #include "BingoCpp/acyclic_graph.h"
 
+using namespace bingo;
 
 TEST(FitnessTest, optimize_constants) {
   StandardRegression sr;

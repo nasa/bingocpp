@@ -15,6 +15,9 @@
 
 #include <Eigen/Dense>
 #include <Eigen/Core>
+
+namespace bingo {
+
 /*! \class AcyclicGraph
  *
  *  Acyclic Graph representation of an equation.
@@ -140,5 +143,7 @@ class AcyclicGraph {
   static const bool is_terminal_map[13];
   static const char *stack_print_map[13];
 };
+
+} // Namespace bingo
 #endif  // INCLUDE_BINGOCPP_ACYCLIC_GRAPH_H_
 
