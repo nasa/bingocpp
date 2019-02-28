@@ -6,6 +6,7 @@
 
 #include "BingoCpp/backend.h"
 #include "testing_utils.h"
+#include "test_fixtures.h"
 
 using namespace bingo;
 namespace {
@@ -23,6 +24,11 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
   std::vector<Eigen::ArrayXXd> operator_x_derivs;
   std::vector<Eigen::ArrayXXd> operator_c_derivs;
 
+  Eigen::ArrayX3i simple_stack;
+  Eigen::ArrayX3i simple_stack2;
+  Eigen::ArrayXXd x;
+  Eigen::ArrayXd constants;
+
   virtual void SetUp() {
     sample_agraph_1_values = testutils::init_agraph_vals(AGRAPH_VAL_START,
                                                          AGRAPH_VAL_END,
@@ -30,6 +36,11 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
     operator_evals_x0 = testutils::init_op_evals_x0(sample_agraph_1_values);
     operator_x_derivs = testutils::init_op_x_derivs(sample_agraph_1_values);
     operator_c_derivs = testutils::init_op_c_derivs(sample_agraph_1_values);
+
+    simple_stack = testutils::stack_operators_0_to_5(); 
+    simple_stack2 = testutils::stack_unary_operator(4);
+    x = testutils::one_to_nine_3_by_3();
+    constants = testutils::pi_ten_constants();
   }
   virtual void TearDown() {}
 };
@@ -98,4 +109,69 @@ TEST_P(AGraphBackend, simplify_and_evaluate_c_deriv) {
 }
 INSTANTIATE_TEST_CASE_P(,AGraphBackend, ::testing::Range(0, N_OPS, 1));
 
+
+TEST_F(AGraphBackend, evaluate) {
+  Eigen::ArrayXXd y = Evaluate(simple_stack, x, constants);
+  Eigen::ArrayXXd y_true = x.col(0) * (constants[0] + constants[1] 
+                          / x.col(1)) - x.col(0);
+  ASSERT_TRUE(testutils::almost_equal(y, y_true));
+}
+
+TEST_F(AGraphBackend, evaluate_and_derivative) {
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy =
+    EvaluateWithDerivative(simple_stack, x, constants);
+  Eigen::ArrayXXd y_true = x.col(0) * (constants[0] + constants[1] 
+                          / x.col(1)) - x.col(0);
+  Eigen::ArrayXXd dy_true = Eigen::ArrayXXd::Zero(3, 3);
+  dy_true.col(0) = constants[0] + constants[1] / x.col(1) - 1.;
+  dy_true.col(1) = - x.col(0) * constants[1] / x.col(1) / x.col(1);
+
+  ASSERT_TRUE(testutils::almost_equal(y_and_dy.first, y_true));
+  ASSERT_TRUE(testutils::almost_equal(y_and_dy.second, dy_true));
+}
+
+TEST_F(AGraphBackend, mask_evaluate) {
+  Eigen::ArrayXXd y = Evaluate(simple_stack, x, constants);
+  Eigen::ArrayXXd y_simple = SimplifyAndEvaluate(simple_stack, x, constants);
+  ASSERT_TRUE(testutils::almost_equal(y, y_simple));
+}
+
+TEST_F(AGraphBackend, mask_evaluate_and_derivative) {
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy =
+    EvaluateWithDerivative(simple_stack, x, constants);
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy_simple =
+    SimplifyAndEvaluateWithDerivative(simple_stack, x, constants);
+    ASSERT_TRUE(testutils::almost_equal(y_and_dy.first, y_and_dy_simple.first));
+    ASSERT_TRUE(testutils::almost_equal(y_and_dy.first, y_and_dy_simple.first));
+}
+
+// TEST_F(AcyclicGraphTest, simplify) {
+//   // shorter stack
+//   std::cout << "stack\n" << stack << std::endl;
+//   Eigen::ArrayX3i short_stack = SimplifyStack(stack);
+//   std::cout << "2\n";
+//   ASSERT_LE(short_stack.rows(), stack.rows());
+//   std::cout << "3\n";
+
+//   // equivalent evatuation
+//   Eigen::ArrayXXd y = Evaluate(stack, x, constants);
+//   std::cout << "4\n";
+//   Eigen::ArrayXXd simplified_y = Evaluate(short_stack, x, constants);
+//   std::cout << "5\n";
+
+//   for (size_t i = 0; i < x.rows(); ++i) {
+//     ASSERT_EQ(y(i), simplified_y(i));
+//   }
+// }
+
+TEST_F(AGraphBackend, get_utilized_commands) {
+  std::vector<bool> used_commands = GetUtilizedCommands(simple_stack);
+  int num_used_commands = 0;
+  for (auto const& command_is_used : used_commands) {
+    if (command_is_used) {
+      ++num_used_commands;
+    }
+  }
+  ASSERT_EQ(num_used_commands, 8);
+}
 } // namespace

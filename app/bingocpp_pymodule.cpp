@@ -42,10 +42,12 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 #include <pybind11/stl.h>
+
 #include "BingoCpp/acyclic_graph.h"
-#include "graph_manip.cpp"
-#include "fitness_metric.cpp"
-#include "training_data.cpp"
+#include "BingoCpp/graph_manip.h"
+#include "BingoCpp/fitness_metric.h"
+#include "BingoCpp/training_data.h"
+#include "BingoCpp/utils.h"
 
 double add(double i, double j) {
   return i + j;

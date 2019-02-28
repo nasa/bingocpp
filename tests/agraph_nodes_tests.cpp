@@ -15,47 +15,29 @@
 #include "gtest/gtest.h"
 
 #include "BingoCpp/backend.h"
+#include "test_fixtures.h"
 
 using namespace bingo;
 namespace {
 
-class AcyclicGraphTest : public::testing::Test {
+class AGraphNodesTest: public::testing::Test {
  public:
   Eigen::ArrayX3i stack;
   Eigen::ArrayX3i stack2;
   Eigen::ArrayXXd x;
   Eigen::VectorXd constants;
 
-  AcyclicGraphTest(): stack(12, 3), x(3, 3), stack2(2, 3), constants(2) {
-  }
-
   void SetUp() {
-    // y = x_0 * ( C_0 + C_1/x_1 ) - x_0
-    stack << 0, 0, 0,
-          0, 1, 1,
-          1, 0, 0,
-          1, 1, 1,
-          5, 3, 1,
-          5, 3, 1,
-          2, 4, 2,
-          2, 4, 2,
-          4, 6, 0,
-          4, 5, 6,
-          3, 7, 6,
-          3, 8, 0;
-    // y = x_0 * x_0
-    stack2 << 0, 0, 0,
-           4, 0, 0;
-    x << 1., 4., 7., 2., 5., 8., 3., 6., 9.;
-    constants << 3.14, 10.0;
+    stack = testutils::stack_operators_0_to_5(); 
+    stack2 = testutils::stack_unary_operator(4);
+    x = testutils::one_to_nine_3_by_3();
+    constants = testutils::pi_ten_constants();
   }
 
-  void TearDown() {
-    // code here will be called just after the test completes
-  }
+  void TearDown() {}
 };
 
-TEST(AcyclicGraphNodesTest, XLoad) {
+TEST(AGraphNodesTest, XLoad) {
   Eigen::ArrayX3i stack(1, 3);
   Eigen::ArrayXXd x(3, 3);
   Eigen::VectorXd constants(2);
@@ -71,7 +53,7 @@ TEST(AcyclicGraphNodesTest, XLoad) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, CLoad) {
+TEST(AGraphNodesTest, CLoad) {
   Eigen::ArrayX3i stack(1, 3);
   Eigen::ArrayXXd x(3, 3);
   Eigen::VectorXd constants(2);
@@ -86,7 +68,7 @@ TEST(AcyclicGraphNodesTest, CLoad) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Addition) {
+TEST(AGraphNodesTest, Addition) {
   Eigen::ArrayX3i stack(3, 3);
   Eigen::ArrayX3i stack2(3, 3);
   Eigen::ArrayX3i stack3(2, 3);
@@ -144,7 +126,7 @@ TEST(AcyclicGraphNodesTest, Addition) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Subtraction) {
+TEST(AGraphNodesTest, Subtraction) {
   Eigen::ArrayX3i stack(3, 3);
   Eigen::ArrayX3i stack2(3, 3);
   Eigen::ArrayX3i stack3(2, 3);
@@ -203,7 +185,7 @@ TEST(AcyclicGraphNodesTest, Subtraction) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Multiplication) {
+TEST(AGraphNodesTest, Multiplication) {
   Eigen::ArrayX3i stack(3, 3);
   Eigen::ArrayX3i stack2(3, 3);
   Eigen::ArrayX3i stack3(2, 3);
@@ -260,7 +242,7 @@ TEST(AcyclicGraphNodesTest, Multiplication) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Division) {
+TEST(AGraphNodesTest, Division) {
   Eigen::ArrayX3i stack(3, 3);
   Eigen::ArrayX3i stack2(3, 3);
   Eigen::ArrayX3i stack3(2, 3);
@@ -323,7 +305,7 @@ TEST(AcyclicGraphNodesTest, Division) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Sin) {
+TEST(AGraphNodesTest, Sin) {
   Eigen::ArrayX3i stack(2, 3);
   Eigen::ArrayX3i stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
@@ -364,7 +346,7 @@ TEST(AcyclicGraphNodesTest, Sin) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Cos) {
+TEST(AGraphNodesTest, Cos) {
   Eigen::ArrayX3i stack(2, 3);
   Eigen::ArrayX3i stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
@@ -405,7 +387,7 @@ TEST(AcyclicGraphNodesTest, Cos) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Exp) {
+TEST(AGraphNodesTest, Exp) {
   Eigen::ArrayX3i stack(2, 3);
   Eigen::ArrayX3i stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
@@ -446,7 +428,7 @@ TEST(AcyclicGraphNodesTest, Exp) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Log) {
+TEST(AGraphNodesTest, Log) {
   Eigen::ArrayX3i stack(2, 3);
   Eigen::ArrayX3i stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
@@ -487,7 +469,7 @@ TEST(AcyclicGraphNodesTest, Log) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Power) {
+TEST(AGraphNodesTest, Power) {
   Eigen::ArrayX3i stack(3, 3);
   Eigen::ArrayX3i stack2(3, 3);
   Eigen::ArrayX3i stack3(2, 3);
@@ -554,7 +536,7 @@ TEST(AcyclicGraphNodesTest, Power) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Absolute) {
+TEST(AGraphNodesTest, Absolute) {
   Eigen::ArrayX3i stack(2, 3);
   Eigen::ArrayX3i stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
@@ -593,7 +575,7 @@ TEST(AcyclicGraphNodesTest, Absolute) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Sqrt) {
+TEST(AGraphNodesTest, Sqrt) {
   Eigen::ArrayX3i stack(2, 3);
   Eigen::ArrayX3i stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
@@ -633,109 +615,6 @@ TEST(AcyclicGraphNodesTest, Sqrt) {
     ASSERT_DOUBLE_EQ(d_x.second(i), d_true_x(i));
   }
 }
-
-TEST_F(AcyclicGraphTest, evaluate) {
-  Eigen::ArrayXXd y = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd y_true = x.col(0) * (constants[0] + constants[1] / x.col(1))
-                           - x.col(0);
-
-  for (size_t i = 0; i < x.rows(); ++i) {
-    ASSERT_DOUBLE_EQ(y(i), y_true(i));
-  }
-}
-
-
-TEST_F(AcyclicGraphTest, derivative) {
-  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy =
-    EvaluateWithDerivative(stack, x, constants);
-  Eigen::ArrayXXd y_true = x.col(0) * (constants[0] + constants[1] / x.col(1))
-                           - x.col(0);
-  Eigen::ArrayXXd dy_true = Eigen::ArrayXXd::Zero(3, 3);
-  dy_true.col(0) = constants[0] + constants[1] / x.col(1) - 1.;
-  dy_true.col(1) = - x.col(0) * constants[1] / x.col(1) / x.col(1);
-
-  for (size_t i = 0; i < x.rows(); ++i) {
-    ASSERT_DOUBLE_EQ(y_and_dy.first(i), y_true(i));
-  }
-
-  for (size_t i = 0; i < x.size(); ++i) {
-    ASSERT_DOUBLE_EQ(y_and_dy.second(i), dy_true(i));
-  }
-}
-
-
-TEST_F(AcyclicGraphTest, maskevaluate) {
-  Eigen::ArrayXXd y = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd y_simple = SimplifyAndEvaluate(stack, x, constants);
-
-  for (size_t i = 0; i < x.rows(); ++i) {
-    ASSERT_DOUBLE_EQ(y(i), y_simple(i));
-  }
-}
-
-
-TEST_F(AcyclicGraphTest, maskderivative) {
-  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy =
-    EvaluateWithDerivative(stack, x, constants);
-  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy_simple =
-    SimplifyAndEvaluateWithDerivative(stack, x, constants);
-
-  for (size_t i = 0; i < x.rows(); ++i) {
-    ASSERT_DOUBLE_EQ(y_and_dy.first(i), y_and_dy_simple.first(i));
-  }
-
-  for (size_t i = 0; i < x.size(); ++i) {
-    ASSERT_DOUBLE_EQ(y_and_dy.second(i), y_and_dy_simple.second(i));
-  }
-}
-
-
-// TEST_F(AcyclicGraphTest, simplify) {
-//   // shorter stack
-//   std::cout << "stack\n" << stack << std::endl;
-//   Eigen::ArrayX3i short_stack = SimplifyStack(stack);
-//   std::cout << "2\n";
-//   ASSERT_LE(short_stack.rows(), stack.rows());
-//   std::cout << "3\n";
-
-//   // equivalent evatuation
-//   Eigen::ArrayXXd y = Evaluate(stack, x, constants);
-//   std::cout << "4\n";
-//   Eigen::ArrayXXd simplified_y = Evaluate(short_stack, x, constants);
-//   std::cout << "5\n";
-
-//   for (size_t i = 0; i < x.rows(); ++i) {
-//     ASSERT_EQ(y(i), simplified_y(i));
-//   }
-// }
-
-
-TEST_F(AcyclicGraphTest, utilization) {
-  std::vector<bool> used_commands = GetUtilizedCommands(stack);
-  int num_used_commands = 0;
-
-  for (auto const& command_is_used : used_commands) {
-    if (command_is_used) {
-      ++num_used_commands;
-    }
-  }
-
-  ASSERT_EQ(num_used_commands, 8);
-}
-
-
-TEST_F(AcyclicGraphTest, squaredfunc) {
-  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy =
-    EvaluateWithDerivative(stack2, x, constants);
-  Eigen::ArrayXXd dy_true = Eigen::ArrayXXd::Zero(3, 3);
-  dy_true.col(0) = 2. * x.col(0);
-
-  for (size_t i = 0; i < x.size(); ++i) {
-    ASSERT_DOUBLE_EQ(y_and_dy.second(i), dy_true(i));
-  }
-}
-
-
 }  // namespace
 
 
