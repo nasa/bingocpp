@@ -108,9 +108,9 @@ void benchmark_evaluate(const std::vector<AGraphValues> &indv_list,
                         const Eigen::ArrayXXd &x_vals) {
   std::vector<AGraphValues>::const_iterator indv;
   for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
-    bingo::SimplifyAndEvaluate(indv->command_array,
-                               x_vals,
-                               indv->constants);
+    bingo::simplify_and_evaluate(indv->command_array,
+                                 x_vals,
+                                 indv->constants);
   } 
 }
 
@@ -118,10 +118,10 @@ void benchmark_evaluate_w_x_derivative(const std::vector<AGraphValues> &indv_lis
                                        const Eigen::ArrayXXd &x_vals) {
   std::vector<AGraphValues>::const_iterator indv;
   for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
-    bingo::SimplifyAndEvaluateWithDerivative(indv->command_array,
-                                             x_vals,
-                                             indv->constants,
-                                             true);
+    bingo::simplify_and_evaluate_with_derivative(indv->command_array,
+                                                 x_vals,
+                                                 indv->constants,
+                                                 true);
   }
 }
 
@@ -129,10 +129,10 @@ void benchmark_evaluate_w_c_derivative(const std::vector<AGraphValues> &indv_lis
                                        const Eigen::ArrayXXd &x_vals) {
   std::vector<AGraphValues>::const_iterator indv;
   for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
-    bingo::SimplifyAndEvaluateWithDerivative(indv->command_array,
-                                             x_vals,
-                                             indv->constants,
-                                             false);
+    bingo::simplify_and_evaluate_with_derivative(indv->command_array,
+                                                 x_vals,
+                                                 indv->constants,
+                                                 false);
   }
 }
 

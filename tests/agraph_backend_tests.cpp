@@ -53,9 +53,9 @@ TEST_P(AGraphBackend, simplify_and_evaluate) {
   stack << 0, 0, 0,
            0, 1, 0,
            operator_i, 0, 0;
-  Eigen::ArrayXXd f_of_x = SimplifyAndEvaluate(stack,
-                                               sample_agraph_1_values.x_vals,
-                                               sample_agraph_1_values.constants);
+  Eigen::ArrayXXd f_of_x = simplify_and_evaluate(stack,
+                                                 sample_agraph_1_values.x_vals,
+                                                 sample_agraph_1_values.constants);
   ASSERT_TRUE(testutils::almost_equal(expected_outcome, f_of_x));
 }
 
@@ -74,10 +74,10 @@ TEST_P(AGraphBackend, simplify_and_evaluate_x_deriv) {
   Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals;
   Eigen::ArrayXXd constants = sample_agraph_1_values.constants;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> res_and_gradient = 
-    SimplifyAndEvaluateWithDerivative(stack,
-                                      x_0,
-                                      constants,
-                                      true);
+    simplify_and_evaluate_with_derivative(stack,
+                                          x_0,
+                                          constants,
+                                          true);
   Eigen::ArrayXXd df_dx = res_and_gradient.second;
   ASSERT_TRUE(testutils::almost_equal(expected_derivative, df_dx));
 }
@@ -100,10 +100,10 @@ TEST_P(AGraphBackend, simplify_and_evaluate_c_deriv) {
   Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals;
   Eigen::ArrayXXd constants = sample_agraph_1_values.constants;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> res_and_gradient = 
-    SimplifyAndEvaluateWithDerivative(stack,
-                                      x_0,
-                                      constants,
-                                      false);
+    simplify_and_evaluate_with_derivative(stack,
+                                          x_0,
+                                          constants,
+                                          false);
   Eigen::ArrayXXd df_dc = res_and_gradient.second;
   ASSERT_TRUE(testutils::almost_equal(expected_derivative, df_dc));
 }
@@ -111,7 +111,7 @@ INSTANTIATE_TEST_CASE_P(,AGraphBackend, ::testing::Range(0, N_OPS, 1));
 
 
 TEST_F(AGraphBackend, evaluate) {
-  Eigen::ArrayXXd y = Evaluate(simple_stack, x, constants);
+  Eigen::ArrayXXd y = evaluate(simple_stack, x, constants);
   Eigen::ArrayXXd y_true = x.col(0) * (constants[0] + constants[1] 
                           / x.col(1)) - x.col(0);
   ASSERT_TRUE(testutils::almost_equal(y, y_true));
@@ -119,7 +119,7 @@ TEST_F(AGraphBackend, evaluate) {
 
 TEST_F(AGraphBackend, evaluate_and_derivative) {
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy =
-    EvaluateWithDerivative(simple_stack, x, constants);
+    evaluate_with_derivative(simple_stack, x, constants);
   Eigen::ArrayXXd y_true = x.col(0) * (constants[0] + constants[1] 
                           / x.col(1)) - x.col(0);
   Eigen::ArrayXXd dy_true = Eigen::ArrayXXd::Zero(3, 3);
@@ -131,18 +131,18 @@ TEST_F(AGraphBackend, evaluate_and_derivative) {
 }
 
 TEST_F(AGraphBackend, mask_evaluate) {
-  Eigen::ArrayXXd y = Evaluate(simple_stack, x, constants);
-  Eigen::ArrayXXd y_simple = SimplifyAndEvaluate(simple_stack, x, constants);
+  Eigen::ArrayXXd y = evaluate(simple_stack, x, constants);
+  Eigen::ArrayXXd y_simple = simplify_and_evaluate(simple_stack, x, constants);
   ASSERT_TRUE(testutils::almost_equal(y, y_simple));
 }
 
 TEST_F(AGraphBackend, mask_evaluate_and_derivative) {
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy =
-    EvaluateWithDerivative(simple_stack, x, constants);
+    evaluate_with_derivative(simple_stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy_simple =
-    SimplifyAndEvaluateWithDerivative(simple_stack, x, constants);
-    ASSERT_TRUE(testutils::almost_equal(y_and_dy.first, y_and_dy_simple.first));
-    ASSERT_TRUE(testutils::almost_equal(y_and_dy.first, y_and_dy_simple.first));
+    simplify_and_evaluate_with_derivative(simple_stack, x, constants);
+  ASSERT_TRUE(testutils::almost_equal(y_and_dy.first, y_and_dy_simple.first));
+  ASSERT_TRUE(testutils::almost_equal(y_and_dy.first, y_and_dy_simple.first));
 }
 
 // TEST_F(AcyclicGraphTest, simplify) {
@@ -165,7 +165,7 @@ TEST_F(AGraphBackend, mask_evaluate_and_derivative) {
 // }
 
 TEST_F(AGraphBackend, get_utilized_commands) {
-  std::vector<bool> used_commands = GetUtilizedCommands(simple_stack);
+  std::vector<bool> used_commands = get_utilized_commands(simple_stack);
   int num_used_commands = 0;
   for (auto const& command_is_used : used_commands) {
     if (command_is_used) {

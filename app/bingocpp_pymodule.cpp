@@ -58,17 +58,17 @@ using namespace bingo;
 
 PYBIND11_MODULE(bingocpp, m) {
   m.doc() = "pybind11 example plugin";  // optional module docstring
-  m.def("is_cpp", &IsCpp, "is the backend c++");
-  m.def("evaluate", &Evaluate, "evaluate");
-  m.def("simplify_and_evaluate", &SimplifyAndEvaluate,
+  m.def("is_cpp", &is_cpp, "is the backend c++");
+  m.def("evaluate", &evaluate, "evaluate");
+  m.def("simplify_and_evaluate", &simplify_and_evaluate,
         "evaluate after simplification");
-  m.def("evaluate_with_derivative", &EvaluateWithDerivative,
+  m.def("evaluate_with_derivative", &evaluate_with_derivative,
         "evaluate with derivative");
   m.def("simplify_and_evaluate_with_derivative",
-        &SimplifyAndEvaluateWithDerivative,
+        &simplify_and_evaluate_with_derivative,
         "evaluate with derivative after simplification");
   m.def("get_utilized_commands",
-        &GetUtilizedCommands,
+        &get_utilized_commands,
         "get the commands that are utilized in a stack");
         
         
