@@ -31,9 +31,9 @@ bool is_cpp();
  *
  * \return The value of the last command in the stack. (Eigen::ArrayXXd)
  */
-Eigen::ArrayXXd evaluate(const Eigen::ArrayX3i &stack,
-                         const Eigen::ArrayXXd &x,
-                         const Eigen::VectorXd &constants);
+Eigen::ArrayXXd evaluate(const Eigen::ArrayX3i& stack,
+                         const Eigen::ArrayXXd& x,
+                         const Eigen::VectorXd& constants);
 
 /*!
  * \brief Evaluates a stack and its derivative with the given x and constants.
@@ -54,9 +54,9 @@ Eigen::ArrayXXd evaluate(const Eigen::ArrayX3i &stack,
  *         (std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>)
  */
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> evaluate_with_derivative(
-    const Eigen::ArrayX3i &stack,
-    const Eigen::ArrayXXd &x,
-    const Eigen::VectorXd &constants,
+    const Eigen::ArrayX3i& stack,
+    const Eigen::ArrayXXd& x,
+    const Eigen::VectorXd& constants,
     const bool param_x_or_c = true);
 
 
@@ -72,9 +72,9 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> evaluate_with_derivative(
  *
  * \return The value of the last command in the stack. (Eigen::ArrayXXd)
  */
-Eigen::ArrayXXd simplify_and_evaluate(const Eigen::ArrayX3i &stack,
-                                      const Eigen::ArrayXXd &x,
-                                      const Eigen::VectorXd &constants);
+Eigen::ArrayXXd simplify_and_evaluate(const Eigen::ArrayX3i& stack,
+                                      const Eigen::ArrayXXd& x,
+                                      const Eigen::VectorXd& constants);
 
 
 /*!
@@ -91,9 +91,9 @@ Eigen::ArrayXXd simplify_and_evaluate(const Eigen::ArrayX3i &stack,
  * \return The value of the last command in the stack and the gradient.
  */
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> simplify_and_evaluate_with_derivative(
-    const Eigen::ArrayX3i &stack,
-    const Eigen::ArrayXXd &x,
-    const Eigen::VectorXd &constants,
+    const Eigen::ArrayX3i& stack,
+    const Eigen::ArrayXXd& x,
+    const Eigen::VectorXd& constants,
     const bool param_x_or_c = true);
 
 
@@ -107,7 +107,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> simplify_and_evaluate_with_derivativ
  *
  * \return Simplified stack.
  */
-Eigen::ArrayX3i simplify_stack(const Eigen::ArrayX3i &stack);
+Eigen::ArrayX3i simplify_stack(const Eigen::ArrayX3i& stack);
 
 
 /*!
@@ -120,7 +120,7 @@ Eigen::ArrayX3i simplify_stack(const Eigen::ArrayX3i &stack);
  *
  * \return vector describing which commands in the stack are used.
  */
-std::vector<bool> get_utilized_commands(const Eigen::ArrayX3i &stack);
+std::vector<bool> get_utilized_commands(const Eigen::ArrayX3i& stack);
 
 
 int get_arity(int node);

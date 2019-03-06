@@ -24,16 +24,16 @@ typedef void (
  * forward eval function corresponding to the operation node.
  */
 Eigen::ArrayXXd forward_eval_function(int node, int param1, int param2,
-                                      const Eigen::ArrayXXd &x, 
-                                      const Eigen::VectorXd &constants,
-                                      std::vector<Eigen::ArrayXXd> &forward_eval);
+                                      const Eigen::ArrayXXd& x, 
+                                      const Eigen::VectorXd& constants,
+                                      std::vector<Eigen::ArrayXXd>& forward_eval);
 /*
  * Maps reverse_index, param1, param2, forward evaluation stack and 
  * revese evaluation stack to the corresponding operation node.
  */
 void reverse_eval_function(int node, int reverse_index, int param1, int param2,
-                           const std::vector<Eigen::ArrayXXd> &forward_eval,
-                           std::vector<Eigen::ArrayXXd> &reverse_eval);
+                           const std::vector<Eigen::ArrayXXd>& forward_eval,
+                           std::vector<Eigen::ArrayXXd>& reverse_eval);
 } // namespace bingo
 
 #endif

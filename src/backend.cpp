@@ -138,11 +138,13 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> simplify_and_evaluate_with_derivativ
 std::vector<bool> get_utilized_commands(const Eigen::ArrayX3i& stack) {
   std::vector<bool> used_commands(stack.rows());
   used_commands.back() = true;
-  for (int row = 1; row < stack.rows(); row++) {
-    int node = stack(stack.rows() - row, NODE_IDX);
-    int param1 = stack(stack.rows() - row, OP_1);
-    int param2 = stack(stack.rows() - row, OP_2);
-    if (used_commands[stack.rows() - row] && node > 1) {
+  int stack_size = stack.rows();
+  for (int i = 1; i < stack_size; i++) {
+    int row = stack_size - i;
+    int node = stack(row, NODE_IDX);
+    int param1 = stack(row, OP_1);
+    int param2 = stack(row, OP_2);
+    if (used_commands[row] && node > 1) {
       used_commands[param1] = true;
       if (AcyclicGraph::has_arity_two(node)) {
         used_commands[param2] = true;
