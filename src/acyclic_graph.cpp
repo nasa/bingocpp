@@ -7,283 +7,351 @@
  * This file contains the functions associated with an acyclic graph
  * representation of a symbolic equation.
  */
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <Eigen/Dense>
-
-#include <set>
-#include <map>
 #include <iostream>
+#include <iomanip>
 
 #include "BingoCpp/acyclic_graph.h"
+#include "BingoCpp/backend.h"
 #include "BingoCpp/acyclic_graph_nodes.h"
 
-// create an instance of the Operator_Interface map
-OperatorInterface oper_interface;
+namespace bingo {
 
-bool IsCpp() {
-    return true;
+AcyclicGraph::AcyclicGraph() {
+  stack = Eigen::ArrayX3i(0, 3);
+  constants = Eigen::VectorXd(0);
+  simple_stack = Eigen::ArrayX3i(0, 3);
+  fitness = std::vector<double>();
+  fit_set = false;
+  needs_opt = false;
+  opt_rate = 0;
+  genetic_age = 0;
 }
 
-
-
-void ReverseSingleCommand(const Eigen::ArrayX3i &stack,
-                          const int command_index,
-                          const std::vector<Eigen::ArrayXXd> &forward_buffer,
-                          std::vector<Eigen::ArrayXXd> &reverse_buffer,
-                          const std::set<int> &dependencies) {
-  // Computes reverse autodiff partial of a stack command.
-  for (auto const& dependency : dependencies) {
-    oper_interface.operator_map[stack(dependency, 0)]->deriv_evaluate(
-      stack, command_index, forward_buffer, reverse_buffer,
-      dependency);
-  }
+AcyclicGraph::AcyclicGraph(const AcyclicGraph &ag) {
+  stack = ag.stack;
+  constants = ag.constants;
+  simple_stack = ag.simple_stack;
+  fitness = ag.fitness;
+  fit_set = ag.fit_set;
+  needs_opt = ag.needs_opt;
+  opt_rate = ag.opt_rate;
+  genetic_age = ag.genetic_age;
 }
 
-
-
-Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3i & stack,
-                         const Eigen::ArrayXXd &x,
-                         const Eigen::VectorXd &constants) {
-  // Evaluates a stack at the given x using the given constants.
-  std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
-
-  for (std::size_t i = 0; i < stack.rows(); ++i) {
-    oper_interface.operator_map[stack(i, 0)]->evaluate(
-      stack, x, constants, forward_eval, i);
-  }
-
-  return forward_eval.back();
+AcyclicGraph AcyclicGraph::copy() {
+  AcyclicGraph temp = AcyclicGraph();
+  temp.stack = stack;
+  temp.constants = constants;
+  temp.simple_stack = simple_stack;
+  temp.fitness = fitness;
+  temp.fit_set = fit_set;
+  temp.needs_opt = needs_opt;
+  temp.opt_rate = opt_rate;
+  temp.genetic_age = genetic_age;
+  return temp;
 }
 
+const char *AcyclicGraph::stack_print_map[13] = {
+  "X",
+  "C",
+  "+",
+  "-",
+  "*",
+  "/",
+  "sin",
+  "cos",
+  "exp",
+  "log",
+  "pow",
+  "abs",
+  "sqrt"
+};
 
+const bool AcyclicGraph::is_arity_2_map[13] = {
+  false,
+  false,
+  true,
+  true,
+  true,
+  true,
+  false,
+  false,
+  false,
+  false,
+  true,
+  false,
+  false
+};
 
-Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i & stack,
-                                    const Eigen::ArrayXXd & x,
-                                    const Eigen::VectorXd &constants) {
-  // Evaluates a stack, but only the commands that are utilized.
-  std::vector<bool> mask = FindUsedCommands(stack);
-  return EvaluateWithMask(stack, x, constants, mask);
-}
+const bool AcyclicGraph::is_terminal_map[13] = {
+  true,
+  true,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false
+};
 
-
-
-Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3i & stack,
-                                 const Eigen::ArrayXXd & x,
-                                 const Eigen::VectorXd &constants,
-                                 const std::vector<bool> &mask) {
-  // Evaluates a stack at the given x using the given constants.
-  std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
-
-  for (std::size_t i = 0; i < stack.rows(); ++i) {
-    if (mask[i]) {
-      oper_interface.operator_map[stack(i, 0)]->evaluate(
-        stack, x, constants, forward_eval, i);
-    }
-  }
-
-  return forward_eval.back();
-}
-
-
-
-std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
-  const Eigen::ArrayX3i &stack,
-  const Eigen::ArrayXXd &x,
-  const Eigen::VectorXd &constants,
-  const bool param_x_or_c) {
-  // Evaluates a stack and its derivative with the given x and constants.
-  std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
-  std::vector<std::set<int>> stack_dependencies(stack.rows(), std::set<int>());
-  int deriv_size;
-  int deriv_operator_number;
-
-  if (param_x_or_c) {  // true = x
-    deriv_size = x.cols();
-    deriv_operator_number = 0;
-
-  } else {  // false = c
-    deriv_size = constants.size();
-    deriv_operator_number = 1;
-  }
-
-  std::vector<std::set<int>> param_dependencies(deriv_size, std::set<int>());
-
-  // forward eval with dependencies
-  for (std::size_t i = 0; i < stack.rows(); ++i) {
-    oper_interface.operator_map[stack(i, 0)]->evaluate(
-      stack, x, constants, forward_eval, i);
-
-    if (stack(i, 0) == deriv_operator_number) {
-      param_dependencies[stack(i, 1)].insert(i);
-    }
-
-    for (int j = 0; j < oper_interface.operator_map[stack(i, 0)]->get_arity();
-         ++j) {
-      stack_dependencies[stack(i, j + 1)].insert(i);
-    }
-  }
-
-  // reverse pass through stack
-  std::vector<Eigen::ArrayXXd> reverse_eval(stack.rows(),
-      Eigen::ArrayXXd::Zero(x.rows(), 1));
-  reverse_eval[stack.rows() - 1] = Eigen::ArrayXXd::Ones(x.rows(), 1);
-
-  for (int i = stack.rows() - 2; i >= 0; --i) {
-    ReverseSingleCommand(stack, i, forward_eval, reverse_eval,
-                         stack_dependencies[i]);
-  }
-
-  // build derivative array
-  Eigen::ArrayXXd deriv = Eigen::ArrayXXd::Zero(x.rows(), deriv_size);
-
-  for (std::size_t i = 0; i < x.cols(); ++i) {
-    for (auto const& dependency : param_dependencies[i]) {
-      deriv.col(i) += reverse_eval[dependency];
-    }
-  }
-
-  return std::make_pair(forward_eval.back(), deriv);
-}
-
-
-
-std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
-  const Eigen::ArrayX3i &stack,
-  const Eigen::ArrayXXd &x,
-  const Eigen::VectorXd &constants,
-  const bool param_x_or_c) {
-  // Evaluates a stack and its derivative, but only the utilized commands.
-  std::vector<bool> mask = FindUsedCommands(stack);
-  return EvaluateWithDerivativeAndMask(stack, x, constants, mask, param_x_or_c);
-}
-
-
-
-std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
-  const Eigen::ArrayX3i &stack,
-  const Eigen::ArrayXXd &x,
-  const Eigen::VectorXd &constants,
-  const std::vector<bool> &mask,
-  const bool param_x_or_c) {
-  
-  // Evaluates a stack and its derivative with the given x and constants.
-  std::vector<Eigen::ArrayXXd> forward_eval(stack.rows());
-  std::vector<std::set<int>> stack_dependencies(stack.rows(),
-                          std::set<int>());
-  int deriv_size;
-  int deriv_operator_number;
-
-  if (param_x_or_c) {  // true = x
-    deriv_size = x.cols();
-    deriv_operator_number = 0;
-
-  } else {  // false = c
-    deriv_size = constants.size();
-    deriv_operator_number = 1;
-  }
-
-  std::vector<std::set<int>> param_dependencies(deriv_size, std::set<int>());
-
-  // forward eval with dependencies
-  for (std::size_t i = 0; i < stack.rows(); ++i) {
-    if (mask[i]) {
-      oper_interface.operator_map[stack(i, 0)]->evaluate(
-        stack, x, constants, forward_eval, i);
-      if (stack(i, 0) == deriv_operator_number) {
-        param_dependencies[stack(i, 1)].insert(i);
-      }
-      for (int j = 0; j < oper_interface.operator_map[stack(i, 0)]->get_arity();
-           ++j) {
-        stack_dependencies[stack(i, j + 1)].insert(i);
+bool AcyclicGraph::needs_optimization() {
+  if (opt_rate == 0) {
+    for (int i = 0; i < simple_stack.rows(); ++i) {
+      if (simple_stack(i, 0) == 1 && simple_stack(i, 1) == -1 ||
+          simple_stack(i, 0) == 1 && simple_stack(i, 1) >= constants.size()) {
+        return true;
       }
     }
-  }
-  // reverse pass through stack
-  std::vector<Eigen::ArrayXXd> reverse_eval(stack.rows());
-  reverse_eval[stack.rows() - 1] = Eigen::ArrayXXd::Ones(x.rows(), 1);
-  for (int i = stack.rows() - 2; i >= 0; --i) {
-    if (mask[i]) {
-      reverse_eval[i] = Eigen::ArrayXXd::Zero(x.rows(), 1);
-      ReverseSingleCommand(stack, i, forward_eval, reverse_eval,
-                           stack_dependencies[i]);
-    }
-  }
-  // build derivative array
-  Eigen::ArrayXXd deriv = Eigen::ArrayXXd::Zero(x.rows(), deriv_size);
-  for (std::size_t i = 0; i < deriv_size; ++i) {
-    for (auto const& dependency : param_dependencies[i]) {
-      deriv.col(i) += reverse_eval[dependency];
-    }
-  }
-  return std::make_pair(forward_eval.back(), deriv);
-}
 
+    return false;
 
-
-void PrintStack(const Eigen::ArrayX3i & stack) {
-  // Prints a stack to std::cout.
-  for (std::size_t i = 0; i < stack.rows(); ++i) {
-    //this is the operator
-    std::cout << "(" << i << ") = " <<
-              oper_interface.operator_map[stack(i, 0)]->get_print() << " : ";
-
-    // Hard code for those with arity == 0
-    if (oper_interface.operator_map[stack(i, 0)]->get_arity() == 0) {
-      std::cout << " (" << stack(i, 1) << ")";
-    }
-
-    // loop through the rest dependent on their arity
-    for (int j = 0; j < oper_interface.operator_map[stack(i, 0)]->get_arity();
-         ++j) {
-      std::cout << " (" << stack(i, j) << ")";
-    }
-
-    std::cout << std::endl;
+  } else {
+    return needs_opt;
   }
 }
 
+void AcyclicGraph::set_constants(Eigen::VectorXd con) {
+  constants = con;
+}
 
+int AcyclicGraph::count_constants() {
+  if (opt_rate == 0) {
+    std::set<int> util = utilized_commands();
+    std::set<int>::iterator it = util.begin();
+    int const_num = 0;
 
-Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i & stack) {
-  // Simplifies a stack.
-  std::vector<bool> used_command = FindUsedCommands(stack);
-  std::map<int, int> reduced_param_map;
-  Eigen::ArrayX3i new_stack(used_command.size(), 3);
-
-  // TODO(gbomarito)  would size_t be faster?
-  for (int i = 0, j = 0; i < stack.rows(); ++i) {
-    if (used_command[i]) {
-      for (std::size_t k = 0; k < oper_interface.operator_map[new_stack(j, 0)]
-           ->get_arity(); ++k) {
-        new_stack(j, k + 1) = reduced_param_map[new_stack(j, k + 1)];
+    for (int i = 0; i < simple_stack.rows(); ++i, ++it) {
+      if (simple_stack(i, 0) == 1) {
+        simple_stack(i, 1) = const_num;
+        simple_stack(i, 2) = const_num;
+        stack(*it, 1) = const_num;
+        stack(*it, 2) = const_num;
+        const_num += 1;
       }
-
-      reduced_param_map[i] = j;
-      ++j;
     }
-  }
 
-  return new_stack;
+    return const_num;
+
+  } else {
+    return constants.size();
+  }
+}
+
+// void AcyclicGraph::input_constants() {
+//   std::set<int> util = utilized_commands();
+//   std::set<int>::iterator it = util.begin();
+//   int const_num = 0;
+//   int j = 0;
+//   for (int i = 0; i < stack.rows(); ++i) {
+//     if (i == *it) {
+//       if (stack(i, 0) == 1) {
+//         simple_stack(j, 1) = const_num;
+//         simple_stack(j, 2) = const_num;
+//         stack(*it, 1) = const_num;
+//         stack(*it, 2) = const_num;
+//         const_num += 1;
+//       }
+//       ++it;
+//       ++j;
+//     }
+//     else
+//       if (stack(i, 0) == 1) {
+//         stack(i, 1) = -1;
+//         stack(i, 2) = -1;
+//       }
+//   }
+
+//   // if (const_num != count_constants()) {
+//   //   Eigen::VectorXd temp(const_num);
+//   //   constants = temp;
+//   // }
+//   if (const_num != count_constants())
+//     // std::cout << "Constants are too big\n";
+//     constants.conservativeResize(const_num);
+// }
+
+Eigen::ArrayXXd AcyclicGraph::evaluate(Eigen::ArrayXXd &eval_x) {
+  return bingo::evaluate(simple_stack, eval_x, constants);
+}
+
+std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> AcyclicGraph::evaluate_deriv(
+  Eigen::ArrayXXd &eval_x) {
+  return evaluate_with_derivative(simple_stack, eval_x, constants);
+}
+
+std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>
+AcyclicGraph::evaluate_with_const_deriv(
+  Eigen::ArrayXXd &eval_x) {
+  return evaluate_with_derivative(simple_stack, eval_x, constants, false);
 }
 
 
+// TODO: remove iterator interface
+std::string AcyclicGraph::latexstring() {
+  std::vector<std::string> strings;
+  std::ostringstream stream;
 
-std::vector<bool> FindUsedCommands(const Eigen::ArrayX3i & stack) {
-  // Finds which commands are utilized in a stack.
-  std::vector<bool> used_command(stack.rows());
-  used_command.back() = true;
+  for (int i = 0; i < simple_stack.rows(); ++i) {
+    std::string temp = "";
+
+    switch ((int)simple_stack(i, 0)) {
+      case 0:
+        stream << AcyclicGraph::get_print(simple_stack(i, 0))
+               << "_" << simple_stack(i, 1);
+        break;
+
+      case 1:
+        if (simple_stack(i, 1) == -1) {
+          stream << "0";
+
+        } else {
+          stream << constants[simple_stack(i, 1)];
+        }
+
+        break;
+
+      case 2:
+        stream << strings[simple_stack(i, 1)] << " + " <<
+               strings[simple_stack(i, 2)];
+        break;
+
+      case 3:
+        stream << strings[simple_stack(i, 1)] << " - (" <<
+               strings[simple_stack(i, 2)] << ")";
+        break;
+
+      case 4:
+        stream << "(" << strings[simple_stack(i, 1)] << ")(" <<
+               strings[simple_stack(i, 2)] << ")";
+        break;
+
+      case 5:
+        stream << "\\frac{" << strings[simple_stack(i, 1)] << "}{" <<
+               strings[simple_stack(i, 2)] << "}";
+        break;
+
+      case 6:
+      case 7:
+      case 8:
+      case 9:
+      case 12:
+        stream << "\\" << AcyclicGraph::get_print(simple_stack(i, 0))
+               << "{" << strings[simple_stack(i, 1)] << "}";
+        break;
+
+      case 10:
+        stream << "(" << strings[simple_stack(i, 1)] << ")^{(" <<
+               strings[simple_stack(i, 2)] << ")}";
+        break;
+
+      case 11:
+        stream << "|{" << strings[simple_stack(i, 1)] << "}|";
+        break;
+
+      default:
+        stream << "";
+        break;
+    }
+
+    temp = stream.str();
+    strings.push_back(temp);
+    stream.str(std::string());
+  }
+
+  return strings.back();
+}
+
+std::set<int> AcyclicGraph::utilized_commands() {
+  std::set<int> util;
+  util.insert(stack.rows() - 1);
 
   for (int i = stack.rows() - 1; i >= 0; --i) {
-    if (used_command[i]) {
-      for (std::size_t j = 0; j < oper_interface.operator_map[stack(i, 0)]
-           ->get_arity(); ++j) {
-        used_command[stack(i, j + 1)] = true;
-      }
+    if (stack(i, 0) > 1 && util.count(i) == 1) {
+      util.insert(stack(i, 1));
+      util.insert(stack(i, 2));
     }
   }
 
-  return used_command;
+  return util;
 }
+
+int AcyclicGraph::complexity() {
+  return simple_stack.rows();
+}
+
+std::string AcyclicGraph::print_stack() {
+  std::ostringstream out;
+  out << "---full stack---\n";
+
+  for (int i = 0; i < stack.rows(); ++i) {
+    out << std::left << std::setw(4) << i;
+    out << "<= ";
+
+    if (stack(i, 0) == 0)
+      out << AcyclicGraph::get_print(stack(i, 0))
+          << stack(i, 1) << std::endl;
+
+    else if (stack(i, 0) == 1) {
+      if (stack(i, 1) == -1) {
+        out << AcyclicGraph::get_print(stack(i, 0));
+
+      } else {
+        out << constants[stack(i, 1)];
+      }
+
+      out << std::endl;
+
+    } else {
+      out << "(" << stack(i, 1) << ") "
+          << AcyclicGraph::get_print(stack(i, 0))
+          << " (" << stack(i, 2) << ")\n";
+    }
+  }
+
+  out << "---small stack---\n";
+
+  for (int i = 0; i < simple_stack.rows(); ++i) {
+    out << std::left << std::setw(4) << i;
+    out << "<= ";
+
+    if (simple_stack(i, 0) == 0)
+      out << AcyclicGraph::get_print(simple_stack(i, 0))
+          << simple_stack(i, 1) << std::endl;
+
+    else if (simple_stack(i, 0) == 1) {
+      if (simple_stack(i, 1) == -1) {
+        out << AcyclicGraph::get_print(simple_stack(i, 0));
+
+      } else {
+        out << constants[simple_stack(i, 1)];
+      }
+
+      out << std::endl;
+
+    } else {
+      out << "(" << simple_stack(i, 1) << ") "
+          << AcyclicGraph::get_print(simple_stack(i, 0))
+          << " (" << simple_stack(i, 2) << ")\n";
+    }
+  }
+
+  return out.str();
+}
+
+bool AcyclicGraph::has_arity_two(int node) {
+  return is_arity_2_map[node];
+}
+
+bool AcyclicGraph::is_terminal(int node) {
+  return is_terminal_map[node];
+}
+
+const char *AcyclicGraph::get_print(int node) {
+  return stack_print_map[node];
+}
+} // namespace bingo 

@@ -10,51 +10,34 @@
 
 #include <stdio.h>
 #include <math.h>
-
 #include <iostream>
 
 #include "gtest/gtest.h"
-#include "BingoCpp/acyclic_graph.h"
 
+#include "BingoCpp/backend.h"
+#include "test_fixtures.h"
+
+using namespace bingo;
 namespace {
 
-class AcyclicGraphTest : public::testing::Test {
+class AGraphNodesTest: public::testing::Test {
  public:
   Eigen::ArrayX3i stack;
   Eigen::ArrayX3i stack2;
   Eigen::ArrayXXd x;
   Eigen::VectorXd constants;
 
-  AcyclicGraphTest(): stack(12, 3), x(3, 3), stack2(2, 3), constants(2) {
-  }
-
   void SetUp() {
-    // y = x_0 * ( C_0 + C_1/x_1 ) - x_0
-    stack << 0, 0, 0,
-          0, 1, 1,
-          1, 0, 0,
-          1, 1, 1,
-          5, 3, 1,
-          5, 3, 1,
-          2, 4, 2,
-          2, 4, 2,
-          4, 6, 0,
-          4, 5, 6,
-          3, 7, 6,
-          3, 8, 0;
-    // y = x_0 * x_0
-    stack2 << 0, 0, 0,
-           4, 0, 0;
-    x << 1., 4., 7., 2., 5., 8., 3., 6., 9.;
-    constants << 3.14, 10.0;
+    stack = testutils::stack_operators_0_to_5(); 
+    stack2 = testutils::stack_unary_operator(4);
+    x = testutils::one_to_nine_3_by_3();
+    constants = testutils::pi_ten_constants();
   }
 
-  void TearDown() {
-    // code here will be called just after the test completes
-  }
+  void TearDown() {}
 };
 
-TEST(AcyclicGraphNodesTest, XLoad) {
+TEST(AGraphNodesTest, XLoad) {
   Eigen::ArrayX3i stack(1, 3);
   Eigen::ArrayXXd x(3, 3);
   Eigen::VectorXd constants(2);
@@ -63,14 +46,14 @@ TEST(AcyclicGraphNodesTest, XLoad) {
   x << 7., 6., 9., 5., 11., 4., 3., 2., 1.;
   Eigen::ArrayXXd a_true(3, 1);
   a_true << 6., 11., 2.;
-  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test = evaluate(stack, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
   }
 }
 
-TEST(AcyclicGraphNodesTest, CLoad) {
+TEST(AGraphNodesTest, CLoad) {
   Eigen::ArrayX3i stack(1, 3);
   Eigen::ArrayXXd x(3, 3);
   Eigen::VectorXd constants(2);
@@ -78,14 +61,14 @@ TEST(AcyclicGraphNodesTest, CLoad) {
   constants << 3.0, 5.0;
   Eigen::ArrayXXd a_true(3, 1);
   a_true << 5., 5., 5.;
-  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test = evaluate(stack, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
   }
 }
 
-TEST(AcyclicGraphNodesTest, Addition) {
+TEST(AGraphNodesTest, Addition) {
   Eigen::ArrayX3i stack(3, 3);
   Eigen::ArrayX3i stack2(3, 3);
   Eigen::ArrayX3i stack3(2, 3);
@@ -110,20 +93,20 @@ TEST(AcyclicGraphNodesTest, Addition) {
   a_true_xx << 14., 12., 18.;
   Eigen::ArrayXXd a_true_cc(3, 1);
   a_true_cc << 6., 6., 6.;
-  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
-  Eigen::ArrayXXd test3 = Evaluate(stack3, x, constants);
-  Eigen::ArrayXXd test4 = Evaluate(stack4, x, constants);
+  Eigen::ArrayXXd test = evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test3 = evaluate(stack3, x, constants);
+  Eigen::ArrayXXd test4 = evaluate(stack4, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 1., 0., 0., 1., 0., 0., 1., 0., 0.;
   Eigen::ArrayXXd d_true_xx(3, 3);
   d_true_xx << 2., 0., 0., 2., 0., 0., 2., 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xc =
-    EvaluateWithDerivative(stack, x, constants);
+    evaluate_with_derivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_cx =
-    EvaluateWithDerivative(stack2, x, constants);
+    evaluate_with_derivative(stack2, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xx =
-    EvaluateWithDerivative(stack3, x, constants);
+    evaluate_with_derivative(stack3, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -135,6 +118,7 @@ TEST(AcyclicGraphNodesTest, Addition) {
     ASSERT_DOUBLE_EQ(d_xx.first(i), a_true_xx(i));
   }
 
+
   for (size_t i = 0; i < x.size(); ++i) {
     ASSERT_DOUBLE_EQ(d_xc.second(i), d_true(i));
     ASSERT_DOUBLE_EQ(d_cx.second(i), d_true(i));
@@ -142,7 +126,7 @@ TEST(AcyclicGraphNodesTest, Addition) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Subtraction) {
+TEST(AGraphNodesTest, Subtraction) {
   Eigen::ArrayX3i stack(3, 3);
   Eigen::ArrayX3i stack2(3, 3);
   Eigen::ArrayX3i stack3(2, 3);
@@ -167,10 +151,10 @@ TEST(AcyclicGraphNodesTest, Subtraction) {
   a_true2 << -4., -3., -6.;
   Eigen::ArrayXXd a_true_xx(3, 1);
   a_true_xx << 0., 0., 0.;
-  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
-  Eigen::ArrayXXd test3 = Evaluate(stack3, x, constants);
-  Eigen::ArrayXXd test4 = Evaluate(stack4, x, constants);
+  Eigen::ArrayXXd test = evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test3 = evaluate(stack3, x, constants);
+  Eigen::ArrayXXd test4 = evaluate(stack4, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 1., 0., 0., 1., 0., 0., 1., 0., 0.;
   Eigen::ArrayXXd d_true2(3, 3);
@@ -178,11 +162,11 @@ TEST(AcyclicGraphNodesTest, Subtraction) {
   Eigen::ArrayXXd d_true_xx(3, 3);
   d_true_xx << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xc =
-    EvaluateWithDerivative(stack, x, constants);
+    evaluate_with_derivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_cx =
-    EvaluateWithDerivative(stack2, x, constants);
+    evaluate_with_derivative(stack2, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xx =
-    EvaluateWithDerivative(stack3, x, constants);
+    evaluate_with_derivative(stack3, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -201,7 +185,7 @@ TEST(AcyclicGraphNodesTest, Subtraction) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Multiplication) {
+TEST(AGraphNodesTest, Multiplication) {
   Eigen::ArrayX3i stack(3, 3);
   Eigen::ArrayX3i stack2(3, 3);
   Eigen::ArrayX3i stack3(2, 3);
@@ -226,20 +210,20 @@ TEST(AcyclicGraphNodesTest, Multiplication) {
   a_true_xx << (7. * 7.), (6. * 6.), (9.* 9.);
   Eigen::ArrayXXd a_true_cc(3, 1);
   a_true_cc << 9., 9., 9.;
-  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
-  Eigen::ArrayXXd test3 = Evaluate(stack3, x, constants);
-  Eigen::ArrayXXd test4 = Evaluate(stack4, x, constants);
+  Eigen::ArrayXXd test = evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test3 = evaluate(stack3, x, constants);
+  Eigen::ArrayXXd test4 = evaluate(stack4, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 3., 0., 0., 3., 0., 0., 3., 0., 0.;
   Eigen::ArrayXXd d_true_xx(3, 3);
   d_true_xx << 14., 0., 0., 12., 0., 0., 18., 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xc =
-    EvaluateWithDerivative(stack, x, constants);
+    evaluate_with_derivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_cx =
-    EvaluateWithDerivative(stack2, x, constants);
+    evaluate_with_derivative(stack2, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xx =
-    EvaluateWithDerivative(stack3, x, constants);
+    evaluate_with_derivative(stack3, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -258,7 +242,7 @@ TEST(AcyclicGraphNodesTest, Multiplication) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Division) {
+TEST(AGraphNodesTest, Division) {
   Eigen::ArrayX3i stack(3, 3);
   Eigen::ArrayX3i stack2(3, 3);
   Eigen::ArrayX3i stack3(2, 3);
@@ -285,10 +269,10 @@ TEST(AcyclicGraphNodesTest, Division) {
   a_true_xx << 1., 1., 1.;
   Eigen::ArrayXXd a_true_cc(3, 1);
   a_true_cc << 1., 1., 1.;
-  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
-  Eigen::ArrayXXd test3 = Evaluate(stack3, x, constants);
-  Eigen::ArrayXXd test4 = Evaluate(stack4, x, constants);
+  Eigen::ArrayXXd test = evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test3 = evaluate(stack3, x, constants);
+  Eigen::ArrayXXd test4 = evaluate(stack4, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << (1. / 3.), 0., 0., (1. / 3.), 0., 0., (1. / 3.), 0., 0.;
   Eigen::ArrayXXd d_true2(3, 3);
@@ -298,11 +282,11 @@ TEST(AcyclicGraphNodesTest, Division) {
   Eigen::ArrayXXd d_true_xx(3, 3);
   d_true_xx << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xc =
-    EvaluateWithDerivative(stack, x, constants);
+    evaluate_with_derivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_cx =
-    EvaluateWithDerivative(stack2, x, constants);
+    evaluate_with_derivative(stack2, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xx =
-    EvaluateWithDerivative(stack3, x, constants);
+    evaluate_with_derivative(stack3, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -321,7 +305,7 @@ TEST(AcyclicGraphNodesTest, Division) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Sin) {
+TEST(AGraphNodesTest, Sin) {
   Eigen::ArrayX3i stack(2, 3);
   Eigen::ArrayX3i stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
@@ -336,8 +320,8 @@ TEST(AcyclicGraphNodesTest, Sin) {
   a_true << (sin(3.)), (sin(3.)), (sin(3.));
   Eigen::ArrayXXd a_true_x(3, 1);
   a_true_x << (sin(7.)), (sin(6.)), (sin(9.));
-  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test = evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   Eigen::ArrayXXd d_true_x(3, 3);
@@ -345,9 +329,9 @@ TEST(AcyclicGraphNodesTest, Sin) {
            (cos(6.)), 0., 0.,
            (cos(9.)), 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_c =
-    EvaluateWithDerivative(stack, x, constants);
+    evaluate_with_derivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_x =
-    EvaluateWithDerivative(stack2, x, constants);
+    evaluate_with_derivative(stack2, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -362,7 +346,7 @@ TEST(AcyclicGraphNodesTest, Sin) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Cos) {
+TEST(AGraphNodesTest, Cos) {
   Eigen::ArrayX3i stack(2, 3);
   Eigen::ArrayX3i stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
@@ -377,8 +361,8 @@ TEST(AcyclicGraphNodesTest, Cos) {
   a_true << (cos(3.)), (cos(3.)), (cos(3.));
   Eigen::ArrayXXd a_true_x(3, 1);
   a_true_x << (cos(7.)), (cos(6.)), (cos(9.));
-  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test = evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   Eigen::ArrayXXd d_true_x(3, 3);
@@ -386,9 +370,9 @@ TEST(AcyclicGraphNodesTest, Cos) {
            (-sin(6.)), 0., 0.,
            (-sin(9.)), 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_c =
-    EvaluateWithDerivative(stack, x, constants);
+    evaluate_with_derivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_x =
-    EvaluateWithDerivative(stack2, x, constants);
+    evaluate_with_derivative(stack2, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -403,7 +387,7 @@ TEST(AcyclicGraphNodesTest, Cos) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Exp) {
+TEST(AGraphNodesTest, Exp) {
   Eigen::ArrayX3i stack(2, 3);
   Eigen::ArrayX3i stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
@@ -418,8 +402,8 @@ TEST(AcyclicGraphNodesTest, Exp) {
   a_true << (exp(3.)), (exp(3.)), (exp(3.));
   Eigen::ArrayXXd a_true_x(3, 1);
   a_true_x << (exp(7.)), (exp(6.)), (exp(9.));
-  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test = evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   Eigen::ArrayXXd d_true_x(3, 3);
@@ -427,9 +411,9 @@ TEST(AcyclicGraphNodesTest, Exp) {
            (exp(6.)), 0., 0.,
            (exp(9.)), 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_c =
-    EvaluateWithDerivative(stack, x, constants);
+    evaluate_with_derivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_x =
-    EvaluateWithDerivative(stack2, x, constants);
+    evaluate_with_derivative(stack2, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -444,7 +428,7 @@ TEST(AcyclicGraphNodesTest, Exp) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Log) {
+TEST(AGraphNodesTest, Log) {
   Eigen::ArrayX3i stack(2, 3);
   Eigen::ArrayX3i stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
@@ -459,8 +443,8 @@ TEST(AcyclicGraphNodesTest, Log) {
   a_true << (log(abs(3.))), (log(abs(3.))), (log(abs(3.)));
   Eigen::ArrayXXd a_true_x(3, 1);
   a_true_x << (log(abs(7.))), (log(abs(6.))), (log(abs(9.)));
-  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test = evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   Eigen::ArrayXXd d_true_x(3, 3);
@@ -468,9 +452,9 @@ TEST(AcyclicGraphNodesTest, Log) {
            (1. / abs(6.)), 0., 0.,
            (1. / abs(9.)), 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_c =
-    EvaluateWithDerivative(stack, x, constants);
+    evaluate_with_derivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_x =
-    EvaluateWithDerivative(stack2, x, constants);
+    evaluate_with_derivative(stack2, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -485,7 +469,7 @@ TEST(AcyclicGraphNodesTest, Log) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Power) {
+TEST(AGraphNodesTest, Power) {
   Eigen::ArrayX3i stack(3, 3);
   Eigen::ArrayX3i stack2(3, 3);
   Eigen::ArrayX3i stack3(2, 3);
@@ -512,10 +496,10 @@ TEST(AcyclicGraphNodesTest, Power) {
   a_true_xx << (pow(7., 7.)), (pow(6., 6.)), (pow(9., 9.));
   Eigen::ArrayXXd a_true_cc(3, 1);
   a_true_cc << (pow(3., 3.)), (pow(3., 3.)), (pow(3., 3.));
-  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
-  Eigen::ArrayXXd test3 = Evaluate(stack3, x, constants);
-  Eigen::ArrayXXd test4 = Evaluate(stack4, x, constants);
+  Eigen::ArrayXXd test = evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test3 = evaluate(stack3, x, constants);
+  Eigen::ArrayXXd test4 = evaluate(stack4, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << (3. * pow(7., 2.)), 0., 0.,
          (3. * pow(6., 2.)), 0., 0.,
@@ -529,11 +513,11 @@ TEST(AcyclicGraphNodesTest, Power) {
             (pow(6., 6.) * (1 + log(6.))), 0., 0.,
             (pow(9., 9.) * (1 + log(9.))), 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xc =
-    EvaluateWithDerivative(stack, x, constants);
+    evaluate_with_derivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_cx =
-    EvaluateWithDerivative(stack2, x, constants);
+    evaluate_with_derivative(stack2, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xx =
-    EvaluateWithDerivative(stack3, x, constants);
+    evaluate_with_derivative(stack3, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -552,7 +536,7 @@ TEST(AcyclicGraphNodesTest, Power) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Absolute) {
+TEST(AGraphNodesTest, Absolute) {
   Eigen::ArrayX3i stack(2, 3);
   Eigen::ArrayX3i stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
@@ -567,16 +551,16 @@ TEST(AcyclicGraphNodesTest, Absolute) {
   a_true << 3., 3., 3.;
   Eigen::ArrayXXd a_true_x(3, 1);
   a_true_x << 7., 6., 9.;
-  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test = evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   Eigen::ArrayXXd d_true_x(3, 3);
   d_true_x << -1., 0., 0., 1., 0., 0., -1., 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_c =
-    EvaluateWithDerivative(stack, x, constants);
+    evaluate_with_derivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_x =
-    EvaluateWithDerivative(stack2, x, constants);
+    evaluate_with_derivative(stack2, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -591,7 +575,7 @@ TEST(AcyclicGraphNodesTest, Absolute) {
   }
 }
 
-TEST(AcyclicGraphNodesTest, Sqrt) {
+TEST(AGraphNodesTest, Sqrt) {
   Eigen::ArrayX3i stack(2, 3);
   Eigen::ArrayX3i stack2(2, 3);
   Eigen::ArrayXXd x(3, 3);
@@ -606,8 +590,8 @@ TEST(AcyclicGraphNodesTest, Sqrt) {
   a_true << (sqrt(abs(3.))), (sqrt(abs(3.))), (sqrt(abs(3.)));
   Eigen::ArrayXXd a_true_x(3, 1);
   a_true_x << (sqrt(abs(-7.))), (sqrt(abs(6.))), (sqrt(abs(-9.)));
-  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test = evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   Eigen::ArrayXXd d_true_x(3, 3);
@@ -615,9 +599,9 @@ TEST(AcyclicGraphNodesTest, Sqrt) {
            1. / (2.*sqrt(6.)), 0., 0.,
            -1. / (2.*sqrt(9.)), 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_c =
-    EvaluateWithDerivative(stack, x, constants);
+    evaluate_with_derivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_x =
-    EvaluateWithDerivative(stack2, x, constants);
+    evaluate_with_derivative(stack2, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -631,109 +615,6 @@ TEST(AcyclicGraphNodesTest, Sqrt) {
     ASSERT_DOUBLE_EQ(d_x.second(i), d_true_x(i));
   }
 }
-
-TEST_F(AcyclicGraphTest, evaluate) {
-  Eigen::ArrayXXd y = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd y_true = x.col(0) * (constants[0] + constants[1] / x.col(1))
-                           - x.col(0);
-
-  for (size_t i = 0; i < x.rows(); ++i) {
-    ASSERT_DOUBLE_EQ(y(i), y_true(i));
-  }
-}
-
-
-TEST_F(AcyclicGraphTest, derivative) {
-  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy =
-    EvaluateWithDerivative(stack, x, constants);
-  Eigen::ArrayXXd y_true = x.col(0) * (constants[0] + constants[1] / x.col(1))
-                           - x.col(0);
-  Eigen::ArrayXXd dy_true = Eigen::ArrayXXd::Zero(3, 3);
-  dy_true.col(0) = constants[0] + constants[1] / x.col(1) - 1.;
-  dy_true.col(1) = - x.col(0) * constants[1] / x.col(1) / x.col(1);
-
-  for (size_t i = 0; i < x.rows(); ++i) {
-    ASSERT_DOUBLE_EQ(y_and_dy.first(i), y_true(i));
-  }
-
-  for (size_t i = 0; i < x.size(); ++i) {
-    ASSERT_DOUBLE_EQ(y_and_dy.second(i), dy_true(i));
-  }
-}
-
-
-TEST_F(AcyclicGraphTest, maskevaluate) {
-  Eigen::ArrayXXd y = Evaluate(stack, x, constants);
-  Eigen::ArrayXXd y_simple = SimplifyAndEvaluate(stack, x, constants);
-
-  for (size_t i = 0; i < x.rows(); ++i) {
-    ASSERT_DOUBLE_EQ(y(i), y_simple(i));
-  }
-}
-
-
-TEST_F(AcyclicGraphTest, maskderivative) {
-  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy =
-    EvaluateWithDerivative(stack, x, constants);
-  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy_simple =
-    SimplifyAndEvaluateWithDerivative(stack, x, constants);
-
-  for (size_t i = 0; i < x.rows(); ++i) {
-    ASSERT_DOUBLE_EQ(y_and_dy.first(i), y_and_dy_simple.first(i));
-  }
-
-  for (size_t i = 0; i < x.size(); ++i) {
-    ASSERT_DOUBLE_EQ(y_and_dy.second(i), y_and_dy_simple.second(i));
-  }
-}
-
-
-// TEST_F(AcyclicGraphTest, simplify) {
-//   // shorter stack
-//   std::cout << "stack\n" << stack << std::endl;
-//   Eigen::ArrayX3i short_stack = SimplifyStack(stack);
-//   std::cout << "2\n";
-//   ASSERT_LE(short_stack.rows(), stack.rows());
-//   std::cout << "3\n";
-
-//   // equivalent evatuation
-//   Eigen::ArrayXXd y = Evaluate(stack, x, constants);
-//   std::cout << "4\n";
-//   Eigen::ArrayXXd simplified_y = Evaluate(short_stack, x, constants);
-//   std::cout << "5\n";
-
-//   for (size_t i = 0; i < x.rows(); ++i) {
-//     ASSERT_EQ(y(i), simplified_y(i));
-//   }
-// }
-
-
-TEST_F(AcyclicGraphTest, utilization) {
-  std::vector<bool> used_commands = FindUsedCommands(stack);
-  int num_used_commands = 0;
-
-  for (auto const& command_is_used : used_commands) {
-    if (command_is_used) {
-      ++num_used_commands;
-    }
-  }
-
-  ASSERT_EQ(num_used_commands, 8);
-}
-
-
-TEST_F(AcyclicGraphTest, squaredfunc) {
-  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy =
-    EvaluateWithDerivative(stack2, x, constants);
-  Eigen::ArrayXXd dy_true = Eigen::ArrayXXd::Zero(3, 3);
-  dy_true.col(0) = 2. * x.col(0);
-
-  for (size_t i = 0; i < x.size(); ++i) {
-    ASSERT_DOUBLE_EQ(y_and_dy.second(i), dy_true(i));
-  }
-}
-
-
 }  // namespace
 
 

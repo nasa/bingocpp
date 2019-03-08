@@ -14,6 +14,8 @@
 #include <Eigen/Core>
 #include "BingoCpp/utils.h"
 
+namespace bingo {
+
 ExplicitTrainingData::ExplicitTrainingData(Eigen::ArrayXXd vx,
     Eigen::ArrayXXd vy) {
   x = vx;
@@ -61,3 +63,4 @@ ImplicitTrainingData* ImplicitTrainingData:: get_item(std::list<int> items) {
   ImplicitTrainingData* temp = new ImplicitTrainingData(temp_x, temp_dx_dt);
   return temp;
 }
+} // namespace bingo

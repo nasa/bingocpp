@@ -1,5 +1,5 @@
 /*!
- * \file acyclic_graph.hh
+ * \file acyclic_graph.h
  *
  * \author Geoffrey F. Bomarito
  * \date
@@ -11,231 +11,139 @@
 #ifndef INCLUDE_BINGOCPP_ACYCLIC_GRAPH_H_
 #define INCLUDE_BINGOCPP_ACYCLIC_GRAPH_H_
 
+#include <set>
+
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
-#include <set>
-#include <utility>
-#include <vector>
+namespace bingo {
 
-
-typedef Eigen::Ref<Eigen::ArrayXXd,
-        0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ArrayByRef;
-
-
-// using EigenDStride = Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>;
-// template <typename MatrixType> using EigenDRef =
-//    Eigen::Ref<MatrixType, 0, EigenDStride>;
-
-/*!
- * \brief Identify whether a c++ backend is being used in python module.
+/*! \class AcyclicGraph
  *
+ *  Acyclic Graph representation of an equation.
  *
- * \return true, the backend is c++ (bool)
+ *  \note Operators include : X_Load, C_Load, Addition, Subtraction,
+ *        Multiplication, Division, sin, cos, exp, log, pow, abs, sqrt
+ *
+ *  \fn bool needs_optimization()
+ *  \fn void set_constants(Eigen::VectorXd con)
+ *  \fn int count_constants()
+ *  \fn Eigen::ArrayXXd evaluate(Eigen::ArrayXXd &eval_x)
+ *  \fn std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> evaluate_deriv(Eigen::ArrayXXd &eval_x)
+ *  \fn std::string latexstring()
+ *  \fn std::set<int> utilized_commands()
+ *  \fn int complexity()
+ *  \fn std::string print_stack()
  */
-bool IsCpp();
+class AcyclicGraph {
+ public:
+  //! Eigen::ArrayX3i stack
+  /*! stack representation of equation */
+  Eigen::ArrayX3i stack;
+  //! Eigen::ArrayX3i simple_stack
+  /*! stack simplified stack */
+  Eigen::ArrayX3i simple_stack;
+  //! Eigen::VectorXd constants
+  /*! vector to hold constants */
+  Eigen::VectorXd constants;
+  //! double fitness
+  /*! holds fitness for individual */
+  std::vector<double> fitness;
+  //! bool fit_set
+  /*! if the fitness is set */
+  bool fit_set;
+  //! bool needs_opt
+  /*! if the constants need optimization */
+  bool needs_opt;
+  //! int op_rate
+  /*! rate to determine when to optimize
+   *
+   * 0 - Default - no extra optimization
+   * 1 - Simplify stack inputs constants and sets needs optimization
+   * 2 - Same as 1, but during crossover, bring constants from parent to child
+   * 3 - Same as 1, but optimize every crossover
+   * 4 - Same as 1, but optimize every mutation
+   * 5 - Same as 1, but optimize every mutation and crossover
+   */
+  int opt_rate;
+  //! int genetic_age
+  /*! holds genetic age of individual */
+  int genetic_age;
 
-/*!
- * \brief Computes reverse autodiff partial of a stack command.
- *
- * The partial derivative of the result with respect to the command at the
- * specified location in the stack is evaluated.  This requires the addition of
- * all the dependencies of the command using the chain rule.  References can be
- * made in to the forward buffer and later reverse buffer values; all are
- * referenced by index.
- *
- * \note Addition of new operators must edit this segment.
- *
- * \param[in] stack Description of an acyclic graph in stack format.
- * \param[in] command_index Index of command in the stack; also the location of
- *                          the result to be placed in the reverse buffer.
- * \param[in] forward_buffer Vector of Eigen arrays for the forward buffer.
- * \param[in\out] forward_buffer Vector of Eigen arrays for the forward buffer.
- * \param[in] dependencies Vector of indices of the stack which depend on the
-                           specified command.
- *
- */
-void ReverseSingleCommand(const Eigen::ArrayX3i &stack,
-                          const int command_index,
-                          const std::vector<Eigen::ArrayXXd> &forward_buffer,
-                          std::vector<Eigen::ArrayXXd> &reverse_buffer,
-                          const std::set<int> &dependencies);
+  
+    
+  //! \brief Default constructor
+  AcyclicGraph();
+  //! \brief Copy constructor
+  AcyclicGraph(const AcyclicGraph &ag);
+  //! \brief Copies self (for pybind)
+  AcyclicGraph copy();
+  /*! \brief find out whether constants need optimization
+   *
+   *  \return true if stack needs optimization
+   */
+  bool needs_optimization();
+  /*! \brief set the constants
+   *
+   *  \param[in] con The constants to set. Eigen::VectorXd
+   */
+  void set_constants(Eigen::VectorXd con);
+  /*! \brief returns constants.size()
+   *
+   *  \return int the size of the constants vector
+   */
+  int count_constants();
+  /*! \brief replaces -1 in stack with location in constants vector
+   *
+   *  \return void
+   */
+  // void input_constants();
+  /*! \brief evaluate the compiled stack
+   *
+   *  \param[in] eval_x The x parameters. Eigen::ArrayXXd
+   *  \return Eigen::ArrayXXd of evaluated stack
+   */
+  Eigen::ArrayXXd evaluate(Eigen::ArrayXXd &eval_x);
+  /*! \brief evaluate the compiled stack
+   *
+   *  \param[in] eval_x The x parameters. Eigen::ArrayXXd
+   *  \return std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> of evaluated deriv stack
+   */
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>evaluate_with_const_deriv(
+    Eigen::ArrayXXd &eval_x);
+  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> evaluate_deriv(
+    Eigen::ArrayXXd &eval_x);
+  /*! \brief conversion to simplified latex string
+   *
+   *  \return the latexstring representation of the stack
+   */
+  std::string latexstring();
+  /*! \brief find which commands are utilized
+   *
+   *  \return std::set<int> with the numbers that are utilized
+   */
+  std::set<int> utilized_commands();
+  /*! \brief find number of commands that are utilized
+   *
+   *  \return int the complexity
+   */
+  int complexity();
+  /*! \brief string output
+   *
+   *  \return the string to display the stack
+   */
+  std::string print_stack();
 
+  static bool has_arity_two(int node);
+  static bool is_terminal(int node);
+  static const char *get_print(int node);
 
-/*!
- * \brief Evaluates a stack at the given x using the given constants.
- *
- * An acyclic graph is given in stack form.  The stack is evaluated command by
- * command putting the result of each command into a local buffer.  References
- * can be made in the stack to columns of the x input as well as constants; both
- * are referenced by index.
- *
- * \param[in] stack Description of an acyclic graph in stack format.
- * \param[in] x The input variables to the acyclic graph. (Eigen::ArrayXXd)
- * \param[in] constants Vector of the constants used in the stack.
- *
- * \return The value of the last command in the stack. (Eigen::ArrayXXd)
- */
-Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3i &stack,
-                         const Eigen::ArrayXXd &x,
-                         const Eigen::VectorXd &constants);
+ private:
+  static const bool is_arity_2_map[13]; 
+  static const bool is_terminal_map[13];
+  static const char *stack_print_map[13];
+};
 
-
-/*!
- * \brief Evaluates a stack, but only the commands that are utilized.
- *
- * An acyclic graph is given in stack form.  The stack is evaluated, but only
- * the commands which are utilized by the final result.
- *
- * \param[in] stack Description of an acyclic graph in stack format.
- * \param[in] x The input variables to the acyclic graph. (Eigen::ArrayXXd)
- * \param[in] constants Vector of the constants used in the stack.
- *
- * \return The value of the last command in the stack. (Eigen::ArrayXXd)
- */
-Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i &stack,
-                                    const Eigen::ArrayXXd &x,
-                                    const Eigen::VectorXd &constants);
-
-
-/*!
- * \brief Evaluates a stack at the given x using the given constants.
- *
- * An acyclic graph is given in stack form.  The stack is evaluated command by
- * command (but only the ones with a true value of the mask) putting the result
- * of each command into a local buffer.  References can be made in the satck to
- * columns of the x input as well as constants; both are referenced by index.
- *
- * \param[in] stack Description of an acyclic graph in stack format.
- * \param[in] x The input variables to the acyclic graph. (Eigen::ArrayXXd)
- * \param[in] constants Vector of the constants used in the stack.
- * \param[in] mask Vector of booleans detailing which commands are included.
- *
- * \return The value of the last command in the stack. (Eigen::ArrayXXd)
- */
-Eigen::ArrayXXd EvaluateWithMask(const Eigen::ArrayX3i &stack,
-                                 const Eigen::ArrayXXd &x,
-                                 const Eigen::VectorXd &constants,
-                                 const std::vector<bool> &mask);
-
-
-
-/*!
- * \brief Evaluates a stack and its derivative with the given x and constants.
- *
- * An acyclic graph is given in stack form.  The stack is evaluated command by
- * command putting the result of each command into a local buffer.  References
- * can be made in the stack to columns of the x input as well as constants; both
- * are referenced by index.  The stack is then processed in reverse to calculate
- * the gradient of the stack with respect to the chosen parameter.  This reverse 
- * processing is standard reverse auto-differentiation.
- *
- * \param[in] stack Description of an acyclic graph in stack format.
- * \param[in] x The input variables to the acyclic graph. (Eigen::ArrayXXd)
- * \param[in] constants Vector of the constants used in the stack.
- * \param[in] param_x_or_c true: x derivative, false: c derivative
- *
- * \return The value of the last command in the stack and the gradient.
- *         (std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>)
- */
-std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
-  const Eigen::ArrayX3i &stack,
-  const Eigen::ArrayXXd &x,
-  const Eigen::VectorXd &constants,
-  const bool param_x_or_c = true);
-
-
-
-/*!
- * \brief Evaluates a stack and its derivative, but only the utilized commands.
- *
- * An acyclic graph is given in stack form.  The stack is evaluated with its
- * derivative, but only the commands which are utilized by the final result.
- *
- * \param[in] stack Description of an acyclic graph in stack format.
- * \param[in] x The input variables to the acyclic graph. (Eigen::ArrayXXd)
- * \param[in] constants Vector of the constants used in the stack.
- * \param[in] param_x_or_c true: x derivative, false: c derivative
- *
- * \return The value of the last command in the stack and the gradient.
- *         (std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>)
- */
-std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> SimplifyAndEvaluateWithDerivative(
-  const Eigen::ArrayX3i &stack,
-  const Eigen::ArrayXXd &x,
-  const Eigen::VectorXd &constants,
-  const bool param_x_or_c = true);
-
-
-
-/*!
- * \brief Evaluates a stack and its derivative with the given x and constants.
- *
- * An acyclic graph is given in stack form.  The stack is evaluated command by
- * command (but only the ones with a true value of the mask) putting the result
- * of each command into a local buffer.  References can be made in the satck to
- * columns of the x input as well as constants; both are referenced by index.
- * The stack is then processed in reverse (again considering only the ones with
- * a true value of the mask) to calculate the gradient of the stack with respect
- * to to the chosen parameter.  This reverse processing is standard reverse 
- * auto-differentiation.
- *
- * \param[in] stack Description of an acyclic graph in stack format.
- * \param[in] x The input variables to the acyclic graph. (Eigen::ArrayXXd)
- * \param[in] constants Vector of the constants used in the stack.
- * \param[in] mask Vector of booleans detailing which commands are included.
- * \param[in] param_x_or_c true: x derivative, false: c derivative
- *
- * \return The value of the last command in the stack and the gradient.
- *         (std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>)
- */
-std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivativeAndMask(
-  const Eigen::ArrayX3i &stack,
-  const Eigen::ArrayXXd &x,
-  const Eigen::VectorXd &constants,
-  const std::vector<bool> &mask,
-  const bool param_x_or_c=true);
-
-
-
-/*!
- * \brief Prints a stack to std::cout.
- *
- * An acyclic graph is given in stack form.  The stack is printed to std::cout
- * command by command in the following format:
- * (stack_location) = operation : (parameters)
- *
- * \param[in] stack Description of an acyclic graph in stack format.
- */
-void PrintStack(const Eigen::ArrayX3i &stack);
-
-
-
-/*!
- * \brief Simplifies a stack.
- *
- * An acyclic graph is given in stack form.  The stack is first simplified to
- * consist only of the commands used by the last command.
- *
- * \param[in] stack Description of an acyclic graph in stack format.
- *
- * \return Simplified stack.
- */
-Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i &stack);
-
-
-
-/*!
- * \brief Finds which commands are utilized in a stack.
- *
- * An acyclic graph is given in stack form.  The stack is processed in reverse
- * to find which commands the last command depends.
- *
- * \param[in] stack Description of an acyclic graph in stack format.
- *
- * \return Vector describing which commands in the stack are used.
- */
-std::vector<bool> FindUsedCommands(const Eigen::ArrayX3i &stack);
-
+} // Namespace bingo
 #endif  // INCLUDE_BINGOCPP_ACYCLIC_GRAPH_H_
 

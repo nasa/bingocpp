@@ -18,7 +18,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
-
+namespace bingo {
 /*! \brief Calculate derivatves with respect to time (first dimension)
  *
  *   \param[in] x array in which derivatives will be calculated in the
@@ -92,5 +92,5 @@ Eigen::ArrayXXd savitzky_golay(Eigen::ArrayXXd y, int window_size,
                                int order, int deriv = 0);
 // Eigen::ArrayXXd savitzky_golay(Eigen::ArrayXXd y, int window_size,
 //                                     int order, int deriv=0, int rate=1);
-
+} // namespace  bingo 
 #endif

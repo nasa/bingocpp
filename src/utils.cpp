@@ -12,7 +12,7 @@
 #include <vector>
 #include <numeric>
 
-
+namespace bingo {
 std::vector<Eigen::ArrayXXd> calculate_partials(Eigen::ArrayXXd x) {
   std::vector<int> break_points;
   break_points.push_back(0);
@@ -167,4 +167,5 @@ Eigen::ArrayXXd savitzky_golay(Eigen::ArrayXXd y, int window_size, int order,
   }
 
   return f;
+}
 }

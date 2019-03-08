@@ -14,6 +14,8 @@
 #include <Eigen/Core>
 #include <unsupported/Eigen/NonLinearOptimization>
 
+namespace bingo {
+  
 int LMFunctor::operator()(const Eigen::VectorXd &x, Eigen::VectorXd &fvec) {
   agraphIndv.set_constants(x);
   fvec = fit->evaluate_fitness_vector(agraphIndv, *train);
@@ -117,3 +119,4 @@ Eigen::ArrayXXd ImplicitRegression::evaluate_fitness_vector(AcyclicGraph &indv,
   fit = dot.rowwise().sum() / dot.abs().rowwise().sum();
   return fit;
 }
+} // namespace bingo 
