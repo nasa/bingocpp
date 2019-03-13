@@ -9,15 +9,16 @@
  */
 
 #include "BingoCpp/utils.h"
+#include <vector>
 #include <numeric>
 
-
+namespace bingo {
 std::vector<Eigen::ArrayXXd> calculate_partials(Eigen::ArrayXXd x) {
   std::vector<int> break_points;
   break_points.push_back(0);
 
   for (int i = 0; i < x.rows(); ++i) {
-    if (isnan(x(i))) {
+    if (std::isnan(x(i))) {
       break_points.push_back(i);
     }
   }
@@ -166,4 +167,5 @@ Eigen::ArrayXXd savitzky_golay(Eigen::ArrayXXd y, int window_size, int order,
   }
 
   return f;
+}
 }

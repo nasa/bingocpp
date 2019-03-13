@@ -43,13 +43,13 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
-#include <Eigen/Dense>
-
 #include <iostream>
 #include <chrono>
 
+#include <Eigen/Dense>
+
 #include "BingoCpp/version.h"
-#include "BingoCpp/acyclic_graph.h"
+#include "BingoCpp/backend.h"
 
 
 int test_eig() {
@@ -113,7 +113,7 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
     t1 = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < num_evals; ++i) {
-      y = Evaluate(stack, x, constants);
+      y = bingo::evaluate(stack, x, constants);
     }
 
     t2 = std::chrono::high_resolution_clock::now();
@@ -122,7 +122,7 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
     t1 = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < num_evals; ++i) {
-      y = Evaluate(simple_stack, x, constants);
+      y = bingo::evaluate(simple_stack, x, constants);
     }
 
     t2 = std::chrono::high_resolution_clock::now();
@@ -131,7 +131,7 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
     t1 = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < num_evals; ++i) {
-      y_and_dy = EvaluateWithDerivative(stack, x, constants);
+      y_and_dy = bingo::evaluate_with_derivative(stack, x, constants);
     }
 
     t2 = std::chrono::high_resolution_clock::now();
@@ -140,7 +140,7 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
     t1 = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < num_evals; ++i) {
-      y_and_dy = EvaluateWithDerivative(simple_stack, x, constants);
+      y_and_dy = bingo::evaluate_with_derivative(simple_stack, x, constants);
     }
 
     t2 = std::chrono::high_resolution_clock::now();

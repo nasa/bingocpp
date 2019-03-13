@@ -15,6 +15,9 @@
 #include <vector>
 #include <list>
 
+
+namespace bingo {
+
 /*! \struct TrainingData
  *
  *  An abstract struct to hold the data for fitness calculations
@@ -81,6 +84,5 @@ struct ImplicitTrainingData : TrainingData {
     return x.rows();
   }
 };
-
-
+} // namespace bingo
 #endif
