@@ -176,18 +176,18 @@ int AcyclicGraph::count_constants() {
 // }
 
 Eigen::ArrayXXd AcyclicGraph::evaluate(Eigen::ArrayXXd &eval_x) {
-  return bingo::evaluate(simple_stack, eval_x, constants);
+  return backend::evaluate(simple_stack, eval_x, constants);
 }
 
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> AcyclicGraph::evaluate_deriv(
   Eigen::ArrayXXd &eval_x) {
-  return evaluate_with_derivative(simple_stack, eval_x, constants);
+  return backend::evaluateWithDerivative(simple_stack, eval_x, constants);
 }
 
 std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>
 AcyclicGraph::evaluate_with_const_deriv(
   Eigen::ArrayXXd &eval_x) {
-  return evaluate_with_derivative(simple_stack, eval_x, constants, false);
+  return backend::evaluateWithDerivative(simple_stack, eval_x, constants, false);
 }
 
 

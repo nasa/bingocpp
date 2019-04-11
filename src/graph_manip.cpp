@@ -97,7 +97,7 @@ void AcyclicGraphManipulator::simplify_stack(AcyclicGraph &indv) {
     for (std::set<int>::iterator it = util.begin(); it != util.end(); ++it) {
       reduced[*it] = i;
       temp(i, 0) = indv.stack(*it, 0);
-      int arity = get_arity(temp(i, 0));
+      int arity = backend::get_arity(temp(i, 0));
 
       if (arity == 0) {
         temp(i, 1) = indv.stack(*it, 1);

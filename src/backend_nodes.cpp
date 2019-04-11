@@ -1,7 +1,7 @@
-#include <iostream>
 #include "BingoCpp/backend_nodes.h"
 
 namespace bingo {
+namespace backend {
 namespace { 
 
 // Load x
@@ -11,6 +11,7 @@ Eigen::ArrayXXd loadx_forward_eval(int param1, int param2,
                                     std::vector<Eigen::ArrayXXd>& forward_eval) {
   return x.col(param1);
 }
+
 void loadx_reverse_eval(int reverse_index, int param1, int param2,
                         const std::vector<Eigen::ArrayXXd>& forward_eval,
                         std::vector<Eigen::ArrayXXd>& reverse_eval) {
@@ -24,6 +25,7 @@ Eigen::ArrayXXd loadc_forward_eval(int param1, int param2,
                                    std::vector<Eigen::ArrayXXd>& forward_eval) {
   return Eigen::ArrayXd::Constant(x.rows(), constants[param1]);
 }
+
 void loadc_reverse_eval(int reverse_index, int param1, int param2,
                         const std::vector<Eigen::ArrayXXd>& forward_eval,
                         std::vector<Eigen::ArrayXXd>& reverse_eval) {
@@ -37,6 +39,7 @@ Eigen::ArrayXXd add_forward_eval(int param1, int param2,
                                  std::vector<Eigen::ArrayXXd>& forward_eval) {
   return forward_eval[param1] + forward_eval[param2]; 
 } 
+
 void add_reverse_eval(int reverse_index, int param1, int param2, 
                       const std::vector<Eigen::ArrayXXd>& forward_eval, 
                       std::vector<Eigen::ArrayXXd>& reverse_eval) {
@@ -51,6 +54,7 @@ Eigen::ArrayXXd subtract_forward_eval(int param1, int param2,
                                       std::vector<Eigen::ArrayXXd>& forward_eval) {
   return forward_eval[param1] - forward_eval[param2]; 
 } 
+
 void subtract_reverse_eval(int reverse_index, int param1, int param2, 
                            const std::vector<Eigen::ArrayXXd>& forward_eval, 
                            std::vector<Eigen::ArrayXXd>& reverse_eval) {
@@ -65,6 +69,7 @@ Eigen::ArrayXXd multiply_forward_eval(int param1, int param2,
                                       std::vector<Eigen::ArrayXXd>& forward_eval) {
   return forward_eval[param1] * forward_eval[param2]; 
 } 
+
 void multiply_reverse_eval(int reverse_index, int param1, int param2, 
                            const std::vector<Eigen::ArrayXXd>& forward_eval, 
                            std::vector<Eigen::ArrayXXd>& reverse_eval) {
@@ -81,6 +86,7 @@ Eigen::ArrayXXd divide_forward_eval(int param1, int param2,
                                     std::vector<Eigen::ArrayXXd>& forward_eval) {
   return forward_eval[param1] / forward_eval[param2]; 
 } 
+
 void divide_reverse_eval(int reverse_index, int param1, int param2, 
                          const std::vector<Eigen::ArrayXXd>& forward_eval, 
                          std::vector<Eigen::ArrayXXd>& reverse_eval) {
@@ -97,7 +103,8 @@ Eigen::ArrayXXd sin_forward_eval(int param1, int param2,
                                  const Eigen::VectorXd& constants, 
                                  std::vector<Eigen::ArrayXXd>& forward_eval) {
   return forward_eval.at(param1).sin(); 
-} 
+}
+
 void sin_reverse_eval(int reverse_index, int param1, int param2, 
                       const std::vector<Eigen::ArrayXXd>& forward_eval, 
                       std::vector<Eigen::ArrayXXd>& reverse_eval) {
@@ -111,7 +118,8 @@ Eigen::ArrayXXd cos_forward_eval(int param1, int param2,
                                  const Eigen::VectorXd& constants, 
                                  std::vector<Eigen::ArrayXXd>& forward_eval) {
   return forward_eval[param1].cos(); 
-} 
+}
+
 void cos_reverse_eval(int reverse_index, int param1, int param2, 
                       const std::vector<Eigen::ArrayXXd>& forward_eval, 
                       std::vector<Eigen::ArrayXXd>& reverse_eval) {
@@ -126,6 +134,7 @@ Eigen::ArrayXXd exp_forward_eval(int param1, int param2,
                                  std::vector<Eigen::ArrayXXd>& forward_eval) {
   return forward_eval[param1].exp();
 }
+
 void exp_reverse_eval(int reverse_index, int param1, int param2, 
                       const std::vector<Eigen::ArrayXXd>& forward_eval, 
                       std::vector<Eigen::ArrayXXd>& reverse_eval) {
@@ -140,6 +149,7 @@ Eigen::ArrayXXd log_forward_eval(int param1, int param2,
                                  std::vector<Eigen::ArrayXXd>& forward_eval) {
   return forward_eval[param1].abs().log();
 }
+
 void log_reverse_eval(int reverse_index, int param1, int param2, 
                       const std::vector<Eigen::ArrayXXd>& forward_eval, 
                       std::vector<Eigen::ArrayXXd>& reverse_eval) {
@@ -154,6 +164,7 @@ Eigen::ArrayXXd pow_forward_eval(int param1, int param2,
                                  std::vector<Eigen::ArrayXXd>& forward_eval) {
   return forward_eval[param1].abs().pow(forward_eval[param2]);
 }
+
 void pow_reverse_eval(int reverse_index, int param1, int param2, 
                       const std::vector<Eigen::ArrayXXd>& forward_eval, 
                       std::vector<Eigen::ArrayXXd>& reverse_eval) {
@@ -173,6 +184,7 @@ Eigen::ArrayXXd abs_forward_eval(int param1, int param2,
                                  std::vector<Eigen::ArrayXXd>& forward_eval) {
   return forward_eval[param1].abs();
 }
+
 void abs_reverse_eval(int reverse_index, int param1, int param2, 
                       const std::vector<Eigen::ArrayXXd>& forward_eval, 
                       std::vector<Eigen::ArrayXXd>& reverse_eval) {
@@ -187,6 +199,7 @@ Eigen::ArrayXXd sqrt_forward_eval(int param1, int param2,
                                   std::vector<Eigen::ArrayXXd>& forward_eval) {
   return forward_eval[param1].abs().sqrt();
 }
+
 void sqrt_reverse_eval(int reverse_index, int param1, int param2, 
                        const std::vector<Eigen::ArrayXXd>& forward_eval, 
                        std::vector<Eigen::ArrayXXd>& reverse_eval) {
@@ -226,7 +239,7 @@ const std::vector<reverse_operator_function> reverse_eval_map {
   abs_reverse_eval,
   sqrt_reverse_eval
 };
-} //namespace
+} // namespace
 
 Eigen::ArrayXXd forward_eval_function(int node, int param1, int param2,
                                       const Eigen::ArrayXXd& x, 
@@ -240,4 +253,5 @@ void reverse_eval_function(int node, int reverse_index, int param1, int param2,
                            std::vector<Eigen::ArrayXXd>& reverse_eval) {
   reverse_eval_map.at(node)(reverse_index, param1, param2, forward_eval, reverse_eval);
 }
-} //backendnodes
+} // namespace backend
+} // namespace bingo

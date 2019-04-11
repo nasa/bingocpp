@@ -13,6 +13,7 @@ const int OP_2 = 2;
 const int BACKENDNODES = 1;
 
 namespace bingo {
+namespace backend {
 namespace {
 
 Eigen::ArrayXXd reverse_eval_with_mask(const std::pair<int, int>& deriv_shape,
@@ -92,7 +93,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> evaluate_with_derivative_and_mask(
 }
 } // namespace
 
-bool is_cpp() {
+bool isCpp() {
     return true;
 }
 
@@ -106,7 +107,7 @@ Eigen::ArrayXXd evaluate(const Eigen::ArrayX3i& stack,
   return forward_eval.back();  
 }
 
-std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> evaluate_with_derivative(
+std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> evaluateWithDerivative(
     const Eigen::ArrayX3i& stack,
     const Eigen::ArrayXXd& x,
     const Eigen::VectorXd& constants,
@@ -117,25 +118,25 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> evaluate_with_derivative(
     stack, x, constants, use_all_mask, param_x_or_c);
 }
 
-Eigen::ArrayXXd simplify_and_evaluate(const Eigen::ArrayX3i& stack,
+Eigen::ArrayXXd simplifyAndEvaluate(const Eigen::ArrayX3i& stack,
                                       const Eigen::ArrayXXd& x,
                                       const Eigen::VectorXd& constants) {
-  std::vector<bool> mask = get_utilized_commands(stack);
+  std::vector<bool> mask = getUtilizedCommands(stack);
   std::vector<Eigen::ArrayXXd> forward_eval = forward_eval_with_mask(
       stack, x, constants, mask);
   return forward_eval.back();
 }
 
-std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> simplify_and_evaluate_with_derivative(
+std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> simplifyAndEvaluateWithDerivative(
     const Eigen::ArrayX3i& stack,
     const Eigen::ArrayXXd& x,
     const Eigen::VectorXd& constants,
     const bool param_x_or_c) {
-  std::vector<bool> mask = get_utilized_commands(stack);
+  std::vector<bool> mask = getUtilizedCommands(stack);
   return evaluate_with_derivative_and_mask(stack, x, constants, mask, param_x_or_c);
 }
 
-std::vector<bool> get_utilized_commands(const Eigen::ArrayX3i& stack) {
+std::vector<bool> getUtilizedCommands(const Eigen::ArrayX3i& stack) {
   std::vector<bool> used_commands(stack.rows());
   used_commands.back() = true;
   int stack_size = stack.rows();
@@ -154,8 +155,8 @@ std::vector<bool> get_utilized_commands(const Eigen::ArrayX3i& stack) {
   return used_commands;
 }
 
-Eigen::ArrayX3i simplify_stack(const Eigen::ArrayX3i& stack) {
-  std::vector<bool> used_command = get_utilized_commands(stack);
+Eigen::ArrayX3i simplifyStack(const Eigen::ArrayX3i& stack) {
+  std::vector<bool> used_command = getUtilizedCommands(stack);
   std::map<int, int> reduced_param_map;
   Eigen::ArrayX3i new_stack(used_command.size(), 3);
 
@@ -175,4 +176,5 @@ int get_arity(int node) {
   if (AcyclicGraph::is_terminal(node)) return 0;
   return AcyclicGraph::has_arity_two(node) ? 2 : 1;
 }
+} // namespace backend
 } // namespace bingo 

@@ -9,13 +9,13 @@
 #include <Eigen/Core>
 
 namespace bingo {
-
+namespace backend{
 /*!
  * \brief Identify whether a c++ backend is being used in python module.
  *
  * \return true, the backend is c++ (bool)
  */
-bool is_cpp();
+bool isCpp();
 
 /*!
  * \brief Evaluates a stack at the given x using the given constants.
@@ -53,7 +53,7 @@ Eigen::ArrayXXd evaluate(const Eigen::ArrayX3i& stack,
  * \return The value of the last command in the stack and the gradient.
  *         (std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>)
  */
-std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> evaluate_with_derivative(
+std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> evaluateWithDerivative(
     const Eigen::ArrayX3i& stack,
     const Eigen::ArrayXXd& x,
     const Eigen::VectorXd& constants,
@@ -72,9 +72,9 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> evaluate_with_derivative(
  *
  * \return The value of the last command in the stack. (Eigen::ArrayXXd)
  */
-Eigen::ArrayXXd simplify_and_evaluate(const Eigen::ArrayX3i& stack,
-                                      const Eigen::ArrayXXd& x,
-                                      const Eigen::VectorXd& constants);
+Eigen::ArrayXXd simplifyAndEvaluate(const Eigen::ArrayX3i& stack,
+                                    const Eigen::ArrayXXd& x,
+                                    const Eigen::VectorXd& constants);
 
 
 /*!
@@ -90,7 +90,7 @@ Eigen::ArrayXXd simplify_and_evaluate(const Eigen::ArrayX3i& stack,
  *
  * \return The value of the last command in the stack and the gradient.
  */
-std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> simplify_and_evaluate_with_derivative(
+std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> simplifyAndEvaluateWithDerivative(
     const Eigen::ArrayX3i& stack,
     const Eigen::ArrayXXd& x,
     const Eigen::VectorXd& constants,
@@ -107,7 +107,7 @@ std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> simplify_and_evaluate_with_derivativ
  *
  * \return Simplified stack.
  */
-Eigen::ArrayX3i simplify_stack(const Eigen::ArrayX3i& stack);
+Eigen::ArrayX3i simplifyStack(const Eigen::ArrayX3i& stack);
 
 
 /*!
@@ -120,9 +120,10 @@ Eigen::ArrayX3i simplify_stack(const Eigen::ArrayX3i& stack);
  *
  * \return vector describing which commands in the stack are used.
  */
-std::vector<bool> get_utilized_commands(const Eigen::ArrayX3i& stack);
+std::vector<bool> getUtilizedCommands(const Eigen::ArrayX3i& stack);
 
 
 int get_arity(int node);
+} // namespace backend
 } // namespace bingo
 #endif  

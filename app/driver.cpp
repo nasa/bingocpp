@@ -113,7 +113,7 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
     t1 = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < num_evals; ++i) {
-      y = bingo::evaluate(stack, x, constants);
+      y = bingo::backend::evaluate(stack, x, constants);
     }
 
     t2 = std::chrono::high_resolution_clock::now();
@@ -122,7 +122,7 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
     t1 = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < num_evals; ++i) {
-      y = bingo::evaluate(simple_stack, x, constants);
+      y = bingo::backend::evaluate(simple_stack, x, constants);
     }
 
     t2 = std::chrono::high_resolution_clock::now();
@@ -131,7 +131,7 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
     t1 = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < num_evals; ++i) {
-      y_and_dy = bingo::evaluate_with_derivative(stack, x, constants);
+      y_and_dy = bingo::backend::evaluateWithDerivative(stack, x, constants);
     }
 
     t2 = std::chrono::high_resolution_clock::now();
@@ -140,7 +140,7 @@ void TestAcyclicGraph(int num_loops, int num_evals) {
     t1 = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < num_evals; ++i) {
-      y_and_dy = bingo::evaluate_with_derivative(simple_stack, x, constants);
+      y_and_dy = bingo::backend::evaluateWithDerivative(simple_stack, x, constants);
     }
 
     t2 = std::chrono::high_resolution_clock::now();

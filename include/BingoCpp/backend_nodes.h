@@ -6,6 +6,7 @@
 #include <Eigen/Dense>
 
 namespace bingo {
+namespace backend {
 
 typedef Eigen::ArrayXXd (
   *forward_operator_function)(
@@ -34,6 +35,7 @@ Eigen::ArrayXXd forward_eval_function(int node, int param1, int param2,
 void reverse_eval_function(int node, int reverse_index, int param1, int param2,
                            const std::vector<Eigen::ArrayXXd>& forward_eval,
                            std::vector<Eigen::ArrayXXd>& reverse_eval);
+}
 } // namespace bingo
 
 #endif

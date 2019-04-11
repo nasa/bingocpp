@@ -61,7 +61,6 @@ std::string print_string_with_args(const std::string& string,
 }
 
 namespace bingo {
-
 namespace {
 
 std::string get_formatted_element_string(const AGraph& individual,
@@ -155,7 +154,7 @@ bool AGraph::needsLocalOptimization() {
 }
 
 std::vector<bool> AGraph::getUtilizedCommands() const {
-  return backend::get_utilized_commands();
+  return backend::getUtilizedCommands(command_array_);
 }
 
 int AGraph::getNumberLocalOptimizationParams() const {}
