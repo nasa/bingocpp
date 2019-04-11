@@ -1,7 +1,11 @@
+#include <limits>
 #include <sstream>
+#include <stdexcept>
 
 #include <BingoCpp/agraph.h>
 #include <BingoCpp/backend.h>
+
+const double kNaN = std::numeric_limits<double>::quiet_NaN();
 
 const PrintMap kStackPrintMap {
   {2, "({}) + ({})"},
@@ -157,10 +161,32 @@ std::vector<bool> AGraph::getUtilizedCommands() const {
   return backend::getUtilizedCommands(command_array_);
 }
 
-int AGraph::getNumberLocalOptimizationParams() const {}
-void AGraph::setLocalOptimizationParams(Eigen::VectorXd params) {}
-Eigen::VectorXd AGraph::getLocalOptimizationParams() const {}
-Eigen::ArrayXXd AGraph::evaluateEquationAt(Eigen::ArrayXXd& x) {}
+int AGraph::getNumberLocalOptimizationParams() const {
+  return constants_.size();
+}
+
+void AGraph::setLocalOptimizationParams(Eigen::VectorXd params) {
+  constants_ = params;
+}
+
+Eigen::VectorXd AGraph::getLocalOptimizationParams() const {
+  return constants_;
+}
+
+Eigen::ArrayXXd AGraph::evaluateEquationAt(Eigen::ArrayXXd& x) {
+  Eigen::ArrayXXd f_of_x; 
+  try {
+    f_of_x = backend::evaluate(this->command_array_,
+                               x,
+                               this->constants_);
+    return f_of_x;
+  } catch (const std::underflow_error& ue) {
+    return Eigen::ArrayXXd::Constant(x.rows(), x.cols(), kNaN);
+  } catch (const std::overflow_error& oe) {
+    return Eigen::ArrayXXd::Constant(x.rows(), x.cols(), kNaN);
+  } 
+}
+
 EvalAndDerivative AGraph::evaluateEquationWithXGradientAt(Eigen::ArrayXXd& x) {}
 EvalAndDerivative AGraph::evaluateEquationWithLocalOptGradientAt(Eigen::ArrayXXd& x) {}
 
