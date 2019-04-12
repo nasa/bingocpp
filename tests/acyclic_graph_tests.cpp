@@ -24,7 +24,7 @@ using namespace bingo;
 
 namespace {
 
-class AGraphTest : public::testing::Test {
+class AcylicGraphTest : public::testing::Test {
  public:
   AcyclicGraph test_indv;
   Eigen::ArrayX3i test_stack;
@@ -53,7 +53,7 @@ class AGraphTest : public::testing::Test {
   void TearDown() {}
 };
 
-TEST_F(AGraphTest, utilized_commands) {
+TEST_F(AcylicGraphTest, utilized_commands) {
   std::set<int> x = test_indv.utilized_commands();
   std::set<int> x_true = {0, 1, 2, 3, 4, 6, 8, 11};
   std::set<int>::iterator it2 = x_true.begin();
@@ -63,7 +63,7 @@ TEST_F(AGraphTest, utilized_commands) {
   }
 }
 
-TEST_F(AGraphTest, copy) {
+TEST_F(AcylicGraphTest, copy) {
   AcyclicGraph indv2 = AcyclicGraph(test_indv);
 
   for (size_t i = 0; i < indv2.stack.rows(); ++i) {
@@ -73,11 +73,11 @@ TEST_F(AGraphTest, copy) {
   }
 }
 
-TEST_F(AGraphTest, needs_optimization) {
+TEST_F(AcylicGraphTest, needs_optimization) {
   EXPECT_FALSE(test_indv.needs_optimization());
 }
 
-TEST_F(AGraphTest, set_constants) {
+TEST_F(AcylicGraphTest, set_constants) {
   Eigen::VectorXd con(2);
   con << 12.0, 5.0;
   test_indv.set_constants(con);
@@ -87,11 +87,11 @@ TEST_F(AGraphTest, set_constants) {
   }
 }
 
-TEST_F(AGraphTest, count_constants) {
+TEST_F(AcylicGraphTest, count_constants) {
   ASSERT_EQ(test_indv.count_constants(), 2);
 }
 
-TEST_F(AGraphTest, evaluate) {
+TEST_F(AcylicGraphTest, evaluate) {
   std::vector<double> truth{4.64, 8.28, 11.42};
   Eigen::ArrayXXd eig = test_indv.evaluate(test_x_vals);
   for (int i = 0; i < 3; ++i) {
@@ -99,7 +99,7 @@ TEST_F(AGraphTest, evaluate) {
   }
 }
 
-TEST_F(AGraphTest, evaluate_deriv) {
+TEST_F(AcylicGraphTest, evaluate_deriv) {
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> p = 
     test_indv.evaluate_deriv(test_x_vals);
   ASSERT_NEAR(p.first(0), 4.64, .001);
@@ -110,16 +110,16 @@ TEST_F(AGraphTest, evaluate_deriv) {
   ASSERT_NEAR(p.second(2), 3.806, .001);
 }
 
-TEST_F(AGraphTest, latexstring) {
+TEST_F(AcylicGraphTest, latexstring) {
   std::string str_true = "(\\frac{10}{X_1} + 3.14)(X_0) - (X_0)";
   EXPECT_EQ(str_true, test_indv.latexstring());
 }
 
-TEST_F(AGraphTest, complexity) {
+TEST_F(AcylicGraphTest, complexity) {
   EXPECT_EQ(8, test_indv.complexity());
 }
 
-TEST_F(AGraphTest, print_stack) {
+TEST_F(AcylicGraphTest, print_stack) {
   std::ostringstream out;
   out << "---full stack---\n";
   out << 0 << "   <= X0\n";
@@ -147,7 +147,7 @@ TEST_F(AGraphTest, print_stack) {
 }
 } // namespace
 
-// TEST_F(AGraphTest, input_constants) {
+// TEST_F(AcylicGraphTest, input_constants) {
 //     Eigen::ArrayX3d stack(12,3);
 //     stack << 0, 0, 0,
 //               0, 1, 1,

@@ -111,17 +111,17 @@ class AGraphTest : public ::testing::TestWithParam<std::string> {
                        " + X_0 - (X_0))(X_0) }{ X_0 } } } } })^{ ("
                        "X_0) }| }"},
       {"console string", "sqrt(|(log(exp(cos(sin(((1.000000 + X_0 - (X_"
-                         "0))(X_0))/(X_0) )))))^(X_0)|)"},
+                         "0))(X_0))/(X_0))))))^(X_0)|)"},
       {"complexity", "13"}
     };
     GraphString sample_agraph_1_map {
       {"latex string", "sin{ X_0 + 1.000000 } + 1.000000"},
-      {"console string", "sin{ X_0 + 1.000000 } + 1.000000"},
+      {"console string", "sin(X_0 + 1.000000) + 1.000000"},
       {"complexity", "5"}
     };
     GraphString invalid_graph_map {
       {"latex string", "sin{ X_0 + ? } + ?"},
-      {"console string", "sin{ X_0 + ? } + ?"},
+      {"console string", "sin(X_0 + ?) + ?"},
       {"complexity", "5"}
     };
     return_val.insert({"all_funcs_graph", all_funcs_graph_map});
@@ -151,6 +151,20 @@ TEST_P(AGraphTest, latex_print) {
   std::string string_rep = map_to_graph_string.at(agraph_name).at("latex string");
   AGraph agraph = map_to_graph.at(agraph_name);
   ASSERT_STREQ(string_rep.c_str(), agraph.getLatexString().c_str());
+}
+
+TEST_P(AGraphTest, console_print) {
+  std::string agraph_name = GetParam();
+  std::string string_rep = map_to_graph_string.at(agraph_name).at("console string");
+  AGraph agraph = map_to_graph.at(agraph_name);
+  ASSERT_STREQ(string_rep.c_str(), agraph.getConsoleString().c_str());
+}
+
+TEST_P(AGraphTest, complexity_print) {
+  std::string agraph_name = GetParam();
+  int complexity_val = std::stoi(map_to_graph_string.at(agraph_name).at("complexity"));
+  AGraph agraph = map_to_graph.at(agraph_name);
+  ASSERT_EQ(complexity_val, agraph.getComplexity());
 }
 INSTANTIATE_TEST_CASE_P(,AGraphTest, ::testing::Values(
     "all_funcs_graph", "sample_agraph_1", "invalid_graph"));

@@ -69,6 +69,52 @@ std::string print_string_with_args(const std::string& string,
 
 namespace bingo {
 namespace {
+std::string get_stack_element_string(const AGraph& individual,
+                                     int command_index ) {
+  Eigen::ArrayX3i command_array = individual.getCommandArray();
+  int node = command_array(command_index, 0);
+  int param1 = command_array(command_index, 1);
+  int param2 = command_array(command_index, 2);
+
+  std::string temp_string;
+  if (node == 0) {
+    temp_string += "X_" + std::to_string(param1);
+  } else if (node == 1) {
+    if (param1 == -1 ||
+        param1 >= individual.getNumberLocalOptimizationParams()) {
+      temp_string += "C";
+    } else {
+      Eigen::VectorXd parameter = individual.getLocalOptimizationParams();
+      temp_string += "C_" + std::to_string(param1) + " = " + 
+                     std::to_string(parameter[param1]);
+    }
+  } else {
+    std::string param1_str = std::to_string(param1);
+    std::string param2_str = std::to_string(param2);
+    temp_string = print_string_with_args(kStackPrintMap.at(node),
+                                         param1_str,
+                                         param2_str);
+  }
+  temp_string += '\n';
+  return temp_string;
+}
+
+std::string get_stack_string(const AGraph& individual, const bool is_short=false) {
+  std::vector<bool> commands;
+  if (is_short) {
+    commands = individual.getUtilizedCommands();
+  } else {
+    commands.resize(individual.getCommandArray().rows());
+    std::fill(commands.begin(), commands.end(), 1);
+  }
+  std::string temp_string;
+  for (size_t i = 0; i < commands.size(); i++) {
+    if (commands[i]) {
+      temp_string += get_stack_element_string(individual, i);
+    }
+  }
+  return temp_string;
+}
 
 std::string get_formatted_element_string(const AGraph& individual,
                                          const int command_index,
@@ -112,7 +158,7 @@ std::string get_formatted_string_using(const AGraph& indvidual,
   }
   return string_list.back();
 }
-}
+} // namespace
 
 AGraph::AGraph() {
   command_array_ = Eigen::ArrayX3i(0, 3);
@@ -216,7 +262,7 @@ Eigen::ArrayXXd AGraph::evaluateEquationAt(Eigen::ArrayXXd& x) {
 EvalAndDerivative AGraph::evaluateEquationWithXGradientAt(Eigen::ArrayXXd& x) {}
 EvalAndDerivative AGraph::evaluateEquationWithLocalOptGradientAt(Eigen::ArrayXXd& x) {}
 
-std::ostream& operator<<(std::ostream& strm, AGraph& graph) {
+std::ostream& operator<<(std::ostream& strm, const AGraph& graph) {
   return strm << graph.getConsoleString();
 }
 
@@ -229,11 +275,20 @@ std::string AGraph::getConsoleString() const {
 }
 
 std::string AGraph::getStackString() const {
-  return "";
+  std::stringstream print_str; 
+  print_str << "---full stack---\n"
+            << get_stack_string(*this)
+            << "---small stack---"
+            << get_stack_string(*this, true); 
+  return print_str.str();
+  
 }
 
 int AGraph::getComplexity() const {
-  return 0;
+  std::vector<bool> commands = getUtilizedCommands();
+  return std::count_if (commands.begin(), commands.end(), [](bool i) {
+    return i;
+  });
 }
 
 const bool AGraph::kIsArity2Map[13] = {
