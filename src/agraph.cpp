@@ -1,4 +1,5 @@
 #include <limits>
+#include <iostream>
 #include <sstream>
 #include <stdexcept>
 
@@ -25,14 +26,14 @@ const PrintMap kLatexPrintMap {
   {2, "{} + {}"},
   {3, "{} - ({})"},
   {4, "({})({})"},
-  {5, "\\frac{{ {} }}{{ {} }}"},
-  {6, "\\sin{{ {} }}"},
-  {7, "\\cos{{ {} }}"},
-  {8, "\\exp{{ {} }}"},
-  {9, "\\log{{ {} }}"},
-  {10, "({})^{{ ({}) }}"},
+  {5, "\\frac{ {} }{ {} }"},
+  {6, "sin{ {} }"},
+  {7, "cos{ {} }"},
+  {8, "exp{ {} }"},
+  {9, "log{ {} }"},
+  {10, "({})^{ ({}) }"},
   {11, "|{}|"},
-  {12, "\\sqrt{{ {} }}"},
+  {12, "\\sqrt{ {} }"},
 };
 
 const PrintMap kConsolePrintMap {
@@ -57,6 +58,8 @@ std::string print_string_with_args(const std::string& string,
   for (auto character = string.begin(); character != string.end(); character++) {
     if (*character == '{' && *(character+1) == '}') {
       stream << ((!first_found) ? arg1 : arg2);
+      character++;
+      first_found = true;
     } else {
       stream << *character;
     }
@@ -78,10 +81,10 @@ std::string get_formatted_element_string(const AGraph& individual,
 
   std::string temp_string;
   if (node == 0) {
-    temp_string = "X" + std::to_string(param1);
+    temp_string = "X_" + std::to_string(param1);
   } else if (node == 1) {
     if (param1 == -1 ||
-        param1 > individual.getNumberLocalOptimizationParams()) {
+        param1 >= individual.getNumberLocalOptimizationParams()) {
       temp_string = "?";
     } else {
       Eigen::VectorXd parameter = individual.getLocalOptimizationParams();
@@ -104,6 +107,7 @@ std::string get_formatted_string_using(const AGraph& indvidual,
     if (utilized_rows[i]) {
       temp_string = get_formatted_element_string(indvidual, i, string_list,
                                                  format_map);
+      string_list.push_back(temp_string);
     }
   }
   return string_list.back();
@@ -115,6 +119,7 @@ AGraph::AGraph() {
   constants_ = Eigen::VectorXd(0);
   fitness_ = 1e9;
   fit_set_ = false;
+  genetic_age_ = 0;
 }
 
 AGraph::AGraph(const AGraph& agraph) {
@@ -122,6 +127,7 @@ AGraph::AGraph(const AGraph& agraph) {
   constants_ = agraph.getLocalOptimizationParams();
   fitness_ = agraph.getFitness();
   fit_set_ = agraph.isFitnessSet();
+  genetic_age_ = agraph.getGeneticAge();
 }
 
 AGraph AGraph::copy() {
@@ -144,6 +150,30 @@ void AGraph::notifyCommandArrayModificiation() {
   fit_set_ = false;
 }
 
+double AGraph::getFitness() const {
+  return fitness_;
+}
+
+void AGraph::setFitness(double fitness) {
+  fitness_ = fitness;
+}
+
+bool AGraph::isFitnessSet() const {
+  return fitness_;
+}
+
+void AGraph::setGeneticAge(const int age) {
+  genetic_age_ = age;
+}
+
+int AGraph::getGeneticAge() const {
+  return genetic_age_;
+}
+
+std::vector<bool> AGraph::getUtilizedCommands() const {
+  return backend::getUtilizedCommands(command_array_);
+}
+
 bool AGraph::needsLocalOptimization() {
   std::vector<bool> commands = this->getUtilizedCommands();
   for (size_t row = 0; row < commands.size(); row ++) {
@@ -155,10 +185,6 @@ bool AGraph::needsLocalOptimization() {
     }
   }
   return false;
-}
-
-std::vector<bool> AGraph::getUtilizedCommands() const {
-  return backend::getUtilizedCommands(command_array_);
 }
 
 int AGraph::getNumberLocalOptimizationParams() const {
@@ -195,7 +221,7 @@ std::ostream& operator<<(std::ostream& strm, AGraph& graph) {
 }
 
 std::string AGraph::getLatexString() const {
-  return "";
+  return get_formatted_string_using(*this, kLatexPrintMap);
 }
 
 std::string AGraph::getConsoleString() const {

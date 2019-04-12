@@ -21,6 +21,7 @@ class AGraph {
   Eigen::VectorXd constants_;
   double fitness_;
   bool fit_set_;
+  int genetic_age_;
   // To string operator when passed into stream
   friend std::ostream& operator<<(std::ostream&, const AGraph&);
   static const bool kIsArity2Map[13]; 
@@ -36,8 +37,10 @@ class AGraph {
   double getFitness() const;
   void setFitness(double fitness);
   bool isFitnessSet() const;
-  bool needsLocalOptimization();
+  void setGeneticAge(const int age);
+  int getGeneticAge() const;
   std::vector<bool> getUtilizedCommands() const;
+  bool needsLocalOptimization();
   int getNumberLocalOptimizationParams() const;
   void setLocalOptimizationParams(Eigen::VectorXd params);
   Eigen::VectorXd getLocalOptimizationParams() const;
