@@ -254,4 +254,23 @@ TEST_F(AGraphTest, evaluatWithCDerivative) {
   ASSERT_TRUE(testutils::almost_equal(sample_agraph_1_values.f_of_x, f_of_x));
   ASSERT_TRUE(testutils::almost_equal(sample_agraph_1_values.grad_c, df_dc));
 }
+
+TEST_F(AGraphTest, get_number_of_optimization_params) {
+  ASSERT_TRUE(invalid_graph.needsLocalOptimization());
+}
+
+TEST_F(AGraphTest, getNumberOfOptimizationParams) {
+  // ASSERT_EQ(invalid_graph.getNumberLocalOptimizationParams(), 1);
+}
+
+TEST_F(AGraphTest, setOptimizationParams) {
+  Eigen::VectorXd opt_params(1);
+  opt_params << 1.0;
+  invalid_graph.setLocalOptimizationParams(opt_params);
+  ASSERT_TRUE(!invalid_graph.needsLocalOptimization());
+  ASSERT_TRUE(testutils::almost_equal(
+    invalid_graph.evaluateEquationAt(sample_agraph_1_values.x),
+    sample_agraph_1.evaluateEquationAt(sample_agraph_1_values.x))
+  );
+}
 } // namespace

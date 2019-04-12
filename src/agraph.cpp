@@ -234,8 +234,9 @@ bool AGraph::needsLocalOptimization() {
   return false;
 }
 
+// TODO: fix with new update
 int AGraph::getNumberLocalOptimizationParams() const {
-  return constants_.size();
+  return constants_.size(); 
 }
 
 void AGraph::setLocalOptimizationParams(Eigen::VectorXd params) {
