@@ -1,6 +1,8 @@
 #ifndef BINGO_TEST_TESTING_UTILS_H_
 #define BINGO_TEST_TESTING_UTILS_H_
 
+#include <iostream>
+
 #include <Eigen/Dense>
 
 namespace testutils {
@@ -16,6 +18,12 @@ AGraphValues(Eigen::ArrayXXd &x, Eigen::VectorXd &c) :
 };
 
 namespace {
+
+inline void print_difference(const Eigen::ArrayXXd &array1,
+                             const Eigen::ArrayXXd& array2) {
+  std::cout << "  Actual: \n" << array1 << "\n";
+  std::cout << "Expected: \n" << array2 << "\n";
+}
   
 inline double difference(double val_1, double val_2) {
   if ((std::isnan(val_1) && std::isnan(val_2)) ||
@@ -28,7 +36,7 @@ inline double difference(double val_1, double val_2) {
 }
 
 inline bool non_comparable_matrices(const Eigen::ArrayXXd &array1,
-                              const Eigen::ArrayXXd &array2) {
+                                    const Eigen::ArrayXXd &array2) {
   int rows_array1 = array1.rows();
   int rows_array2 = array2.rows();
   int cols_array1 = array1.cols();
@@ -42,9 +50,12 @@ inline bool non_comparable_matrices(const Eigen::ArrayXXd &array1,
 }
 } // namespace
 
-inline bool almost_equal(const Eigen::ArrayXXd &array1, const Eigen::ArrayXXd &array2) {
-  if (non_comparable_matrices(array1, array2))
+inline bool almost_equal(const Eigen::ArrayXXd &array1,
+                         const Eigen::ArrayXXd &array2) {
+  if (non_comparable_matrices(array1, array2)) {
+    print_difference(array1, array2);
     return false;
+  }
 
   int rows_array1 = array1.rows();
   int cols_array1 = array1.cols();
@@ -54,8 +65,13 @@ inline bool almost_equal(const Eigen::ArrayXXd &array1, const Eigen::ArrayXXd &a
       matrix_diff(row, col) = difference(array1(row, col), array2(row, col));
     }
   }
+
   double frobenius_norm = matrix_diff.norm();
-  return (frobenius_norm < TESTING_TOL ? true : false);
+  bool equal = (frobenius_norm < TESTING_TOL ? true : false);
+  if (!equal) {
+    print_difference(array1, array2);
+  }
+  return equal;
 }
 
 inline AGraphValues init_agraph_vals(double begin, double end, int num_points) {
@@ -63,13 +79,14 @@ inline AGraphValues init_agraph_vals(double begin, double end, int num_points) {
   constants << 10, 3.14;
 
   Eigen::ArrayXXd x_vals(num_points, 2);
-  x_vals.col(0) = Eigen::ArrayXd::LinSpaced(num_points, begin, end);
-  x_vals.col(1) = Eigen::ArrayXd::LinSpaced(num_points, end, -begin);
+  x_vals.col(0) = Eigen::ArrayXd::LinSpaced(num_points, begin, 0);
+  x_vals.col(1) = Eigen::ArrayXd::LinSpaced(num_points, 0, end);
 
   return AGraphValues(x_vals, constants);
 }
 
-inline std::vector<Eigen::ArrayXXd> init_op_evals_x0(const AGraphValues &sample_agraph_1_values) {
+inline std::vector<Eigen::ArrayXXd> init_op_evals_x0(
+    const AGraphValues &sample_agraph_1_values) {
   Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals.col(0);
   double constant = sample_agraph_1_values.constants[0];
   Eigen::ArrayXXd c_0 = constant * Eigen::ArrayXd::Ones(x_0.rows());

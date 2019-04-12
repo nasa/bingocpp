@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <utility>
 
 #include <BingoCpp/agraph.h>
 #include <BingoCpp/backend.h>
@@ -76,7 +77,7 @@ std::string get_stack_element_string(const AGraph& individual,
   int param1 = command_array(command_index, 1);
   int param2 = command_array(command_index, 2);
 
-  std::string temp_string;
+  std::string temp_string = "("+ std::to_string(command_index) +") <= ";
   if (node == 0) {
     temp_string += "X_" + std::to_string(param1);
   } else if (node == 1) {
@@ -91,7 +92,7 @@ std::string get_stack_element_string(const AGraph& individual,
   } else {
     std::string param1_str = std::to_string(param1);
     std::string param2_str = std::to_string(param2);
-    temp_string = print_string_with_args(kStackPrintMap.at(node),
+    temp_string += print_string_with_args(kStackPrintMap.at(node),
                                          param1_str,
                                          param2_str);
   }
@@ -259,8 +260,40 @@ Eigen::ArrayXXd AGraph::evaluateEquationAt(Eigen::ArrayXXd& x) {
   } 
 }
 
-EvalAndDerivative AGraph::evaluateEquationWithXGradientAt(Eigen::ArrayXXd& x) {}
-EvalAndDerivative AGraph::evaluateEquationWithLocalOptGradientAt(Eigen::ArrayXXd& x) {}
+EvalAndDerivative AGraph::evaluateEquationWithXGradientAt(Eigen::ArrayXXd& x) {
+  EvalAndDerivative df_dx;
+  try {
+    df_dx = backend::evaluateWithDerivative(this->command_array_,
+                                            x,
+                                            this->constants_,
+                                            true);
+    return df_dx;
+  } catch (const std::underflow_error& ue) {
+    Eigen::ArrayXXd nan_array = Eigen::ArrayXXd::Constant(x.rows(), x.cols(), kNaN);
+    return std::make_pair(nan_array, nan_array);
+  } catch (const std::overflow_error& oe) {
+    Eigen::ArrayXXd nan_array = Eigen::ArrayXXd::Constant(x.rows(), x.cols(), kNaN);
+    return std::make_pair(nan_array, nan_array);
+  }
+}
+
+EvalAndDerivative AGraph::evaluateEquationWithLocalOptGradientAt(
+    Eigen::ArrayXXd& x) {
+  EvalAndDerivative df_dc;
+  try {
+    df_dc = backend::evaluateWithDerivative(this->command_array_,
+                                            x,
+                                            this->constants_,
+                                            false);
+    return df_dc;
+  } catch (const std::underflow_error& ue) {
+    Eigen::ArrayXXd nan_array = Eigen::ArrayXXd::Constant(x.rows(), x.cols(), kNaN);
+    return std::make_pair(nan_array, nan_array);
+  } catch (const std::overflow_error& oe) {
+    Eigen::ArrayXXd nan_array = Eigen::ArrayXXd::Constant(x.rows(), x.cols(), kNaN);
+    return std::make_pair(nan_array, nan_array);
+  }
+}
 
 std::ostream& operator<<(std::ostream& strm, const AGraph& graph) {
   return strm << graph.getConsoleString();
@@ -278,7 +311,7 @@ std::string AGraph::getStackString() const {
   std::stringstream print_str; 
   print_str << "---full stack---\n"
             << get_stack_string(*this)
-            << "---small stack---"
+            << "---small stack---\n"
             << get_stack_string(*this, true); 
   return print_str.str();
   
