@@ -23,11 +23,14 @@ struct AGraphTestVals {
   Eigen::ArrayXXd grad_c;
 
   AGraphTestVals() {}
-  AGraphTestVals(Eigen::ArrayXXd x_, Eigen::ArrayXXd f_of_x_, Eigen::ArrayXXd grad_x_,
-                 Eigen::ArrayXXd grad_c_) : x(x_),
-                                            f_of_x(f_of_x_),
-                                            grad_x(grad_x_),
-                                            grad_c(grad_c_) {}
+  AGraphTestVals(Eigen::ArrayXXd x_,
+                 Eigen::ArrayXXd f_of_x_,
+                 Eigen::ArrayXXd grad_x_,
+                 Eigen::ArrayXXd grad_c_) : 
+      x(x_),
+      f_of_x(f_of_x_),
+      grad_x(grad_x_),
+      grad_c(grad_c_) {}
 };
 
 class AGraphTest : public ::testing::TestWithParam<std::string> {
@@ -168,7 +171,7 @@ TEST_F(AGraphTest, copy) {
 
   ASSERT_EQ(agraph_copy.getGeneticAge(), 10);
   ASSERT_EQ(agraph_copy.getCommandArray()(1,1), 0);
-  ASSERT_DOUBLE_EQ(agraph_copy.getLocalOptimizationParams()(0), 1.0);
+  ASSERT_DOUBLE_EQ(agraph_copy.getLocalOptimizationParams()[0], 1.0);
 }
 
 TEST_P(AGraphTest, latex_print) {
@@ -191,6 +194,7 @@ TEST_P(AGraphTest, complexity_print) {
   AGraph agraph = map_to_graph.at(agraph_name);
   ASSERT_EQ(complexity_val, agraph.getComplexity());
 }
+
 INSTANTIATE_TEST_CASE_P(,AGraphTest, ::testing::Values(
     "all_funcs_graph", "sample_agraph_1", "invalid_graph"));
 
@@ -260,7 +264,7 @@ TEST_F(AGraphTest, get_number_of_optimization_params) {
 }
 
 TEST_F(AGraphTest, getNumberOfOptimizationParams) {
-  // ASSERT_EQ(invalid_graph.getNumberLocalOptimizationParams(), 1);
+  ASSERT_EQ(invalid_graph.getNumberLocalOptimizationParams(), 1);
 }
 
 TEST_F(AGraphTest, setOptimizationParams) {

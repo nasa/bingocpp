@@ -18,14 +18,25 @@ namespace bingo {
 class AGraph {
  private:
   Eigen::ArrayX3i command_array_;
+  Eigen::ArrayX3i short_command_array_;
   Eigen::VectorXd constants_;
+  bool needs_opt_;
+  int num_constants_;
   double fitness_;
   bool fit_set_;
   int genetic_age_;
+
   // To string operator when passed into stream
   friend std::ostream& operator<<(std::ostream&, const AGraph&);
   static const bool kIsArity2Map[13]; 
   static const bool kIsTerminalMap[13];
+
+  // Helper Functions
+  void process_modified_command_array();
+  void renumber_constants(const std::vector<bool>& utilized_commands);
+  void update_short_command_array(const std::vector<bool>& utilized_commands);
+  std::string get_stack_string(const bool is_short=false) const;
+  std::string get_formatted_string_using(const PrintMap& format_map) const;
 
  public:
   AGraph();
