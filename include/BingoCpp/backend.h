@@ -9,7 +9,6 @@
 #include <Eigen/Core>
 
 namespace bingo {
-
 /*!
  * \brief Identify whether a c++ backend is being used in python module.
  *
