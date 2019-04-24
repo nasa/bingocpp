@@ -147,6 +147,7 @@ AGraph::AGraph() {
   command_array_ = Eigen::ArrayX3i(0, 3);
   short_command_array_ = Eigen::ArrayX3i(0, 3);
   constants_ = Eigen::VectorXd(0);
+  needs_opt_ = false;
   fitness_ = 1e9;
   fit_set_ = false;
   genetic_age_ = 0;
@@ -156,6 +157,7 @@ AGraph::AGraph(const AGraph& agraph) {
   command_array_ = agraph.getCommandArray();
   short_command_array_ = Eigen::ArrayX3i(0, 3);
   constants_ = agraph.getLocalOptimizationParams();
+  needs_opt_ = agraph.needsLocalOptimization();
   fitness_ = agraph.getFitness();
   fit_set_ = agraph.isFitnessSet();
   genetic_age_ = agraph.getGeneticAge();
@@ -205,8 +207,7 @@ void AGraph::renumber_constants (const std::vector<bool>& utilized_commands) {
   num_constants_ = const_num;
 }
 
-void AGraph::update_short_command_array(
-    const std::vector<bool>& utilized_commands) {
+void AGraph::update_short_command_array(const std::vector<bool>& utilized_commands) {
   int stack_depth = std::count_if (
       utilized_commands.begin(), utilized_commands.end(), [](bool i) {
         return i;
@@ -233,6 +234,7 @@ void AGraph::update_short_command_array(
       command(0, 2) = inclusive_sum_scan[command(0, 2)] - 1;
     }
   }
+  // std::cout << "short command array\n" << short_command_array_ << std::endl;
 }
 
 double AGraph::getFitness() const {
@@ -259,7 +261,7 @@ std::vector<bool> AGraph::getUtilizedCommands() const {
   return backend::getUtilizedCommands(command_array_);
 }
 
-bool AGraph::needsLocalOptimization() {
+bool AGraph::needsLocalOptimization() const {
   return needs_opt_;
 }
 
@@ -365,12 +367,13 @@ std::string AGraph::getStackString() const {
 std::string AGraph::get_stack_string(const bool is_short) const {
   Eigen::ArrayX3i stack;
   if (is_short) {
-    stack = command_array_; 
+    stack = short_command_array_; 
   } else {
-    stack = short_command_array_;
+    stack = command_array_;
   }
   std::string temp_string;
   for (int i = 0; i < stack.rows(); i++) {
+    std::cout << i << std::endl;
     temp_string += get_stack_element_string(*this, i, stack.row(i));
   }
   return temp_string;

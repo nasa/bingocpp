@@ -212,7 +212,7 @@ TEST_F(AGraphTest, stack_print) {
                    "(1) <= C_0 = 1.000000\n"
                    "(2) <= (0) + (1)\n"
                    "(3) <= sin (2)\n"
-                   "(5) <= (3) + (1)\n";
+                   "(4) <= (3) + (1)\n";
   ASSERT_STREQ(expected_str.str().c_str(), sample_agraph_1.getStackString().c_str());
 }
 
@@ -230,7 +230,7 @@ TEST_F(AGraphTest, invalid_stack_print) {
                    "(1) <= C\n"
                    "(2) <= (0) + (1)\n"
                    "(3) <= sin (2)\n"
-                   "(5) <= (3) + (1)\n";
+                   "(4) <= (3) + (1)\n";
   ASSERT_STREQ(expected_str.str().c_str(), invalid_graph.getStackString().c_str());
 }
 

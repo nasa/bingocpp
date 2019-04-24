@@ -51,7 +51,7 @@ class AGraph {
   void setGeneticAge(const int age);
   int getGeneticAge() const;
   std::vector<bool> getUtilizedCommands() const;
-  bool needsLocalOptimization();
+  bool needsLocalOptimization() const;
   int getNumberLocalOptimizationParams() const;
   void setLocalOptimizationParams(Eigen::VectorXd params);
   Eigen::VectorXd getLocalOptimizationParams() const;
