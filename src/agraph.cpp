@@ -243,10 +243,11 @@ double AGraph::getFitness() const {
 
 void AGraph::setFitness(double fitness) {
   fitness_ = fitness;
+  fit_set_ = true;
 }
 
 bool AGraph::isFitnessSet() const {
-  return fitness_;
+  return fit_set_;
 }
 
 void AGraph::setGeneticAge(const int age) {

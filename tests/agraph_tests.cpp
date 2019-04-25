@@ -1,5 +1,6 @@
 #include <unordered_map>
 #include <string>
+#include <climits>
 
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
@@ -185,7 +186,9 @@ TEST_P(AGraphTest, console_print) {
   std::string agraph_name = GetParam();
   std::string string_rep = map_to_graph_string.at(agraph_name).at("console string");
   AGraph agraph = map_to_graph.at(agraph_name);
-  ASSERT_STREQ(string_rep.c_str(), agraph.getConsoleString().c_str());
+  std::stringstream ss;
+  ss << agraph;
+  ASSERT_STREQ(string_rep.c_str(), ss.str().c_str());
 }
 
 TEST_P(AGraphTest, complexity_print) {
@@ -271,10 +274,65 @@ TEST_F(AGraphTest, setOptimizationParams) {
   Eigen::VectorXd opt_params(1);
   opt_params << 1.0;
   invalid_graph.setLocalOptimizationParams(opt_params);
-  ASSERT_TRUE(!invalid_graph.needsLocalOptimization());
+  ASSERT_FALSE(invalid_graph.needsLocalOptimization());
   ASSERT_TRUE(testutils::almost_equal(
     invalid_graph.evaluateEquationAt(sample_agraph_1_values.x),
     sample_agraph_1.evaluateEquationAt(sample_agraph_1_values.x))
   );
 }
+
+TEST_F(AGraphTest, setting_fitness_updates_fit_set) {
+  AGraph new_graph = AGraph();
+  ASSERT_FALSE(new_graph.isFitnessSet());
+  new_graph.setFitness(2.0);
+  ASSERT_TRUE(new_graph.isFitnessSet());
+}
+
+TEST_F(AGraphTest, notify_command_array_mod) {
+  ASSERT_TRUE(sample_agraph_1.isFitnessSet());
+  sample_agraph_1.notifyCommandArrayModificiation();
+  ASSERT_FALSE(sample_agraph_1.isFitnessSet());
+}
+
+TEST_F(AGraphTest, setting_command_array_unsets_fitness) {
+  ASSERT_TRUE(sample_agraph_1.isFitnessSet());
+  sample_agraph_1.setCommandArray(Eigen::ArrayX3i::Ones(1, 3));
+  ASSERT_FALSE(sample_agraph_1.isFitnessSet());
+}
+
+// class AGraphExceptionTest : public ::testing::Test {
+//  public:
+//   AGraph x_squared;
+//   Eigen::ArrayXXd large_x;
+
+//   void SetUp() {
+//     x_squared = init_exception_graph();
+//     large_x = init_large_x_vals();
+//   }
+
+//   void TearDown() {}
+
+//   AGraph init_exception_graph() {
+//     Eigen::ArrayX3i command_array(2, 3);
+//     command_array << 0, 0, 0,
+//                      4, 0, 0;
+//     AGraph test_stack = AGraph();
+//     test_stack.setCommandArray(command_array);
+//     return test_stack;
+//   }
+
+//   Eigen::ArrayXXd init_large_x_vals() {
+//     int num_points = 100;
+//     double begin = 2;
+//     double end = 12;
+//     Eigen::ArrayXXd result(num_points, 1);
+//     result = Eigen::ArrayXd::LinSpaced(num_points, begin, end);
+//     return result;
+//   }
+// };
+
+// TEST_F(AGraphExceptionTest, evaluate_overflow_returns_nan_array) {
+//   std::cout << large_x << std::endl;
+//   Eigen::ArrayXXd return_vals = x_squared.evaluateEquationAt(large_x);
+// }
 } // namespace
