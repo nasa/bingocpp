@@ -4,7 +4,8 @@
 #include <Eigen/Dense>
 #include <gtest/gtest.h>
 
-#include "BingoCpp/backend.h"
+#include <BingoCpp/backend.h>
+
 #include "testing_utils.h"
 #include "test_fixtures.h"
 
@@ -12,7 +13,16 @@ using namespace bingo;
 using namespace backend;
 
 namespace {
+
 const int N_OPS = 13;
+
+struct AGraphValues {
+Eigen::ArrayXXd x_vals;
+Eigen::VectorXd constants;
+AGraphValues() {}
+AGraphValues(Eigen::ArrayXXd& x, Eigen::VectorXd& c) : 
+  x_vals(x), constants(c) {}
+};
 
 class AGraphBackend : public ::testing::TestWithParam<int> {
  public:
@@ -21,7 +31,7 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
   const double AGRAPH_VAL_END = 0;
   const int N_AGRAPH_VAL = 11;
 
-  testutils::AGraphValues sample_agraph_1_values;
+  AGraphValues sample_agraph_1_values;
   std::vector<Eigen::ArrayXXd> operator_evals_x0;
   std::vector<Eigen::ArrayXXd> operator_x_derivs;
   std::vector<Eigen::ArrayXXd> operator_c_derivs;
@@ -32,12 +42,12 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
   Eigen::ArrayXd constants;
 
   virtual void SetUp() {
-    sample_agraph_1_values = testutils::init_agraph_vals(AGRAPH_VAL_START,
-                                                         AGRAPH_VAL_END,
-                                                         N_AGRAPH_VAL);
-    operator_evals_x0 = testutils::init_op_evals_x0(sample_agraph_1_values);
-    operator_x_derivs = testutils::init_op_x_derivs(sample_agraph_1_values);
-    operator_c_derivs = testutils::init_op_c_derivs(sample_agraph_1_values);
+    sample_agraph_1_values = init_agraph_vals(AGRAPH_VAL_START,
+                                              AGRAPH_VAL_END,
+                                              N_AGRAPH_VAL);           
+    operator_evals_x0 = init_op_evals_x0(sample_agraph_1_values);
+    operator_x_derivs = init_op_x_derivs(sample_agraph_1_values);
+    operator_c_derivs = init_op_c_derivs(sample_agraph_1_values);
 
     simple_stack = testutils::stack_operators_0_to_5(); 
     simple_stack2 = testutils::stack_unary_operator(4);
@@ -45,6 +55,94 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
     constants = testutils::pi_ten_constants();
   }
   virtual void TearDown() {}
+
+ AGraphValues init_agraph_vals(double begin, double end, int num_points) {
+  Eigen::VectorXd constants = Eigen::VectorXd(2);
+  constants << 10, 3.14;
+
+  Eigen::ArrayXXd x_vals(num_points, 2);
+  x_vals.col(0) = Eigen::ArrayXd::LinSpaced(num_points, begin, 0);
+  x_vals.col(1) = Eigen::ArrayXd::LinSpaced(num_points, 0, end);
+
+  return AGraphValues(x_vals, constants);
+}
+
+std::vector<Eigen::ArrayXXd> init_op_evals_x0(
+    const AGraphValues& sample_agraph_1_values) {
+  Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals.col(0);
+  double constant = sample_agraph_1_values.constants[0];
+  Eigen::ArrayXXd c_0 = constant * Eigen::ArrayXd::Ones(x_0.rows());
+
+  std::vector<Eigen::ArrayXXd> op_evals_x0 = std::vector<Eigen::ArrayXXd>();
+  op_evals_x0.push_back(x_0);
+  op_evals_x0.push_back(c_0);
+  op_evals_x0.push_back(x_0+x_0);
+  op_evals_x0.push_back(x_0-x_0);
+  op_evals_x0.push_back(x_0*x_0);
+  op_evals_x0.push_back(x_0/x_0);
+  op_evals_x0.push_back(x_0.sin());
+  op_evals_x0.push_back(x_0.cos());
+  op_evals_x0.push_back(x_0.exp());
+  op_evals_x0.push_back(x_0.abs().log());
+  op_evals_x0.push_back(x_0.abs().pow(x_0));
+  op_evals_x0.push_back(x_0.abs());
+  op_evals_x0.push_back(x_0.abs().sqrt());
+
+  return op_evals_x0;
+}
+
+std::vector<Eigen::ArrayXXd> init_op_x_derivs(
+    const AGraphValues& sample_agraph_1_values) {
+  Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals.col(0);
+  std::vector<Eigen::ArrayXXd> op_x_derivs = std::vector<Eigen::ArrayXXd>();
+  int size = x_0.rows();
+
+  auto last_nan = [](Eigen::ArrayXXd array) {
+    array(array.rows() - 1, array.cols() -1) = std::nan("1");
+    Eigen::ArrayXXd modified_array = array;
+    return modified_array;
+  };
+  op_x_derivs.push_back(Eigen::ArrayXd::Ones(size));
+  op_x_derivs.push_back(Eigen::ArrayXd::Zero(size));
+  op_x_derivs.push_back(2.0  * Eigen::ArrayXd::Ones(size));
+  op_x_derivs.push_back(Eigen::ArrayXd::Zero(size));
+  op_x_derivs.push_back(2.0 * x_0);
+  op_x_derivs.push_back(last_nan(Eigen::ArrayXd::Zero(size)));
+  op_x_derivs.push_back(x_0.cos());
+  op_x_derivs.push_back(-x_0.sin());
+  op_x_derivs.push_back(x_0.exp());
+  op_x_derivs.push_back(1.0 / x_0);
+  op_x_derivs.push_back(last_nan(x_0.abs().pow(x_0)*(x_0.abs().log()
+                        + Eigen::ArrayXd::Ones(size))));
+  op_x_derivs.push_back(x_0.sign());
+  op_x_derivs.push_back(0.5 * x_0.sign() / x_0.abs().sqrt());
+
+  return op_x_derivs;
+}
+
+std::vector<Eigen::ArrayXXd> init_op_c_derivs(
+    const AGraphValues& sample_agraph_1_values) {
+  int size = sample_agraph_1_values.x_vals.rows();
+  Eigen::ArrayXXd c_1 = sample_agraph_1_values.constants[1] * Eigen::ArrayXd::Ones(size);
+  std::vector<Eigen::ArrayXXd> op_c_derivs = std::vector<Eigen::ArrayXXd>();
+
+  op_c_derivs.push_back(Eigen::ArrayXd::Zero(size));
+  op_c_derivs.push_back(Eigen::ArrayXd::Ones(size));
+  op_c_derivs.push_back(2.0  * Eigen::ArrayXd::Ones(size));
+  op_c_derivs.push_back(Eigen::ArrayXd::Zero(size));
+  op_c_derivs.push_back(2.0 * c_1);
+  op_c_derivs.push_back((Eigen::ArrayXd::Zero(size)));
+  op_c_derivs.push_back(c_1.cos());
+  op_c_derivs.push_back(-c_1.sin());
+  op_c_derivs.push_back(c_1.exp());
+  op_c_derivs.push_back(1.0 / c_1);
+  op_c_derivs.push_back(c_1.abs().pow(c_1)*(c_1.abs().log()
+                        + Eigen::ArrayXd::Ones(size)));
+  op_c_derivs.push_back(c_1.sign());
+  op_c_derivs.push_back(0.5 * c_1.sign() / c_1.abs().sqrt());
+
+  return op_c_derivs;
+}
 };
 
 TEST_P(AGraphBackend, simplify_and_evaluate) {
@@ -110,7 +208,6 @@ TEST_P(AGraphBackend, simplify_and_evaluate_c_deriv) {
   ASSERT_TRUE(testutils::almost_equal(expected_derivative, df_dc));
 }
 INSTANTIATE_TEST_CASE_P(,AGraphBackend, ::testing::Range(0, N_OPS, 1));
-
 
 TEST_F(AGraphBackend, evaluate) {
   Eigen::ArrayXXd y = evaluate(simple_stack, x, constants);

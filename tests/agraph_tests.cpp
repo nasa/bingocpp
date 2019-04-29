@@ -8,6 +8,7 @@
 #include <BingoCpp/agraph.h>
 #include <BingoCpp/backend.h>
 
+#include "test_fixtures.h"
 #include "testing_utils.h"
 
 using namespace bingo;
@@ -44,7 +45,7 @@ class AGraphTest : public ::testing::TestWithParam<std::string> {
   AGraphTestVals sample_agraph_1_values;
 
   void SetUp() {
-    sample_agraph_1 = init_sample_agraph_1();
+    sample_agraph_1 = testutils::init_sample_agraph_1();
     invalid_graph = init_invalid_graph(sample_agraph_1);
     all_funcs_graph = init_all_funcs_graph();
     map_to_graph_string = init_hash_map();
@@ -65,48 +66,15 @@ class AGraphTest : public ::testing::TestWithParam<std::string> {
   }
 
   AGraphTestVals init_sample_agraph_1_values() {
-    Eigen::ArrayXXd x = testutils::init_agraph_vals(-1, 1, 11).x_vals;
+    int num_points = 11;
+    Eigen::ArrayXXd x(num_points, 2);
+    x.col(0) = Eigen::ArrayXd::LinSpaced(num_points, -1, 0);
+    x.col(1) = Eigen::ArrayXd::LinSpaced(num_points, 0, 1);
     Eigen::ArrayXXd f_of_x = (x + 1.0).sin() + 1.0;
     Eigen::ArrayXXd grad_x = Eigen::ArrayXXd::Zero(x.rows(), x.cols());
     grad_x.col(0) = (x + 1.0).cos();
     Eigen::ArrayXXd grad_c = (x + 1.0).cos() + 1.0;
     return AGraphTestVals(x, f_of_x.col(0), grad_x, grad_c.col(0));
-  }
-  
-  AGraph init_sample_agraph_1() {
-    AGraph test_graph = AGraph();
-    Eigen::ArrayX3i test_command_array(6, 3);
-    test_command_array << 0, 0, 0,
-                          1, 0, 0,
-                          2, 0, 1,
-                          6, 2, 2,
-                          2, 0, 1,
-                          2, 3, 1;
-    test_graph.setCommandArray(test_command_array);
-    test_graph.setGeneticAge(10);
-    Eigen::VectorXd local_opt_params(1);
-    local_opt_params << 1.0;
-    test_graph.setLocalOptimizationParams(local_opt_params);
-    test_graph.setFitness(1);
-    return test_graph;
-  }
-
-  AGraph init_sample_agraph_2() {
-    AGraph test_graph = AGraph();
-    Eigen::ArrayX3i test_command_array(6, 3);
-    test_command_array << 0, 1, 3,
-                          1, 1, 2,
-                          3, 1, 1,
-                          4, 0, 2,
-                          2, 0, 1,
-                          6, 3, 0;
-    test_graph.setCommandArray(test_command_array);
-    test_graph.setGeneticAge(20);
-    Eigen::VectorXd local_opt_params(2);
-    local_opt_params << 1.0, 1.0;
-    test_graph.setLocalOptimizationParams(local_opt_params);
-    test_graph.setFitness(2);
-    return test_graph;
   }
 
   AGraph init_all_funcs_graph() {

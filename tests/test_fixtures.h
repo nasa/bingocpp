@@ -1,9 +1,10 @@
 #ifndef BINGO_TESTS_TEST_FIXTURES_H_
 #define BINGO_TESTS_TEST_FIXTURES_H_
 
+#include <BingoCpp/agraph.h>
+#include <BingoCpp/graph_manip.h>
+
 #include "testing_utils.h"
-#include "BingoCpp/acyclic_graph.h"
-#include "BingoCpp/graph_manip.h"
 
 namespace testutils {
 
@@ -53,5 +54,40 @@ inline Eigen::VectorXd pi_ten_constants() {
   return constants;
 } 
 
+inline bingo::AGraph init_sample_agraph_1() {
+  bingo::AGraph test_graph = bingo::AGraph();
+  Eigen::ArrayX3i test_command_array(6, 3);
+  test_command_array << 0, 0, 0,
+                        1, 0, 0,
+                        2, 0, 1,
+                        6, 2, 2,
+                        2, 0, 1,
+                        2, 3, 1;
+  test_graph.setCommandArray(test_command_array);
+  test_graph.setGeneticAge(10);
+  Eigen::VectorXd local_opt_params(1);
+  local_opt_params << 1.0;
+  test_graph.setLocalOptimizationParams(local_opt_params);
+  test_graph.setFitness(1);
+  return test_graph;
+}
+
+inline bingo::AGraph init_sample_agraph_2() {
+  bingo::AGraph test_graph = bingo::AGraph();
+  Eigen::ArrayX3i test_command_array(6, 3);
+  test_command_array << 0, 1, 3,
+                        1, 1, 2,
+                        3, 1, 1,
+                        4, 0, 2,
+                        2, 0, 1,
+                        6, 3, 0;
+  test_graph.setCommandArray(test_command_array);
+  test_graph.setGeneticAge(20);
+  Eigen::VectorXd local_opt_params(2);
+  local_opt_params << 1.0, 1.0;
+  test_graph.setLocalOptimizationParams(local_opt_params);
+  test_graph.setFitness(2);
+  return test_graph;
+}
 } // namespace testutils
 #endif //BINGO_TESTS_TEST_FIXTURES_H_
