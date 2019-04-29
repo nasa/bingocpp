@@ -71,6 +71,8 @@ PYBIND11_MODULE(bingocpp, m) {
   m.def("get_utilized_commands",
         &backend::getUtilizedCommands,
         "get the commands that are utilized in a stack");
+  m.def("simplify_stack", &backend::simplifyStack,
+        "simplify stack to only utilized commands");
         
         
   m.def("rand_init", &rand_init);
