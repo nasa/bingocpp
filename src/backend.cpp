@@ -1,4 +1,5 @@
 #include <map>
+#include <numeric>
 
 #include <Eigen/Dense>
 
@@ -219,12 +220,23 @@ std::vector<bool> getUtilizedCommands(const Eigen::ArrayX3i& stack) {
 Eigen::ArrayX3i simplifyStack(const Eigen::ArrayX3i& stack) {
   std::vector<bool> used_command = getUtilizedCommands(stack);
   std::map<int, int> reduced_param_map;
-  Eigen::ArrayX3i new_stack(used_command.size(), 3);
+  int num_commands = 0;
+  num_commands = std::accumulate(used_command.begin(), used_command.end(), 0);
+  Eigen::ArrayX3i new_stack(num_commands, 3);
 
   for (int i = 0, j = 0; i < stack.rows(); ++i) {
     if (used_command[i]) {
-      for (int k = 0; k < get_arity(new_stack(j, 0)); ++k) {
-        new_stack(j, k + 1) = reduced_param_map[new_stack(j, k + 1)];
+      new_stack(j, 0) = stack(i, 0);
+      if (AcyclicGraph::is_terminal(new_stack(j, 0))) {
+        new_stack(j, 1) = stack(i, 1);
+        new_stack(j, 2) = stack(i, 2);
+      } else {
+        new_stack(j, 1) = reduced_param_map[stack(i, 1)];
+        if (AcyclicGraph::has_arity_two(new_stack(j, 0))) {
+          new_stack(j, 2) = reduced_param_map[stack(i, 2)];
+        } else {
+          new_stack(j, 2) = new_stack(j, 1);
+        }
       }
       reduced_param_map[i] = j;
       ++j;
