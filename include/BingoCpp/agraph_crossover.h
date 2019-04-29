@@ -2,10 +2,11 @@
 #define INCLUDE_BINGOCPP_AGRAPH_CROSSOVER_H_
 
 #include <BingoCpp/agraph.h>
-
-typedef std::pair<bingo::AGraph, bingo::AGraph> CrossoverChildren;
+#include <BingoCpp/constants.h>
 
 namespace bingo {
+
+typedef std::pair<AGraph, AGraph> CrossoverChildren;
 
 class AGraphCrossover {
  public:

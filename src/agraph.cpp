@@ -108,8 +108,8 @@ std::string get_stack_element_string(const AGraph& individual,
     std::string param1_str = std::to_string(param1);
     std::string param2_str = std::to_string(param2);
     temp_string += print_string_with_args(kStackPrintMap.at(node),
-                                         param1_str,
-                                         param2_str);
+                                          param1_str,
+                                          param2_str);
   }
   temp_string += '\n';
   return temp_string;
@@ -378,6 +378,14 @@ int AGraph::getComplexity() const {
   return std::count_if (commands.begin(), commands.end(), [](bool i) {
     return i;
   });
+}
+
+bool AGraph::hasArityTwo(int node) {
+  return kIsArity2Map[node];
+}
+
+bool AGraph::isTerminal(int node) {
+  return kIsTerminalMap[node];
 }
 
 const bool AGraph::kIsArity2Map[13] = {

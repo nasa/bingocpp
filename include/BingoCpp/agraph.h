@@ -10,8 +10,9 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
-typedef std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvalAndDerivative;
+
 typedef std::unordered_map<int, std::string> PrintMap;
+typedef std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvalAndDerivative;
 
 namespace bingo {
 
@@ -62,6 +63,8 @@ class AGraph {
   std::string getConsoleString() const;
   std::string getStackString() const;
   int getComplexity() const;
+  static bool hasArityTwo(int node);
+  static bool isTerminal(int node);
 };
 } // namespace bingo
 #endif //INCLUDE_BINGOCPP_AGRAPH_H_

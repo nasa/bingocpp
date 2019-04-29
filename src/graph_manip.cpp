@@ -15,6 +15,10 @@
 #include "BingoCpp/fitness_metric.h"
 
 namespace bingo {
+int get_arity(int node) {
+  if (AcyclicGraph::is_terminal(node)) return 0;
+  return AcyclicGraph::has_arity_two(node) ? 2 : 1;
+}
 
 AcyclicGraphManipulator::AcyclicGraphManipulator(int nvars, int ag_size,
     int nloads, float float_lim, float terminal_prob, int opt_rate) {
@@ -97,7 +101,7 @@ void AcyclicGraphManipulator::simplify_stack(AcyclicGraph &indv) {
     for (std::set<int>::iterator it = util.begin(); it != util.end(); ++it) {
       reduced[*it] = i;
       temp(i, 0) = indv.stack(*it, 0);
-      int arity = backend::get_arity(temp(i, 0));
+      int arity = get_arity(temp(i, 0));
 
       if (arity == 0) {
         temp(i, 1) = indv.stack(*it, 1);
@@ -484,4 +488,6 @@ std::vector<int> AcyclicGraphManipulator::rand_terminal() {
   temp.push_back(param);
   return temp;
 }
+
+
 } // namespace bingo
