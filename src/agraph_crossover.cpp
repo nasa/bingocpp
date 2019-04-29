@@ -1,3 +1,4 @@
+#include <iostream>
 #include <cstdlib>
 #include <ctime>
 
@@ -5,18 +6,21 @@
 
 namespace bingo {
 namespace {
+
 int find_random_int(int min, int max) {
-  return std::rand()%(max - min + 1) + min;
+  return std::rand()%((max-1) - min + 1) + min;
 }
 
 void perform_crossover(AGraph& child, AGraph& parent, int cross_point) {
-
   Eigen::ArrayX3i child_array = child.getCommandArray();
   Eigen::ArrayX3i parent_array = parent.getCommandArray();
-  size_t agraph_size = parent.getCommandArray.rows();
+  size_t num_modified_rows = parent_array.rows() - cross_point;
 
-  child_array.block(cross_point, 0, agraph_size, agraph_size) =
-    parent_array.block(cross_point, 0, agraph_size, agraph_size);
+  // Hard coded substitute 2 for row length
+  child_array.block(cross_point, 0, num_modified_rows, child_array.cols()) =
+    parent_array.block(cross_point, 0, num_modified_rows, parent_array.cols());
+  
+  child.setCommandArray(child_array);
 }
 } // namespace
 
@@ -33,9 +37,6 @@ CrossoverChildren AGraphCrossover::crossover(AGraph& parent_1,
   int cross_point = find_random_int(1, agraph_size - 1);
   perform_crossover(child_1, parent_2, cross_point);
   perform_crossover(child_2, parent_1, cross_point);
-
-  child_1.notifyCommandArrayModificiation();
-  child_2.notifyCommandArrayModificiation();
 
   int child_age = std::max(parent_1.getGeneticAge(), parent_2.getGeneticAge());
   child_1.setGeneticAge(child_age);

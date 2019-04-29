@@ -1,15 +1,13 @@
 #ifndef INCLUDE_BINGOCPP_AGRAPH_CROSSOVER_H_
 #define INCLUDE_BINGOCPP_AGRAPH_CROSSOVER_H_
 
-#include "BingoCpp/agraph.h"
+#include <BingoCpp/agraph.h>
 
 typedef std::pair<bingo::AGraph, bingo::AGraph> CrossoverChildren;
 
 namespace bingo {
 
 class AGraphCrossover {
- private:
-  ;
  public:
   AGraphCrossover();
   AGraphCrossover(const AGraphCrossover& crossover) = delete;
