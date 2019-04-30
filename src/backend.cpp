@@ -119,10 +119,10 @@ EvalAndDerivative evaluate_with_derivative(
   int deriv_wrt_node;
   if (param_x_or_c) {  // true = x
     deriv_shape = std::make_pair(x.rows(), x.cols());
-    deriv_wrt_node = 0;
+    deriv_wrt_node = Op::LOAD_X;
   } else {  // false = c
     deriv_shape = std::make_pair(x.rows(), constants.size());
-    deriv_wrt_node = 1;
+    deriv_wrt_node = Op::LOAD_C;
   }
 
   Eigen::ArrayXXd derivative = reverse_eval(
@@ -143,10 +143,10 @@ EvalAndDerivative evaluate_with_derivative_and_mask(
   int deriv_wrt_node;
   if (param_x_or_c) {  // true = x
     deriv_shape = std::make_pair(x.rows(), x.cols());
-    deriv_wrt_node = 0;
+    deriv_wrt_node = Op::LOAD_X;
   } else {  // false = c
     deriv_shape = std::make_pair(x.rows(), constants.size());
-    deriv_wrt_node = 1;
+    deriv_wrt_node = Op::LOAD_C;
   }
 
   Eigen::ArrayXXd derivative = reverse_eval_with_mask(
@@ -203,7 +203,7 @@ std::vector<bool> getUtilizedCommands(const Eigen::ArrayX3i& stack) {
     int node = stack(row, ArrayProps::kNodeIdx);
     int param1 = stack(row, ArrayProps::kOp1);
     int param2 = stack(row, ArrayProps::kOp2);
-    if (used_commands[row] && node > 1) {
+    if (used_commands[row] && node > Op::LOAD_C) {
       used_commands[param1] = true;
       if (AGraph::hasArityTwo(node)) {
         used_commands[param2] = true;

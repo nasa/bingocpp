@@ -4,10 +4,9 @@
 #include <stdexcept>
 #include <utility>
 
-#include "BingoCpp/agraph.h"
-#include "BingoCpp/backend.h"
-
-const double kNaN = std::numeric_limits<double>::quiet_NaN();
+#include <BingoCpp/agraph.h>
+#include <BingoCpp/backend.h>
+#include <BingoCpp/constants.h>
 
 const PrintMap kStackPrintMap {
   {2, "({}) + ({})"},
@@ -60,7 +59,7 @@ std::string print_string_with_args(const std::string& string,
   std::stringstream stream;
   bool first_found = false;
   for (auto character = string.begin(); character != string.end(); character++) {
-    if (*character == '{' && *(character+1) == '}') {
+    if (*character == '{' && *(character + 1) == '}') {
       stream << ((!first_found) ? arg1 : arg2);
       character++;
       first_found = true;
@@ -75,9 +74,10 @@ bool check_optimization_requirement(AGraph& agraph,
                                     const std::vector<bool>& utilized_commands) {
   Eigen::ArrayX3i command_array = agraph.getCommandArray();
   for (int i = 0; i < command_array.rows(); i++) {
-    if (utilized_commands[i] && command_array(i, 0) == 1) {
-      if (command_array(i, 1) == -1 ||
-          command_array(i, 1) >= agraph.getLocalOptimizationParams().size()) {
+    if (utilized_commands[i] && command_array(i, ArrayProps::kNodeIdx) == Op::LOAD_C) {
+      if (command_array(i, ArrayProps::kOp1) == Op::C_OPTIMIZE ||
+          command_array(i, ArrayProps::kOp1) >=
+          agraph.getLocalOptimizationParams().size()) {
         return true;
       }
     }
@@ -88,15 +88,15 @@ bool check_optimization_requirement(AGraph& agraph,
 std::string get_stack_element_string(const AGraph& individual,
                                      int command_index,
                                      const Eigen::ArrayX3i& stack_element) {
-  int node = stack_element(0, 0);
-  int param1 = stack_element(0, 1);
-  int param2 = stack_element(0, 2);
+  int node = stack_element(0, ArrayProps::kNodeIdx);
+  int param1 = stack_element(0, ArrayProps::kOp1);
+  int param2 = stack_element(0, ArrayProps::kOp2);
 
   std::string temp_string = "("+ std::to_string(command_index) +") <= ";
-  if (node == 0) {
+  if (node == Op::LOAD_X) {
     temp_string += "X_" + std::to_string(param1);
-  } else if (node == 1) {
-    if (param1 == -1 ||
+  } else if (node == Op::LOAD_C) {
+    if (param1 == Op::C_OPTIMIZE ||
         param1 >= individual.getLocalOptimizationParams().size()) {
       temp_string += "C";
     } else {
@@ -119,15 +119,15 @@ std::string get_formatted_element_string(const AGraph& individual,
                                          const Eigen::ArrayX3i& stack_element,
                                          std::vector<std::string> string_list,
                                          const PrintMap& format_map) {
-  int node = stack_element(0, 0);
-  int param1 = stack_element(0, 1);
-  int param2 = stack_element(0, 2);
+  int node = stack_element(0, ArrayProps::kNodeIdx);
+  int param1 = stack_element(0, ArrayProps::kOp1);
+  int param2 = stack_element(0, ArrayProps::kOp2);
 
   std::string temp_string;
-  if (node == 0) {
+  if (node == Op::LOAD_X) {
     temp_string = "X_" + std::to_string(param1);
-  } else if (node == 1) {
-    if (param1 == -1 ||
+  } else if (node == Op::LOAD_C) {
+    if (param1 == Op::C_OPTIMIZE ||
         param1 >= individual.getLocalOptimizationParams().size()) {
       temp_string = "?";
     } else {
@@ -200,7 +200,7 @@ void AGraph::renumber_constants (const std::vector<bool>& utilized_commands) {
   int const_num = 0;
   int command_array_depth = command_array_.rows();
   for (int i = 0; i < command_array_depth; i++) {
-    if (utilized_commands[i] && command_array_(i, 0) == 1) {
+    if (utilized_commands[i] && command_array_(i, ArrayProps::kNodeIdx) == Op::LOAD_C) {
       command_array_.row(i) << 1, const_num , const_num; 
       const_num ++;
     }
@@ -230,9 +230,9 @@ void AGraph::update_short_command_array(const std::vector<bool>& utilized_comman
   }
 
   for (auto command : short_command_array_.rowwise()) {
-    if (!kIsTerminalMap[command(0, 0)]) {
-      command(0, 1) = inclusive_sum_scan[command(0, 1)] - 1;
-      command(0, 2) = inclusive_sum_scan[command(0, 2)] - 1;
+    if (!kIsTerminalMap[command(0, ArrayProps::kNodeIdx)]) {
+      command(0, ArrayProps::kOp1) = inclusive_sum_scan[command(0, ArrayProps::kOp1)] - 1;
+      command(0, ArrayProps::kOp2) = inclusive_sum_scan[command(0, ArrayProps::kOp2)] - 1;
     }
   }
 }

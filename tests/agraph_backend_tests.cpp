@@ -73,20 +73,21 @@ std::vector<Eigen::ArrayXXd> init_op_evals_x0(
   double constant = sample_agraph_1_values.constants[0];
   Eigen::ArrayXXd c_0 = constant * Eigen::ArrayXd::Ones(x_0.rows());
 
-  std::vector<Eigen::ArrayXXd> op_evals_x0 = std::vector<Eigen::ArrayXXd>();
-  op_evals_x0.push_back(x_0);
-  op_evals_x0.push_back(c_0);
-  op_evals_x0.push_back(x_0+x_0);
-  op_evals_x0.push_back(x_0-x_0);
-  op_evals_x0.push_back(x_0*x_0);
-  op_evals_x0.push_back(x_0/x_0);
-  op_evals_x0.push_back(x_0.sin());
-  op_evals_x0.push_back(x_0.cos());
-  op_evals_x0.push_back(x_0.exp());
-  op_evals_x0.push_back(x_0.abs().log());
-  op_evals_x0.push_back(x_0.abs().pow(x_0));
-  op_evals_x0.push_back(x_0.abs());
-  op_evals_x0.push_back(x_0.abs().sqrt());
+  const std::vector<Eigen::ArrayXXd> op_evals_x0 = {
+    x_0,
+    c_0,
+    x_0+x_0,
+    x_0-x_0,
+    x_0*x_0,
+    x_0/x_0,
+    x_0.sin(),
+    x_0.cos(),
+    x_0.exp(),
+    x_0.abs().log(),
+    x_0.abs().pow(x_0),
+    x_0.abs(),
+    x_0.abs().sqrt()
+  };
 
   return op_evals_x0;
 }
@@ -94,7 +95,6 @@ std::vector<Eigen::ArrayXXd> init_op_evals_x0(
 std::vector<Eigen::ArrayXXd> init_op_x_derivs(
     const AGraphValues& sample_agraph_1_values) {
   Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals.col(0);
-  std::vector<Eigen::ArrayXXd> op_x_derivs = std::vector<Eigen::ArrayXXd>();
   int size = x_0.rows();
 
   auto last_nan = [](Eigen::ArrayXXd array) {
@@ -102,21 +102,23 @@ std::vector<Eigen::ArrayXXd> init_op_x_derivs(
     Eigen::ArrayXXd modified_array = array;
     return modified_array;
   };
-  op_x_derivs.push_back(Eigen::ArrayXd::Ones(size));
-  op_x_derivs.push_back(Eigen::ArrayXd::Zero(size));
-  op_x_derivs.push_back(2.0  * Eigen::ArrayXd::Ones(size));
-  op_x_derivs.push_back(Eigen::ArrayXd::Zero(size));
-  op_x_derivs.push_back(2.0 * x_0);
-  op_x_derivs.push_back(last_nan(Eigen::ArrayXd::Zero(size)));
-  op_x_derivs.push_back(x_0.cos());
-  op_x_derivs.push_back(-x_0.sin());
-  op_x_derivs.push_back(x_0.exp());
-  op_x_derivs.push_back(1.0 / x_0);
-  op_x_derivs.push_back(last_nan(x_0.abs().pow(x_0)*(x_0.abs().log()
-                        + Eigen::ArrayXd::Ones(size))));
-  op_x_derivs.push_back(x_0.sign());
-  op_x_derivs.push_back(0.5 * x_0.sign() / x_0.abs().sqrt());
-
+  
+  const std::vector<Eigen::ArrayXXd> op_x_derivs = {
+    Eigen::ArrayXd::Ones(size),
+    Eigen::ArrayXd::Zero(size),
+    2.0  * Eigen::ArrayXd::Ones(size),
+    Eigen::ArrayXd::Zero(size),
+    2.0 * x_0,
+    last_nan(Eigen::ArrayXd::Zero(size)),
+    x_0.cos(),
+    -x_0.sin(),
+    x_0.exp(),
+    1.0 / x_0,
+    last_nan(x_0.abs().pow(x_0)*(x_0.abs().log() + Eigen::ArrayXd::Ones(size))),
+    x_0.sign(),
+    0.5 * x_0.sign() / x_0.abs().sqrt()
+  };
+  
   return op_x_derivs;
 }
 
@@ -124,23 +126,23 @@ std::vector<Eigen::ArrayXXd> init_op_c_derivs(
     const AGraphValues& sample_agraph_1_values) {
   int size = sample_agraph_1_values.x_vals.rows();
   Eigen::ArrayXXd c_1 = sample_agraph_1_values.constants[1] * Eigen::ArrayXd::Ones(size);
-  std::vector<Eigen::ArrayXXd> op_c_derivs = std::vector<Eigen::ArrayXXd>();
 
-  op_c_derivs.push_back(Eigen::ArrayXd::Zero(size));
-  op_c_derivs.push_back(Eigen::ArrayXd::Ones(size));
-  op_c_derivs.push_back(2.0  * Eigen::ArrayXd::Ones(size));
-  op_c_derivs.push_back(Eigen::ArrayXd::Zero(size));
-  op_c_derivs.push_back(2.0 * c_1);
-  op_c_derivs.push_back((Eigen::ArrayXd::Zero(size)));
-  op_c_derivs.push_back(c_1.cos());
-  op_c_derivs.push_back(-c_1.sin());
-  op_c_derivs.push_back(c_1.exp());
-  op_c_derivs.push_back(1.0 / c_1);
-  op_c_derivs.push_back(c_1.abs().pow(c_1)*(c_1.abs().log()
-                        + Eigen::ArrayXd::Ones(size)));
-  op_c_derivs.push_back(c_1.sign());
-  op_c_derivs.push_back(0.5 * c_1.sign() / c_1.abs().sqrt());
-
+  std::vector<Eigen::ArrayXXd> op_c_derivs =  {
+    Eigen::ArrayXd::Zero(size),
+    Eigen::ArrayXd::Ones(size),
+    2.0  * Eigen::ArrayXd::Ones(size),
+    Eigen::ArrayXd::Zero(size),
+    2.0 * c_1,
+    (Eigen::ArrayXd::Zero(size)),
+    c_1.cos(),
+    -c_1.sin(),
+    c_1.exp(),
+    1.0 / c_1,
+    c_1.abs().pow(c_1)*(c_1.abs().log() + Eigen::ArrayXd::Ones(size)),
+    c_1.sign(),
+    0.5 * c_1.sign() / c_1.abs().sqrt()
+  };
+  
   return op_c_derivs;
 }
 };
