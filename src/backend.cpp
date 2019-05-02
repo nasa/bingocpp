@@ -155,10 +155,6 @@ EvalAndDerivative evaluate_with_derivative_and_mask(
 }
 } // namespace
 
-bool isCpp() {
-    return true;
-}
-
 Eigen::ArrayXXd evaluate(const Eigen::ArrayX3i& stack,
                          const Eigen::ArrayXXd& x,
                          const Eigen::VectorXd& constants) {

@@ -27,49 +27,55 @@
 #include <BingoCpp/agraph.h>
 
 namespace bingo {
-namespace backend{
-/*!
- * \brief Identify whether a c++ backend is being used in python module.
- *
- * \return true, the backend is c++ (bool)
+/**
+ * @brief This file contains the backend of the acyclic graph class.
+ * 
  */
-bool isCpp();
+namespace backend{
 
-/*!
- * \brief Evaluates a stack at the given x using the given constants.
- *
- * An acyclic graph is given in stack form.  The stack is evaluated command by
- * command putting the result of each command into a local buffer.  References
- * can be made in the stack to columns of the x input as well as constants; both
- * are referenced by index.
- *
- * \param stack Description of an acyclic graph in stack format.
- * \param x The input variables to the acyclic graph. (Eigen::ArrayXXd)
- * \param constants Vector of the constants used in the stack.
- *
- * \return The value of the last command in the stack. (Eigen::ArrayXXd)
+/**
+ * @brief Idenitfy whether the backed is C++
+ * 
+ * @return true 
+ */
+inline bool isCpp() { return true; }
+
+/**
+ * @brief Evauluate the equation.
+ * 
+ * Evauluate the equation associated with an Agraph, at the values x.
+ * 
+ * @param stack Nx3 array. The command stack associated with an equation. 
+ * N is the number of commands in the stack.
+ * 
+ * @param x MxD Array. Values at which to evaluate the equations. D is the
+ * dimension in x and M is the number of data points in x.
+ * 
+ * @param constants Vector of doubles. Constants that are used in the equation.
+ * 
+ * @return Eigen::ArrayXXd The evaluation of the graph with x as the input data.
  */
 Eigen::ArrayXXd evaluate(const Eigen::ArrayX3i& stack,
                          const Eigen::ArrayXXd& x,
                          const Eigen::VectorXd& constants);
 
-/*!
- * \brief Evaluates a stack and its derivative with the given x and constants.
- *
- * An acyclic graph is given in stack form.  The stack is evaluated command by
- * command putting the result of each command into a local buffer.  References
- * can be made in the stack to columns of the x input as well as constants; both
- * are referenced by index.  The stack is then processed in reverse to calculate
- * the gradient of the stack with respect to the chosen parameter.  This reverse 
- * processing is standard reverse auto-differentiation.
- *
- * \param stack Description of an acyclic graph in stack format.
- * \param x The input variables to the acyclic graph. (Eigen::ArrayXXd)
- * \param constants Vector of the constants used in the stack.
- * \param param_x_or_c true: x derivative, false: c derivative
- *
- * \return The value of the last command in the stack and the gradient.
- *         (std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd>)
+/**
+ * @brief Evaluate equation and take derivative.
+ * 
+ * Evaluate the derivatives of the equation associated with an Agraph, 
+ * at the values x.
+ * 
+ * @param stack Nx3 array. The command stack associated with an equation. 
+ * N is the number of commands in the stack.
+ * 
+ * @param x MxD Array. Values at which to evaluate the equations. D is the
+ * dimension in x and M is the number of data points in x.
+ * 
+ * @param constants Vector of doubles. Constants that are used in the equation.
+ * 
+ * @param param_x_or_c true: x derivative, false: c derivative
+ * 
+ * @return EvalAndDerivative Derivatives of all dimensions of x/constants at location x.
  */
 EvalAndDerivative evaluateWithDerivative(
     const Eigen::ArrayX3i& stack,
@@ -77,36 +83,45 @@ EvalAndDerivative evaluateWithDerivative(
     const Eigen::VectorXd& constants,
     const bool param_x_or_c = true);
 
-
-/*!
- * \brief Evaluates a stack, but only the commands that are utilized.
- *
- * An acyclic graph is given in stack form.  The stack is evaluated, but only
- * the commands which are utilized by the final result.
- *
- * \param stack Description of an acyclic graph in stack format.
- * \param x The input variables to the acyclic graph. (Eigen::ArrayXXd)
- * \param constants Vector of the constants used in the stack.
- *
- * \return The value of the last command in the stack. (Eigen::ArrayXXd)
+/**
+ * @brief Evauluate the equation after simplification.
+ * 
+ * Evauluate the equation associated with an Agraph, at the values x.
+ * Simplification ensures that only the commands utilized in the result
+ * are considered.
+ * 
+ * @param stack Nx3 array. The command stack associated with an equation. 
+ * N is the number of commands in the stack.
+ * 
+ * @param x MxD Array. Values at which to evaluate the equations. D is the
+ * dimension in x and M is the number of data points in x.
+ * 
+ * @param constants Vector of doubles. Constants that are used in the equation.
+ * 
+ * @return Eigen::ArrayXXd The evaluation of the graph with x as the input data.
  */
 Eigen::ArrayXXd simplifyAndEvaluate(const Eigen::ArrayX3i& stack,
                                     const Eigen::ArrayXXd& x,
                                     const Eigen::VectorXd& constants);
 
-
-/*!
- * \brief Evaluates a stack and its derivative, but only the utilized commands.
- *
- * An acyclic graph is given in stack form.  The stack is evaluated with its
- * derivative, but only the commands which are utilized by the final result.
- *
- * \param stack Description of an acyclic graph in stack format.
- * \param x The input variables to the acyclic graph. (Eigen::ArrayXXd)
- * \param constants Vector of the constants used in the stack.
- * \param param_x_or_c true: x derivative, false: c derivative
- *
- * \return The value of the last command in the stack and the gradient.
+/**
+ * @brief Evaluate equation and take derivative.
+ * 
+ * Evaluate the derivatives of the equation associated with an Agraph, 
+ * at the values x.  Simplification ensures that only the commands
+ * utilized in the result are considered..
+ * 
+ * @param stack Nx3 array. The command stack associated with an equation. 
+ * N is the number of commands in the stack.
+ * 
+ * @param x MxD Array. Values at which to evaluate the equations. D is the
+ * dimension in x and M is the number of data points in x.
+ * 
+ * @param constants Vector of doubles. Constants that are used in the equation.
+ * 
+ * @param param_x_or_c true: x derivative, false: c derivative
+ * 
+ * @return EvalAndDerivative Derivatives of all dimensions of x/constants at location x.
  */
 EvalAndDerivative simplifyAndEvaluateWithDerivative(
     const Eigen::ArrayX3i& stack,
@@ -114,31 +129,29 @@ EvalAndDerivative simplifyAndEvaluateWithDerivative(
     const Eigen::VectorXd& constants,
     const bool param_x_or_c = true);
 
-
-/*!
- * \brief Simplifies a stack.
+/**
+ * @brief Simplifies a stack.
  *
  * An acyclic graph is given in stack form.  The stack is first simplified to
  * consist only of the commands used by the last command.
  *
- * \param stack Description of an acyclic graph in stack format.
+ * @param stack Description of an acyclic graph in stack format.
  *
- * \return Simplified stack.
+ * @return Simplified stack.
  */
 Eigen::ArrayX3i simplifyStack(const Eigen::ArrayX3i& stack);
 
-
-/*!
- * \brief Finds which commands are utilized in a stack.
+/**
+ * @brief Finds which commands are utilized in a stack.
  *
  * An acyclic graph is given in stack form.  The stack is processed in reverse
  * to find which commands the last command depends.
  *
- * \param stack Description of an acyclic graph in stack format.
+ * @param stack Description of an acyclic graph in stack format.
  *
- * \return vector describing which commands in the stack are used.
+ * @return vector describing which commands in the stack are used.
  */
 std::vector<bool> getUtilizedCommands(const Eigen::ArrayX3i& stack);
 } // namespace backend
 } // namespace bingo
-#endif  
+#endif
