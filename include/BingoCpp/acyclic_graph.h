@@ -27,6 +27,7 @@
 #define INCLUDE_BINGOCPP_ACYCLIC_GRAPH_H_
 
 #include <set>
+#include <vector>
 
 #include <Eigen/Dense>
 #include <Eigen/Core>

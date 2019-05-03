@@ -72,7 +72,7 @@ class AGraphTest : public ::testing::TestWithParam<std::string> {
     x.col(1) = Eigen::ArrayXd::LinSpaced(num_points, 0, 1);
     Eigen::ArrayXXd f_of_x = (x + 1.0).sin() + 1.0;
     Eigen::ArrayXXd grad_x = Eigen::ArrayXXd::Zero(x.rows(), x.cols());
-    grad_x.col(0) = (x + 1.0).cos();
+    grad_x.col(0) = (x.col(0) + 1.0).cos();
     Eigen::ArrayXXd grad_c = (x + 1.0).cos() + 1.0;
     return AGraphTestVals(x, f_of_x.col(0), grad_x, grad_c.col(0));
   }

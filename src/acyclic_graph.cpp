@@ -9,6 +9,7 @@
  */
 #include <iostream>
 #include <iomanip>
+#include <vector>
 
 #include "BingoCpp/acyclic_graph.h"
 #include "BingoCpp/backend.h"
