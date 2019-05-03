@@ -17,6 +17,8 @@
 #ifndef INCLUDE_BINGOCPP_AGRAPH_CROSSOVER_H_
 #define INCLUDE_BINGOCPP_AGRAPH_CROSSOVER_H_
 
+#include <random>
+
 #include <BingoCpp/agraph.h>
 #include <BingoCpp/constants.h>
 
@@ -33,8 +35,10 @@ typedef std::pair<AGraph, AGraph> CrossoverChildren;
 class AGraphCrossover {
  public:
   AGraphCrossover();
+
+  AGraphCrossover(std::mt19937::result_type seed);
   
-  AGraphCrossover(const AGraphCrossover& crossover) = delete;
+  AGraphCrossover(const AGraphCrossover& crossover);
   /**
    * @brief Crossover between acyclic graph individuals
    * 
@@ -43,6 +47,9 @@ class AGraphCrossover {
    * @return CrossoverChildren The two children from the crossover
    */
   CrossoverChildren crossover(AGraph& parent_1, AGraph& parent_2);
+
+ private:
+  std::mt19937 engine_;
 };
 } // namespace bingo
 #endif //INCLUDE_BINGOCPP_AGRAPH_CROSSOVER_H_
