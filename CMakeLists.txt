@@ -161,7 +161,7 @@ add_custom_target( git_update
 add_library( googletest
     ${PROJECT_SOURCE_DIR}/external/googletest/src/gtest-all.cc
     ${PROJECT_SOURCE_DIR}/external/googletest/src/gtest_main.cc )
-add_dependencies(googletest git_update)
+# add_dependencies(googletest git_update)
 set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest-all.cc  PROPERTIES GENERATED 1)
 set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest_main.cc PROPERTIES GENERATED 1)
 
@@ -173,5 +173,5 @@ set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest_
 add_library(eigen INTERFACE)
 target_include_directories(eigen INTERFACE 
                            ${CMAKE_CURRENT_SOURCE_DIR}/external/eigen)
-add_dependencies(eigen git_update)
+# add_dependencies(eigen git_update)
 
