@@ -44,6 +44,7 @@
 #include <pybind11/stl.h>
 
 #include "BingoCpp/acyclic_graph.h"
+#include "BingoCpp/backend.h"
 #include "BingoCpp/graph_manip.h"
 #include "BingoCpp/fitness_metric.h"
 #include "BingoCpp/training_data.h"
@@ -58,19 +59,19 @@ using namespace bingo;
 
 PYBIND11_MODULE(bingocpp, m) {
   m.doc() = "pybind11 example plugin";  // optional module docstring
-  m.def("is_cpp", &is_cpp, "is the backend c++");
-  m.def("evaluate", &evaluate, "evaluate");
-  m.def("simplify_and_evaluate", &simplify_and_evaluate,
+  m.def("is_cpp", &backend::isCpp, "is the backend c++");
+  m.def("evaluate", &backend::evaluate, "evaluate");
+  m.def("simplify_and_evaluate", &backend::simplifyAndEvaluate,
         "evaluate after simplification");
-  m.def("evaluate_with_derivative", &evaluate_with_derivative,
+  m.def("evaluate_with_derivative", &backend::evaluateWithDerivative,
         "evaluate with derivative");
   m.def("simplify_and_evaluate_with_derivative",
-        &simplify_and_evaluate_with_derivative,
+        &backend::simplifyAndEvaluateWithDerivative,
         "evaluate with derivative after simplification");
   m.def("get_utilized_commands",
-        &get_utilized_commands,
+        &backend::getUtilizedCommands,
         "get the commands that are utilized in a stack");
-  m.def("simplify_stack", &simplify_stack,
+  m.def("simplify_stack", &backend::simplifyStack,
         "simplify stack to only utilized commands");
         
         
