@@ -46,7 +46,7 @@ class AGraphCrossover {
    * @param parent_2 The second parent individual
    * @return CrossoverChildren The two children from the crossover
    */
-  CrossoverChildren crossover(AGraph& parent_1, AGraph& parent_2);
+  CrossoverChildren Crossover(AGraph& parent_1, AGraph& parent_2);
 
  private:
   std::mt19937 engine_;

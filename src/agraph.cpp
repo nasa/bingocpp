@@ -72,12 +72,12 @@ std::string print_string_with_args(const std::string& string,
 
 bool check_optimization_requirement(AGraph& agraph,
                                     const std::vector<bool>& utilized_commands) {
-  Eigen::ArrayX3i command_array = agraph.getCommandArray();
+  Eigen::ArrayX3i command_array = agraph.GetCommandArray();
   for (int i = 0; i < command_array.rows(); i++) {
     if (utilized_commands[i] && command_array(i, ArrayProps::kNodeIdx) == Op::LOAD_C) {
       if (command_array(i, ArrayProps::kOp1) == Op::C_OPTIMIZE ||
           command_array(i, ArrayProps::kOp1) >=
-          agraph.getLocalOptimizationParams().size()) {
+          agraph.GetLocalOptimizationParams().size()) {
         return true;
       }
     }
@@ -97,10 +97,10 @@ std::string get_stack_element_string(const AGraph& individual,
     temp_string += "X_" + std::to_string(param1);
   } else if (node == Op::LOAD_C) {
     if (param1 == Op::C_OPTIMIZE ||
-        param1 >= individual.getLocalOptimizationParams().size()) {
+        param1 >= individual.GetLocalOptimizationParams().size()) {
       temp_string += "C";
     } else {
-      Eigen::VectorXd parameter = individual.getLocalOptimizationParams();
+      Eigen::VectorXd parameter = individual.GetLocalOptimizationParams();
       temp_string += "C_" + std::to_string(param1) + " = " + 
                      std::to_string(parameter[param1]);
     }
@@ -128,10 +128,10 @@ std::string get_formatted_element_string(const AGraph& individual,
     temp_string = "X_" + std::to_string(param1);
   } else if (node == Op::LOAD_C) {
     if (param1 == Op::C_OPTIMIZE ||
-        param1 >= individual.getLocalOptimizationParams().size()) {
+        param1 >= individual.GetLocalOptimizationParams().size()) {
       temp_string = "?";
     } else {
-      Eigen::VectorXd parameter = individual.getLocalOptimizationParams();
+      Eigen::VectorXd parameter = individual.GetLocalOptimizationParams();
       temp_string = std::to_string(parameter[param1]);
     }
   } else {
@@ -155,39 +155,39 @@ AGraph::AGraph() {
 }
 
 AGraph::AGraph(const AGraph& agraph) {
-  this->setCommandArray(agraph.getCommandArray());
-  constants_ = agraph.getLocalOptimizationParams();
-  needs_opt_ = agraph.needsLocalOptimization();
-  num_constants_ = agraph.getNumberLocalOptimizationParams();
-  fitness_ = agraph.getFitness();
-  fit_set_ = agraph.isFitnessSet();
-  genetic_age_ = agraph.getGeneticAge();
+  this->SetCommandArray(agraph.GetCommandArray());
+  constants_ = agraph.GetLocalOptimizationParams();
+  needs_opt_ = agraph.NeedsLocalOptimization();
+  num_constants_ = agraph.GetNumberLocalOptimizationParams();
+  fitness_ = agraph.GetFitness();
+  fit_set_ = agraph.IsFitnessSet();
+  genetic_age_ = agraph.GetGeneticAge();
 }
 
-AGraph AGraph::copy() {
+AGraph AGraph::Copy() {
   AGraph return_val = AGraph(*this);
   return return_val;
 }
 
-Eigen::ArrayX3i AGraph::getCommandArray() const {
+Eigen::ArrayX3i AGraph::GetCommandArray() const {
   return command_array_;
 }
 
-void AGraph::setCommandArray(Eigen::ArrayX3i command_array) {
+void AGraph::SetCommandArray(Eigen::ArrayX3i command_array) {
   command_array_ = command_array;
   fitness_ = 1e9;
   fit_set_ = false;
   process_modified_command_array();
 }
 
-void AGraph::notifyCommandArrayModificiation() {
+void AGraph::NotifyCommandArrayModificiation() {
   fitness_ = 1e9;
   fit_set_ = false;
   process_modified_command_array();
 }
 
 void AGraph::process_modified_command_array() {
-  std::vector<bool> util = getUtilizedCommands();
+  std::vector<bool> util = GetUtilizedCommands();
 
   needs_opt_ = check_optimization_requirement(*this, util);
   if (needs_opt_)  {
@@ -237,52 +237,52 @@ void AGraph::update_short_command_array(const std::vector<bool>& utilized_comman
   }
 }
 
-double AGraph::getFitness() const {
+double AGraph::GetFitness() const {
   return fitness_;
 }
 
-void AGraph::setFitness(double fitness) {
+void AGraph::SetFitness(double fitness) {
   fitness_ = fitness;
   fit_set_ = true;
 }
 
-bool AGraph::isFitnessSet() const {
+bool AGraph::IsFitnessSet() const {
   return fit_set_;
 }
 
-void AGraph::setGeneticAge(const int age) {
+void AGraph::SetGeneticAge(const int age) {
   genetic_age_ = age;
 }
 
-int AGraph::getGeneticAge() const {
+int AGraph::GetGeneticAge() const {
   return genetic_age_;
 }
 
-std::vector<bool> AGraph::getUtilizedCommands() const {
-  return backend::getUtilizedCommands(command_array_);
+std::vector<bool> AGraph::GetUtilizedCommands() const {
+  return backend::GetUtilizedCommands(command_array_);
 }
 
-bool AGraph::needsLocalOptimization() const {
+bool AGraph::NeedsLocalOptimization() const {
   return needs_opt_;
 }
 
-int AGraph::getNumberLocalOptimizationParams() const {
+int AGraph::GetNumberLocalOptimizationParams() const {
   return num_constants_;
 }
 
-void AGraph::setLocalOptimizationParams(Eigen::VectorXd params) {
+void AGraph::SetLocalOptimizationParams(Eigen::VectorXd params) {
   constants_ = params;
   needs_opt_ = false;
 }
 
-Eigen::VectorXd AGraph::getLocalOptimizationParams() const {
+Eigen::VectorXd AGraph::GetLocalOptimizationParams() const {
   return constants_;
 }
 
-Eigen::ArrayXXd AGraph::evaluateEquationAt(Eigen::ArrayXXd& x) {
+Eigen::ArrayXXd AGraph::EvaluateEquationAt(Eigen::ArrayXXd& x) {
   Eigen::ArrayXXd f_of_x; 
   try {
-    f_of_x = backend::evaluate(this->command_array_,
+    f_of_x = backend::Evaluate(this->command_array_,
                                x,
                                this->constants_);
     return f_of_x;
@@ -293,10 +293,10 @@ Eigen::ArrayXXd AGraph::evaluateEquationAt(Eigen::ArrayXXd& x) {
   } 
 }
 
-EvalAndDerivative AGraph::evaluateEquationWithXGradientAt(Eigen::ArrayXXd& x) {
+EvalAndDerivative AGraph::EvaluateEquationWithXGradientAt(Eigen::ArrayXXd& x) {
   EvalAndDerivative df_dx;
   try {
-    df_dx = backend::evaluateWithDerivative(this->command_array_,
+    df_dx = backend::EvaluateWithDerivative(this->command_array_,
                                             x,
                                             this->constants_,
                                             true);
@@ -310,11 +310,11 @@ EvalAndDerivative AGraph::evaluateEquationWithXGradientAt(Eigen::ArrayXXd& x) {
   }
 }
 
-EvalAndDerivative AGraph::evaluateEquationWithLocalOptGradientAt(
+EvalAndDerivative AGraph::EvaluateEquationWithLocalOptGradientAt(
     Eigen::ArrayXXd& x) {
   EvalAndDerivative df_dc;
   try {
-    df_dc = backend::evaluateWithDerivative(this->command_array_,
+    df_dc = backend::EvaluateWithDerivative(this->command_array_,
                                             x,
                                             this->constants_,
                                             false);
@@ -329,14 +329,14 @@ EvalAndDerivative AGraph::evaluateEquationWithLocalOptGradientAt(
 }
 
 std::ostream& operator<<(std::ostream& strm, const AGraph& graph) {
-  return strm << graph.getConsoleString();
+  return strm << graph.GetConsoleString();
 }
 
-std::string AGraph::getLatexString() const {
+std::string AGraph::GetLatexString() const {
   return get_formatted_string_using(kLatexPrintMap);
 }
 
-std::string AGraph::getConsoleString() const {
+std::string AGraph::GetConsoleString() const {
   return get_formatted_string_using(kConsolePrintMap);
 }
 
@@ -350,7 +350,7 @@ std::string AGraph::get_formatted_string_using(const PrintMap& format_map) const
   return string_list.back();
 }
 
-std::string AGraph::getStackString() const {
+std::string AGraph::GetStackString() const {
   std::stringstream print_str; 
   print_str << "---full stack---\n"
             << get_stack_string()
@@ -373,18 +373,18 @@ std::string AGraph::get_stack_string(const bool is_short) const {
   return temp_string;
 }
 
-int AGraph::getComplexity() const {
-  std::vector<bool> commands = getUtilizedCommands();
+int AGraph::GetComplexity() const {
+  std::vector<bool> commands = GetUtilizedCommands();
   return std::count_if (commands.begin(), commands.end(), [](bool i) {
     return i;
   });
 }
 
-bool AGraph::hasArityTwo(int node) {
+bool AGraph::HasArityTwo(int node) {
   return kIsArity2Map[node];
 }
 
-bool AGraph::isTerminal(int node) {
+bool AGraph::IsTerminal(int node) {
   return kIsTerminalMap[node];
 }
 

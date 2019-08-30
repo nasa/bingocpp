@@ -48,7 +48,7 @@ TEST(AGraphNodesTest, XLoad) {
   x << 7., 6., 9., 5., 11., 4., 3., 2., 1.;
   Eigen::ArrayXXd a_true(3, 1);
   a_true << 6., 11., 2.;
-  Eigen::ArrayXXd test = evaluate(stack, x, constants);
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -63,7 +63,7 @@ TEST(AGraphNodesTest, CLoad) {
   constants << 3.0, 5.0;
   Eigen::ArrayXXd a_true(3, 1);
   a_true << 5., 5., 5.;
-  Eigen::ArrayXXd test = evaluate(stack, x, constants);
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -95,20 +95,20 @@ TEST(AGraphNodesTest, Addition) {
   a_true_xx << 14., 12., 18.;
   Eigen::ArrayXXd a_true_cc(3, 1);
   a_true_cc << 6., 6., 6.;
-  Eigen::ArrayXXd test = evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
-  Eigen::ArrayXXd test3 = evaluate(stack3, x, constants);
-  Eigen::ArrayXXd test4 = evaluate(stack4, x, constants);
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test3 = Evaluate(stack3, x, constants);
+  Eigen::ArrayXXd test4 = Evaluate(stack4, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 1., 0., 0., 1., 0., 0., 1., 0., 0.;
   Eigen::ArrayXXd d_true_xx(3, 3);
   d_true_xx << 2., 0., 0., 2., 0., 0., 2., 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xc =
-    evaluateWithDerivative(stack, x, constants);
+    EvaluateWithDerivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_cx =
-    evaluateWithDerivative(stack2, x, constants);
+    EvaluateWithDerivative(stack2, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xx =
-    evaluateWithDerivative(stack3, x, constants);
+    EvaluateWithDerivative(stack3, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -153,10 +153,10 @@ TEST(AGraphNodesTest, Subtraction) {
   a_true2 << -4., -3., -6.;
   Eigen::ArrayXXd a_true_xx(3, 1);
   a_true_xx << 0., 0., 0.;
-  Eigen::ArrayXXd test = evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
-  Eigen::ArrayXXd test3 = evaluate(stack3, x, constants);
-  Eigen::ArrayXXd test4 = evaluate(stack4, x, constants);
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test3 = Evaluate(stack3, x, constants);
+  Eigen::ArrayXXd test4 = Evaluate(stack4, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 1., 0., 0., 1., 0., 0., 1., 0., 0.;
   Eigen::ArrayXXd d_true2(3, 3);
@@ -164,11 +164,11 @@ TEST(AGraphNodesTest, Subtraction) {
   Eigen::ArrayXXd d_true_xx(3, 3);
   d_true_xx << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xc =
-    evaluateWithDerivative(stack, x, constants);
+    EvaluateWithDerivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_cx =
-    evaluateWithDerivative(stack2, x, constants);
+    EvaluateWithDerivative(stack2, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xx =
-    evaluateWithDerivative(stack3, x, constants);
+    EvaluateWithDerivative(stack3, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -212,20 +212,20 @@ TEST(AGraphNodesTest, Multiplication) {
   a_true_xx << (7. * 7.), (6. * 6.), (9.* 9.);
   Eigen::ArrayXXd a_true_cc(3, 1);
   a_true_cc << 9., 9., 9.;
-  Eigen::ArrayXXd test = evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
-  Eigen::ArrayXXd test3 = evaluate(stack3, x, constants);
-  Eigen::ArrayXXd test4 = evaluate(stack4, x, constants);
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test3 = Evaluate(stack3, x, constants);
+  Eigen::ArrayXXd test4 = Evaluate(stack4, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 3., 0., 0., 3., 0., 0., 3., 0., 0.;
   Eigen::ArrayXXd d_true_xx(3, 3);
   d_true_xx << 14., 0., 0., 12., 0., 0., 18., 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xc =
-    evaluateWithDerivative(stack, x, constants);
+    EvaluateWithDerivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_cx =
-    evaluateWithDerivative(stack2, x, constants);
+    EvaluateWithDerivative(stack2, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xx =
-    evaluateWithDerivative(stack3, x, constants);
+    EvaluateWithDerivative(stack3, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -271,10 +271,10 @@ TEST(AGraphNodesTest, Division) {
   a_true_xx << 1., 1., 1.;
   Eigen::ArrayXXd a_true_cc(3, 1);
   a_true_cc << 1., 1., 1.;
-  Eigen::ArrayXXd test = evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
-  Eigen::ArrayXXd test3 = evaluate(stack3, x, constants);
-  Eigen::ArrayXXd test4 = evaluate(stack4, x, constants);
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test3 = Evaluate(stack3, x, constants);
+  Eigen::ArrayXXd test4 = Evaluate(stack4, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << (1. / 3.), 0., 0., (1. / 3.), 0., 0., (1. / 3.), 0., 0.;
   Eigen::ArrayXXd d_true2(3, 3);
@@ -284,11 +284,11 @@ TEST(AGraphNodesTest, Division) {
   Eigen::ArrayXXd d_true_xx(3, 3);
   d_true_xx << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xc =
-    evaluateWithDerivative(stack, x, constants);
+    EvaluateWithDerivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_cx =
-    evaluateWithDerivative(stack2, x, constants);
+    EvaluateWithDerivative(stack2, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xx =
-    evaluateWithDerivative(stack3, x, constants);
+    EvaluateWithDerivative(stack3, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -322,8 +322,8 @@ TEST(AGraphNodesTest, Sin) {
   a_true << (sin(3.)), (sin(3.)), (sin(3.));
   Eigen::ArrayXXd a_true_x(3, 1);
   a_true_x << (sin(7.)), (sin(6.)), (sin(9.));
-  Eigen::ArrayXXd test = evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   Eigen::ArrayXXd d_true_x(3, 3);
@@ -331,9 +331,9 @@ TEST(AGraphNodesTest, Sin) {
            (cos(6.)), 0., 0.,
            (cos(9.)), 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_c =
-    evaluateWithDerivative(stack, x, constants);
+    EvaluateWithDerivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_x =
-    evaluateWithDerivative(stack2, x, constants);
+    EvaluateWithDerivative(stack2, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -363,8 +363,8 @@ TEST(AGraphNodesTest, Cos) {
   a_true << (cos(3.)), (cos(3.)), (cos(3.));
   Eigen::ArrayXXd a_true_x(3, 1);
   a_true_x << (cos(7.)), (cos(6.)), (cos(9.));
-  Eigen::ArrayXXd test = evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   Eigen::ArrayXXd d_true_x(3, 3);
@@ -372,9 +372,9 @@ TEST(AGraphNodesTest, Cos) {
            (-sin(6.)), 0., 0.,
            (-sin(9.)), 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_c =
-    evaluateWithDerivative(stack, x, constants);
+    EvaluateWithDerivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_x =
-    evaluateWithDerivative(stack2, x, constants);
+    EvaluateWithDerivative(stack2, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -404,8 +404,8 @@ TEST(AGraphNodesTest, Exp) {
   a_true << (exp(3.)), (exp(3.)), (exp(3.));
   Eigen::ArrayXXd a_true_x(3, 1);
   a_true_x << (exp(7.)), (exp(6.)), (exp(9.));
-  Eigen::ArrayXXd test = evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   Eigen::ArrayXXd d_true_x(3, 3);
@@ -413,9 +413,9 @@ TEST(AGraphNodesTest, Exp) {
            (exp(6.)), 0., 0.,
            (exp(9.)), 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_c =
-    evaluateWithDerivative(stack, x, constants);
+    EvaluateWithDerivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_x =
-    evaluateWithDerivative(stack2, x, constants);
+    EvaluateWithDerivative(stack2, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -445,8 +445,8 @@ TEST(AGraphNodesTest, Log) {
   a_true << (log(abs(3.))), (log(abs(3.))), (log(abs(3.)));
   Eigen::ArrayXXd a_true_x(3, 1);
   a_true_x << (log(abs(7.))), (log(abs(6.))), (log(abs(9.)));
-  Eigen::ArrayXXd test = evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   Eigen::ArrayXXd d_true_x(3, 3);
@@ -454,9 +454,9 @@ TEST(AGraphNodesTest, Log) {
            (1. / abs(6.)), 0., 0.,
            (1. / abs(9.)), 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_c =
-    evaluateWithDerivative(stack, x, constants);
+    EvaluateWithDerivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_x =
-    evaluateWithDerivative(stack2, x, constants);
+    EvaluateWithDerivative(stack2, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -498,10 +498,10 @@ TEST(AGraphNodesTest, Power) {
   a_true_xx << (pow(7., 7.)), (pow(6., 6.)), (pow(9., 9.));
   Eigen::ArrayXXd a_true_cc(3, 1);
   a_true_cc << (pow(3., 3.)), (pow(3., 3.)), (pow(3., 3.));
-  Eigen::ArrayXXd test = evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
-  Eigen::ArrayXXd test3 = evaluate(stack3, x, constants);
-  Eigen::ArrayXXd test4 = evaluate(stack4, x, constants);
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test3 = Evaluate(stack3, x, constants);
+  Eigen::ArrayXXd test4 = Evaluate(stack4, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << (3. * pow(7., 2.)), 0., 0.,
          (3. * pow(6., 2.)), 0., 0.,
@@ -515,11 +515,11 @@ TEST(AGraphNodesTest, Power) {
             (pow(6., 6.) * (1 + log(6.))), 0., 0.,
             (pow(9., 9.) * (1 + log(9.))), 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xc =
-    evaluateWithDerivative(stack, x, constants);
+    EvaluateWithDerivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_cx =
-    evaluateWithDerivative(stack2, x, constants);
+    EvaluateWithDerivative(stack2, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_xx =
-    evaluateWithDerivative(stack3, x, constants);
+    EvaluateWithDerivative(stack3, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -553,16 +553,16 @@ TEST(AGraphNodesTest, Absolute) {
   a_true << 3., 3., 3.;
   Eigen::ArrayXXd a_true_x(3, 1);
   a_true_x << 7., 6., 9.;
-  Eigen::ArrayXXd test = evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   Eigen::ArrayXXd d_true_x(3, 3);
   d_true_x << -1., 0., 0., 1., 0., 0., -1., 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_c =
-    evaluateWithDerivative(stack, x, constants);
+    EvaluateWithDerivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_x =
-    evaluateWithDerivative(stack2, x, constants);
+    EvaluateWithDerivative(stack2, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
@@ -592,8 +592,8 @@ TEST(AGraphNodesTest, Sqrt) {
   a_true << (sqrt(abs(3.))), (sqrt(abs(3.))), (sqrt(abs(3.)));
   Eigen::ArrayXXd a_true_x(3, 1);
   a_true_x << (sqrt(abs(-7.))), (sqrt(abs(6.))), (sqrt(abs(-9.)));
-  Eigen::ArrayXXd test = evaluate(stack, x, constants);
-  Eigen::ArrayXXd test2 = evaluate(stack2, x, constants);
+  Eigen::ArrayXXd test = Evaluate(stack, x, constants);
+  Eigen::ArrayXXd test2 = Evaluate(stack2, x, constants);
   Eigen::ArrayXXd d_true(3, 3);
   d_true << 0., 0., 0., 0., 0., 0., 0., 0., 0.;
   Eigen::ArrayXXd d_true_x(3, 3);
@@ -601,9 +601,9 @@ TEST(AGraphNodesTest, Sqrt) {
            1. / (2.*sqrt(6.)), 0., 0.,
            -1. / (2.*sqrt(9.)), 0., 0.;
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_c =
-    evaluateWithDerivative(stack, x, constants);
+    EvaluateWithDerivative(stack, x, constants);
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> d_x =
-    evaluateWithDerivative(stack2, x, constants);
+    EvaluateWithDerivative(stack2, x, constants);
 
   for (size_t i = 0; i < x.rows(); ++i) {
     ASSERT_DOUBLE_EQ(test(i), a_true(i));
