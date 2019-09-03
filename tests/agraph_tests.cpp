@@ -270,7 +270,6 @@ TEST_F(AGraphTest, setting_command_array_unsets_fitness) {
 
 TEST_F(AGraphTest, TestDistanceBetweenGraphs) {
   ASSERT_EQ(sample_agraph_1.Distance(sample_agraph_1), 0);
-  sample_agraph_1.Distance(all_funcs_graph);
 }
 
 // class AGraphExceptionTest : public ::testing::Test {

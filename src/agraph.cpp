@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <limits>
 #include <iostream>
 #include <sstream>
@@ -71,92 +72,21 @@ namespace {
 
 std::string print_string_with_args(const std::string& string,
                                    const std::string& arg1,
-                                   const std::string& arg2) {
-  std::stringstream stream;
-  bool first_found = false;
-  for (auto character = string.begin(); character != string.end(); character++) {
-    if (*character == '{' && *(character + 1) == '}') {
-      stream << ((!first_found) ? arg1 : arg2);
-      character++;
-      first_found = true;
-    } else {
-      stream << *character;
-    }
-  }
-  return stream.str();
-}
+                                   const std::string& arg2);
 
 bool check_optimization_requirement(AGraph& agraph,
-                                    const std::vector<bool>& utilized_commands) {
-  Eigen::ArrayX3i command_array = agraph.GetCommandArray();
-  for (int i = 0; i < command_array.rows(); i++) {
-    if (utilized_commands[i] && command_array(i, ArrayProps::kNodeIdx) == Op::LOAD_C) {
-      if (command_array(i, ArrayProps::kOp1) == Op::C_OPTIMIZE ||
-          command_array(i, ArrayProps::kOp1) >=
-          agraph.GetLocalOptimizationParams().size()) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
+                                    const std::vector<bool>& utilized_commands);
 
 std::string get_stack_element_string(const AGraph& individual,
                                      int command_index,
-                                     const Eigen::ArrayX3i& stack_element) {
-  int node = stack_element(0, ArrayProps::kNodeIdx);
-  int param1 = stack_element(0, ArrayProps::kOp1);
-  int param2 = stack_element(0, ArrayProps::kOp2);
-
-  std::string temp_string = "("+ std::to_string(command_index) +") <= ";
-  if (node == Op::LOAD_X) {
-    temp_string += "X_" + std::to_string(param1);
-  } else if (node == Op::LOAD_C) {
-    if (param1 == Op::C_OPTIMIZE ||
-        param1 >= individual.GetLocalOptimizationParams().size()) {
-      temp_string += "C";
-    } else {
-      Eigen::VectorXd parameter = individual.GetLocalOptimizationParams();
-      temp_string += "C_" + std::to_string(param1) + " = " + 
-                     std::to_string(parameter[param1]);
-    }
-  } else {
-    std::string param1_str = std::to_string(param1);
-    std::string param2_str = std::to_string(param2);
-    temp_string += print_string_with_args(kStackPrintMap.at(node),
-                                          param1_str,
-                                          param2_str);
-  }
-  temp_string += '\n';
-  return temp_string;
-}
+                                     const Eigen::ArrayX3i& stack_element);
 
 std::string get_formatted_element_string(const AGraph& individual,
                                          const Eigen::ArrayX3i& stack_element,
                                          std::vector<std::string> string_list,
-                                         const PrintMap& format_map) {
-  int node = stack_element(0, ArrayProps::kNodeIdx);
-  int param1 = stack_element(0, ArrayProps::kOp1);
-  int param2 = stack_element(0, ArrayProps::kOp2);
+                                         const PrintMap& format_map);
 
-  std::string temp_string;
-  if (node == Op::LOAD_X) {
-    temp_string = "X_" + std::to_string(param1);
-  } else if (node == Op::LOAD_C) {
-    if (param1 == Op::C_OPTIMIZE ||
-        param1 >= individual.GetLocalOptimizationParams().size()) {
-      temp_string = "?";
-    } else {
-      Eigen::VectorXd parameter = individual.GetLocalOptimizationParams();
-      temp_string = std::to_string(parameter[param1]);
-    }
-  } else {
-    temp_string = print_string_with_args(format_map.at(node),
-                                         string_list[param1],
-                                         string_list[param2]);
-  }
-  return temp_string;
-}
+
 } // namespace
 
 AGraph::AGraph(
@@ -195,7 +125,7 @@ AGraph AGraph::Copy() {
   return return_val;
 }
 
-Eigen::ArrayX3i AGraph::GetCommandArray() const {
+const Eigen::ArrayX3i& AGraph::GetCommandArray() const {
   return command_array_;
 }
 
@@ -413,17 +343,7 @@ void AGraph::ForceRenumberConstants() {
 }
 
 int AGraph::Distance(const AGraph& agraph) {
-  std::vector<bool> similar_operations(std::max(command_array_.rows(),
-                                       agraph.GetCommandArray().rows()));
-  for (int i = 0; i < command_array_.rows(); i ++) {
-    // if (!valid_index(i, agraph.GetCommandArray())) {
-    //   std::fill(similar_operations, std::begin(similar_operations) + i,
-    //                                 std::end(similar_operations));
-    // } else {
-    //   bool val = (command_array_.row(i) == agraph.GetCommandArray().row(i));
-    // }
-    std::cout << (command_array_.row(0) == agraph.GetCommandArray().row(0)) << std::endl;
-  }
+  return (command_array_ != agraph.GetCommandArray()).sum();
 }
 
 bool AGraph::HasArityTwo(int node) {
@@ -465,4 +385,96 @@ const bool AGraph::kIsTerminalMap[13] = {
   false,
   false
 };
+
+namespace {
+
+std::string print_string_with_args(const std::string& string,
+                                   const std::string& arg1,
+                                   const std::string& arg2) {
+  std::stringstream stream;
+  bool first_found = false;
+  for (auto character = string.begin(); character != string.end(); character++) {
+    if (*character == '{' && *(character + 1) == '}') {
+      stream << ((!first_found) ? arg1 : arg2);
+      character++;
+      first_found = true;
+    } else {
+      stream << *character;
+    }
+  }
+  return stream.str();
 }
+
+bool check_optimization_requirement(AGraph& agraph,
+                                    const std::vector<bool>& utilized_commands) {
+  Eigen::ArrayX3i command_array = agraph.GetCommandArray();
+  for (int i = 0; i < command_array.rows(); i++) {
+    if (utilized_commands[i] && command_array(i, ArrayProps::kNodeIdx) == Op::LOAD_C) {
+      if (command_array(i, ArrayProps::kOp1) == Op::C_OPTIMIZE ||
+          command_array(i, ArrayProps::kOp1) >=
+          agraph.GetLocalOptimizationParams().size()) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+std::string get_stack_element_string(const AGraph& individual,
+                                     int command_index,
+                                     const Eigen::ArrayX3i& stack_element) {
+  int node = stack_element(0, ArrayProps::kNodeIdx);
+  int param1 = stack_element(0, ArrayProps::kOp1);
+  int param2 = stack_element(0, ArrayProps::kOp2);
+
+  std::string temp_string = "("+ std::to_string(command_index) +") <= ";
+  if (node == Op::LOAD_X) {
+    temp_string += "X_" + std::to_string(param1);
+  } else if (node == Op::LOAD_C) {
+    if (param1 == Op::C_OPTIMIZE ||
+        param1 >= individual.GetLocalOptimizationParams().size()) {
+      temp_string += "C";
+    } else {
+      Eigen::VectorXd parameter = individual.GetLocalOptimizationParams();
+      temp_string += "C_" + std::to_string(param1) + " = " + 
+                     std::to_string(parameter[param1]);
+    }
+  } else {
+    std::string param1_str = std::to_string(param1);
+    std::string param2_str = std::to_string(param2);
+    temp_string += print_string_with_args(kStackPrintMap.at(node),
+                                          param1_str,
+                                          param2_str);
+  }
+  temp_string += '\n';
+  return temp_string;
+}
+
+std::string get_formatted_element_string(const AGraph& individual,
+                                         const Eigen::ArrayX3i& stack_element,
+                                         std::vector<std::string> string_list,
+                                         const PrintMap& format_map) {
+  int node = stack_element(0, ArrayProps::kNodeIdx);
+  int param1 = stack_element(0, ArrayProps::kOp1);
+  int param2 = stack_element(0, ArrayProps::kOp2);
+
+  std::string temp_string;
+  if (node == Op::LOAD_X) {
+    temp_string = "X_" + std::to_string(param1);
+  } else if (node == Op::LOAD_C) {
+    if (param1 == Op::C_OPTIMIZE ||
+        param1 >= individual.GetLocalOptimizationParams().size()) {
+      temp_string = "?";
+    } else {
+      Eigen::VectorXd parameter = individual.GetLocalOptimizationParams();
+      temp_string = std::to_string(parameter[param1]);
+    }
+  } else {
+    temp_string = print_string_with_args(format_map.at(node),
+                                         string_list[param1],
+                                         string_list[param2]);
+  }
+  return temp_string;
+}
+} // namespace (anonymous)
+} // namespace bingo

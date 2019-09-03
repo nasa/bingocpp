@@ -14,6 +14,126 @@ namespace {
 Eigen::ArrayXXd reverse_eval(const std::pair<int, int>& deriv_shape,
                              const int deriv_wrt_node,
                              const std::vector<Eigen::ArrayXXd>& forward_eval,
+                             const Eigen::ArrayX3i& stack);
+
+Eigen::ArrayXXd reverse_eval_with_mask(const std::pair<int, int>& deriv_shape,
+                                       const int deriv_wrt_node,
+                                       const std::vector<Eigen::ArrayXXd>& forward_eval,
+                                       const Eigen::ArrayX3i& stack,
+                                       const std::vector<bool>& mask);
+
+std::vector<Eigen::ArrayXXd> forward_eval(
+    const Eigen::ArrayX3i& stack,
+    const Eigen::ArrayXXd& x,
+    const Eigen::VectorXd& constants);
+
+std::vector<Eigen::ArrayXXd> forward_eval_with_mask(
+    const Eigen::ArrayX3i& stack,
+    const Eigen::ArrayXXd& x,
+    const Eigen::VectorXd& constants,
+    const std::vector<bool>& mask);
+
+EvalAndDerivative evaluate_with_derivative(
+    const Eigen::ArrayX3i& stack,
+    const Eigen::ArrayXXd& x,
+    const Eigen::VectorXd& constants,
+    const bool param_x_or_c);
+
+EvalAndDerivative evaluate_with_derivative_and_mask(
+    const Eigen::ArrayX3i& stack,
+    const Eigen::ArrayXXd& x,
+    const Eigen::VectorXd& constants,
+    const std::vector<bool>& mask,
+    const bool param_x_or_c);
+} // namespace
+
+Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3i& stack,
+                         const Eigen::ArrayXXd& x,
+                         const Eigen::VectorXd& constants) {
+  std::vector<Eigen::ArrayXXd> _forward_eval = forward_eval(
+      stack, x, constants);
+  return _forward_eval.back();  
+}
+
+std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
+    const Eigen::ArrayX3i& stack,
+    const Eigen::ArrayXXd& x,
+    const Eigen::VectorXd& constants,
+    const bool param_x_or_c) {
+  return evaluate_with_derivative(
+    stack, x, constants, param_x_or_c);
+}
+
+Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i& stack,
+                                    const Eigen::ArrayXXd& x,
+                                    const Eigen::VectorXd& constants) {
+  std::vector<bool> mask = GetUtilizedCommands(stack);
+  std::vector<Eigen::ArrayXXd> forward_eval = forward_eval_with_mask(
+      stack, x, constants, mask);
+  return forward_eval.back();
+}
+
+EvalAndDerivative SimplifyAndEvaluateWithDerivative(
+    const Eigen::ArrayX3i& stack,
+    const Eigen::ArrayXXd& x,
+    const Eigen::VectorXd& constants,
+    const bool param_x_or_c) {
+  std::vector<bool> mask = GetUtilizedCommands(stack);
+  return evaluate_with_derivative_and_mask(stack, x, constants, mask, param_x_or_c);
+}
+
+std::vector<bool> GetUtilizedCommands(const Eigen::ArrayX3i& stack) {
+  std::vector<bool> used_commands(stack.rows());
+  used_commands.back() = true;
+  int stack_size = stack.rows();
+  for (int i = 1; i < stack_size; i++) {
+    int row = stack_size - i;
+    int node = stack(row, ArrayProps::kNodeIdx);
+    int param1 = stack(row, ArrayProps::kOp1);
+    int param2 = stack(row, ArrayProps::kOp2);
+    if (used_commands[row] && node > Op::LOAD_C) {
+      used_commands[param1] = true;
+      if (AGraph::HasArityTwo(node)) {
+        used_commands[param2] = true;
+      }
+    }
+  }
+  return used_commands;
+}
+
+Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i& stack) {
+  std::vector<bool> used_command = GetUtilizedCommands(stack);
+  std::map<int, int> reduced_param_map;
+  int num_commands = 0;
+  num_commands = std::accumulate(used_command.begin(), used_command.end(), 0);
+  Eigen::ArrayX3i new_stack(num_commands, 3);
+
+  for (int i = 0, j = 0; i < stack.rows(); ++i) {
+    if (used_command[i]) {
+      new_stack(j, ArrayProps::kNodeIdx) = stack(i, ArrayProps::kNodeIdx);
+      if (AGraph::IsTerminal(new_stack(j, ArrayProps::kNodeIdx))) {
+        new_stack(j, ArrayProps::kOp1) = stack(i, ArrayProps::kOp1);
+        new_stack(j, ArrayProps::kOp2) = stack(i, ArrayProps::kOp2);
+      } else {
+        new_stack(j, ArrayProps::kOp1) = reduced_param_map[stack(i, ArrayProps::kOp1)];
+        if (AGraph::HasArityTwo(new_stack(j, ArrayProps::kNodeIdx))) {
+          new_stack(j, ArrayProps::kOp2) = reduced_param_map[stack(i, ArrayProps::kOp2)];
+        } else {
+          new_stack(j, ArrayProps::kOp2) = new_stack(j, ArrayProps::kOp2);
+        }
+      }
+      reduced_param_map[i] = j;
+      ++j;
+    }
+  }
+  return new_stack;
+}
+
+namespace {
+
+Eigen::ArrayXXd reverse_eval(const std::pair<int, int>& deriv_shape,
+                             const int deriv_wrt_node,
+                             const std::vector<Eigen::ArrayXXd>& forward_eval,
                              const Eigen::ArrayX3i& stack) {
   int num_samples = deriv_shape.first;
   int num_features = deriv_shape.second;
@@ -153,88 +273,6 @@ EvalAndDerivative evaluate_with_derivative_and_mask(
       deriv_shape, deriv_wrt_node, forward_eval, stack, mask);
   return std::make_pair(forward_eval.back(), derivative);
 }
-} // namespace
-
-Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3i& stack,
-                         const Eigen::ArrayXXd& x,
-                         const Eigen::VectorXd& constants) {
-  std::vector<Eigen::ArrayXXd> _forward_eval = forward_eval(
-      stack, x, constants);
-  return _forward_eval.back();  
-}
-
-std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
-    const Eigen::ArrayX3i& stack,
-    const Eigen::ArrayXXd& x,
-    const Eigen::VectorXd& constants,
-    const bool param_x_or_c) {
-  return evaluate_with_derivative(
-    stack, x, constants, param_x_or_c);
-}
-
-Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i& stack,
-                                    const Eigen::ArrayXXd& x,
-                                    const Eigen::VectorXd& constants) {
-  std::vector<bool> mask = GetUtilizedCommands(stack);
-  std::vector<Eigen::ArrayXXd> forward_eval = forward_eval_with_mask(
-      stack, x, constants, mask);
-  return forward_eval.back();
-}
-
-EvalAndDerivative SimplifyAndEvaluateWithDerivative(
-    const Eigen::ArrayX3i& stack,
-    const Eigen::ArrayXXd& x,
-    const Eigen::VectorXd& constants,
-    const bool param_x_or_c) {
-  std::vector<bool> mask = GetUtilizedCommands(stack);
-  return evaluate_with_derivative_and_mask(stack, x, constants, mask, param_x_or_c);
-}
-
-std::vector<bool> GetUtilizedCommands(const Eigen::ArrayX3i& stack) {
-  std::vector<bool> used_commands(stack.rows());
-  used_commands.back() = true;
-  int stack_size = stack.rows();
-  for (int i = 1; i < stack_size; i++) {
-    int row = stack_size - i;
-    int node = stack(row, ArrayProps::kNodeIdx);
-    int param1 = stack(row, ArrayProps::kOp1);
-    int param2 = stack(row, ArrayProps::kOp2);
-    if (used_commands[row] && node > Op::LOAD_C) {
-      used_commands[param1] = true;
-      if (AGraph::HasArityTwo(node)) {
-        used_commands[param2] = true;
-      }
-    }
-  }
-  return used_commands;
-}
-
-Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i& stack) {
-  std::vector<bool> used_command = GetUtilizedCommands(stack);
-  std::map<int, int> reduced_param_map;
-  int num_commands = 0;
-  num_commands = std::accumulate(used_command.begin(), used_command.end(), 0);
-  Eigen::ArrayX3i new_stack(num_commands, 3);
-
-  for (int i = 0, j = 0; i < stack.rows(); ++i) {
-    if (used_command[i]) {
-      new_stack(j, ArrayProps::kNodeIdx) = stack(i, ArrayProps::kNodeIdx);
-      if (AGraph::IsTerminal(new_stack(j, ArrayProps::kNodeIdx))) {
-        new_stack(j, ArrayProps::kOp1) = stack(i, ArrayProps::kOp1);
-        new_stack(j, ArrayProps::kOp2) = stack(i, ArrayProps::kOp2);
-      } else {
-        new_stack(j, ArrayProps::kOp1) = reduced_param_map[stack(i, ArrayProps::kOp1)];
-        if (AGraph::HasArityTwo(new_stack(j, ArrayProps::kNodeIdx))) {
-          new_stack(j, ArrayProps::kOp2) = reduced_param_map[stack(i, ArrayProps::kOp2)];
-        } else {
-          new_stack(j, ArrayProps::kOp2) = new_stack(j, ArrayProps::kOp2);
-        }
-      }
-      reduced_param_map[i] = j;
-      ++j;
-    }
-  }
-  return new_stack;
-}
+} // namespace (anonymous)
 } // namespace backend
 } // namespace bingo 

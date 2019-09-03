@@ -65,7 +65,7 @@ class AGraph {
    * 
    * @return Eigen::ArrayX3i The command array for this graph.
    */
-  Eigen::ArrayX3i GetCommandArray() const;
+  const Eigen::ArrayX3i& GetCommandArray() const;
   
   /**
    * @brief Set the Command Array object
