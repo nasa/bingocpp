@@ -143,54 +143,28 @@ void AGraph::NotifyCommandArrayModificiation() {
 }
 
 void AGraph::process_modified_command_array() {
-  std::vector<bool> util = GetUtilizedCommands();
+  if (!manual_constants_) {
+    std::vector<bool> util = GetUtilizedCommands();
 
-  needs_opt_ = check_optimization_requirement(*this, util);
-  if (needs_opt_)  {
-    renumber_constants(util);
+    needs_opt_ = check_optimization_requirement(*this, util);
+    if (needs_opt_)  {
+      renumber_constants(util);
+    }
   }
-  update_short_command_array(util);
+  short_command_array_ = backend::SimplifyStack(command_array_);
 }
 
 void AGraph::renumber_constants (const std::vector<bool>& utilized_commands) {
   int const_num = 0;
   int command_array_depth = command_array_.rows();
   for (int i = 0; i < command_array_depth; i++) {
-    if (utilized_commands[i] && command_array_(i, ArrayProps::kNodeIdx) == Op::LOAD_C) {
+    if (utilized_commands[i] &&
+        command_array_(i, ArrayProps::kNodeIdx) == Op::LOAD_C) {
       command_array_.row(i) << 1, const_num , const_num; 
       const_num ++;
     }
   }
   num_constants_ = const_num;
-}
-
-void AGraph::update_short_command_array(const std::vector<bool>& utilized_commands) {
-  int stack_depth = std::count_if (
-      utilized_commands.begin(), utilized_commands.end(), [](bool i) {
-        return i;
-  });
-
-  short_command_array_ = Eigen::ArrayX3i::Zero(stack_depth, 3);
-  int new_index = 0;
-  for (size_t old_index = 0; old_index < utilized_commands.size(); old_index++) {
-    if (utilized_commands[old_index]) {
-      short_command_array_.row(new_index++) = command_array_.row(old_index);
-    }
-  }
-
-  int inclusive_sum_scan[utilized_commands.size()];
-  inclusive_sum_scan[0] = (utilized_commands[0] ? 1 : 0);
-  for (size_t i = 1; i < utilized_commands.size(); i++) {
-    inclusive_sum_scan[i] = inclusive_sum_scan[i - 1] +
-                            (utilized_commands[i] ? 1 : 0);
-  }
-
-  for (auto command : short_command_array_.rowwise()) {
-    if (!kIsTerminalMap[command(0, ArrayProps::kNodeIdx)]) {
-      command(0, ArrayProps::kOp1) = inclusive_sum_scan[command(0, ArrayProps::kOp1)] - 1;
-      command(0, ArrayProps::kOp2) = inclusive_sum_scan[command(0, ArrayProps::kOp2)] - 1;
-    }
-  }
 }
 
 double AGraph::GetFitness() const {
@@ -235,7 +209,8 @@ Eigen::VectorXd AGraph::GetLocalOptimizationParams() const {
   return constants_;
 }
 
-Eigen::ArrayXXd AGraph::EvaluateEquationAt(Eigen::ArrayXXd& x) {
+Eigen::ArrayXXd 
+AGraph::EvaluateEquationAt(Eigen::ArrayXXd& x) {
   Eigen::ArrayXXd f_of_x; 
   try {
     f_of_x = backend::Evaluate(this->command_array_,
