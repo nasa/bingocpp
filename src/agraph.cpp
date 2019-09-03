@@ -50,6 +50,22 @@ const PrintMap kConsolePrintMap {
   {12, "sqrt({})"},
 };
 
+const PrintVector kOperatorNames {
+  std::vector<std::string> {"load", "x"},
+  std::vector<std::string> {"constant", "c"},
+  std::vector<std::string> {"add", "addition", "+"},
+  std::vector<std::string> {"subtract", "subtraction", "-"},
+  std::vector<std::string> {"multiply", "multiplication", "*"},
+  std::vector<std::string> {"divide", "division", "/"},
+  std::vector<std::string> {"sine", "sin"},
+  std::vector<std::string> {"cosine", "cos"},
+  std::vector<std::string> {"exponential", "exp", "e"},
+  std::vector<std::string> {"logarithm", "log"},
+  std::vector<std::string> {"power", "pow", "^"},
+  std::vector<std::string> {"absolute value", "||", "|"},
+  std::vector<std::string> {"square root", "sqrt"}
+};
+
 namespace bingo {
 namespace {
 
@@ -143,15 +159,25 @@ std::string get_formatted_element_string(const AGraph& individual,
 }
 } // namespace
 
-AGraph::AGraph() {
-  command_array_ = Eigen::ArrayX3i(0, 3);
-  short_command_array_ = Eigen::ArrayX3i(0, 3);
-  constants_ = Eigen::VectorXd(0);
-  num_constants_ = 0;
-  needs_opt_ = false;
-  fitness_ = 1e9;
-  fit_set_ = false;
-  genetic_age_ = 0;
+AGraph::AGraph(
+    Eigen::ArrayX3i command_array,
+    Eigen::ArrayX3i short_command_array,
+    Eigen::VectorXd constants,
+    int num_constants,
+    bool manual_constants,
+    int needs_opt,
+    double fitness,
+    bool fit_set,
+    int genetic_age) {
+  command_array_ = command_array;
+  short_command_array_ = short_command_array;
+  constants_ = constants;
+  num_constants_ = num_constants;
+  manual_constants_ = manual_constants;
+  needs_opt_ = needs_opt;
+  fitness_ = fitness;
+  fit_set_ = fit_set;
+  genetic_age_ = genetic_age;
 }
 
 AGraph::AGraph(const AGraph& agraph) {
@@ -293,7 +319,8 @@ Eigen::ArrayXXd AGraph::EvaluateEquationAt(Eigen::ArrayXXd& x) {
   } 
 }
 
-EvalAndDerivative AGraph::EvaluateEquationWithXGradientAt(Eigen::ArrayXXd& x) {
+EvalAndDerivative
+AGraph::EvaluateEquationWithXGradientAt(Eigen::ArrayXXd& x) {
   EvalAndDerivative df_dx;
   try {
     df_dx = backend::EvaluateWithDerivative(this->command_array_,
@@ -310,8 +337,8 @@ EvalAndDerivative AGraph::EvaluateEquationWithXGradientAt(Eigen::ArrayXXd& x) {
   }
 }
 
-EvalAndDerivative AGraph::EvaluateEquationWithLocalOptGradientAt(
-    Eigen::ArrayXXd& x) {
+EvalAndDerivative
+AGraph::EvaluateEquationWithLocalOptGradientAt(Eigen::ArrayXXd& x) {
   EvalAndDerivative df_dc;
   try {
     df_dc = backend::EvaluateWithDerivative(this->command_array_,
@@ -378,6 +405,25 @@ int AGraph::GetComplexity() const {
   return std::count_if (commands.begin(), commands.end(), [](bool i) {
     return i;
   });
+}
+
+void AGraph::ForceRenumberConstants() {
+  std::vector<bool> util_commands = GetUtilizedCommands();
+  renumber_constants(util_commands);
+}
+
+int AGraph::Distance(const AGraph& agraph) {
+  std::vector<bool> similar_operations(std::max(command_array_.rows(),
+                                       agraph.GetCommandArray().rows()));
+  for (int i = 0; i < command_array_.rows(); i ++) {
+    // if (!valid_index(i, agraph.GetCommandArray())) {
+    //   std::fill(similar_operations, std::begin(similar_operations) + i,
+    //                                 std::end(similar_operations));
+    // } else {
+    //   bool val = (command_array_.row(i) == agraph.GetCommandArray().row(i));
+    // }
+    std::cout << (command_array_.row(0) == agraph.GetCommandArray().row(0)) << std::endl;
+  }
 }
 
 bool AGraph::HasArityTwo(int node) {

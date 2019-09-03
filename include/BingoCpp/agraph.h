@@ -27,6 +27,7 @@
 #include <Eigen/Core>
 
 typedef std::unordered_map<int, std::string> PrintMap;
+typedef std::vector<std::vector<std::string>> PrintVector;
 typedef std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvalAndDerivative;
 
 namespace bingo {
@@ -39,7 +40,16 @@ namespace bingo {
  */
 class AGraph {
  public:
-  AGraph();
+  AGraph(
+      Eigen::ArrayX3i command_array = Eigen::ArrayX3i(0, 3),
+      Eigen::ArrayX3i short_command_array = Eigen::ArrayX3i(0, 3),
+      Eigen::VectorXd constants = Eigen::VectorXd(0),
+      int num_constants = 0,
+      bool manual_constants = false,
+      int needs_opt = false,
+      double fitness = 1e9,
+      bool fit_set = false,
+      int genetic_age = 0);
 
   AGraph(const AGraph& agraph);
 
@@ -225,6 +235,10 @@ class AGraph {
    */
   int GetComplexity() const;
 
+  void ForceRenumberConstants();
+
+  int Distance(const AGraph& agraph);
+
   /**
    * @brief Determines if the equation operation has arity two.
    * 
@@ -249,6 +263,7 @@ class AGraph {
   Eigen::VectorXd constants_;
   bool needs_opt_;
   int num_constants_;
+  bool manual_constants_ = false;
   double fitness_;
   bool fit_set_;
   int genetic_age_;

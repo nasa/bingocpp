@@ -230,7 +230,7 @@ TEST_F(AGraphTest, evaluatWithCDerivative) {
   ASSERT_TRUE(testutils::almost_equal(sample_agraph_1_values.grad_c, df_dc));
 }
 
-TEST_F(AGraphTest, get_number_of_optimization_params) {
+TEST_F(AGraphTest, NeedsLocalOptimization) {
   ASSERT_TRUE(invalid_graph.NeedsLocalOptimization());
 }
 
@@ -266,6 +266,11 @@ TEST_F(AGraphTest, setting_command_array_unsets_fitness) {
   ASSERT_TRUE(sample_agraph_1.IsFitnessSet());
   sample_agraph_1.SetCommandArray(Eigen::ArrayX3i::Ones(1, 3));
   ASSERT_FALSE(sample_agraph_1.IsFitnessSet());
+}
+
+TEST_F(AGraphTest, TestDistanceBetweenGraphs) {
+  ASSERT_EQ(sample_agraph_1.Distance(sample_agraph_1), 0);
+  sample_agraph_1.Distance(all_funcs_graph);
 }
 
 // class AGraphExceptionTest : public ::testing::Test {
