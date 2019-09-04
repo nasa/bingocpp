@@ -41,15 +41,16 @@ namespace bingo {
 class AGraph {
  public:
   AGraph(
+      int genetic_age = 0,
+      double fitness = 1e9,
+      bool fit_set = false,
       Eigen::ArrayX3i command_array = Eigen::ArrayX3i(0, 3),
       Eigen::ArrayX3i short_command_array = Eigen::ArrayX3i(0, 3),
       Eigen::VectorXd constants = Eigen::VectorXd(0),
-      int num_constants = 0,
-      bool manual_constants = false,
       int needs_opt = false,
-      double fitness = 1e9,
-      bool fit_set = false,
-      int genetic_age = 0);
+      int num_constants = 0,
+      bool manual_constants = false
+      );
 
   AGraph(const AGraph& agraph);
 
@@ -271,16 +272,8 @@ class AGraph {
   // To string operator when passed into stream
   friend std::ostream& operator<<(std::ostream&, const AGraph&);
 
-  // Maps for operation nodes.
-  static const bool kIsArity2Map[13]; 
-  static const bool kIsTerminalMap[13];
-
   // Helper Functions
   void process_modified_command_array();
-  void renumber_constants(const std::vector<bool>& utilized_commands);
-  void update_short_command_array(const std::vector<bool>& utilized_commands);
-  std::string get_stack_string(const bool is_short=false) const;
-  std::string get_formatted_string_using(const PrintMap& format_map) const;
 };
 } // namespace bingo
 #endif //BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_H_
