@@ -45,6 +45,7 @@
 
 #include "BingoCpp/acyclic_graph.h"
 #include "BingoCpp/backend.h"
+#include "BingoCpp/agraph.h"
 #include "BingoCpp/graph_manip.h"
 #include "BingoCpp/fitness_metric.h"
 #include "BingoCpp/training_data.h"
@@ -58,7 +59,7 @@ namespace py = pybind11;
 using namespace bingo;
 
 PYBIND11_MODULE(bingocpp, m) {
-  m.doc() = "pybind11 example plugin";  // optional module docstring
+  m.doc() = "bingocpp module";  // optional module docstring
   m.def("is_cpp", &backend::IsCpp, "is the backend c++");
   m.def("evaluate", &backend::Evaluate, "evaluate");
   m.def("simplify_and_evaluate", &backend::SimplifyAndEvaluate,
@@ -73,9 +74,40 @@ PYBIND11_MODULE(bingocpp, m) {
         "get the commands that are utilized in a stack");
   m.def("simplify_stack", &backend::SimplifyStack,
         "simplify stack to only utilized commands");
-        
-        
+
   m.def("rand_init", &rand_init);
+
+  py::class_<AGraph>(m, "AGraph")
+    .def(py::init<bool &>(), py::arg("manual_constants") = false)
+    .def_property("command_array",
+                  &AGraph::GetCommandArray,
+                  &AGraph::SetCommandArray)
+    .def_property("fitness",
+                  &AGraph::GetFitness,
+                  &AGraph::SetFitness)
+    .def_property("fit_set",
+                  &AGraph::IsFitnessSet,
+                  &AGraph::SetFitness)
+    .def("notify_command_array_modification",
+         &AGraph::NotifyCommandArrayModificiation)
+    .def("needs_local_optimization", &AGraph::NeedsLocalOptimization)
+    .def("get_utilized_commands", &AGraph::GetUtilizedCommands)
+    .def("get_number_local_optimization_params",
+        &AGraph::GetNumberLocalOptimizationParams)
+    .def("set_local_optimization_params", &AGraph::SetLocalOptimizationParams)
+    .def("evaluate_equation_at", &AGraph::EvaluateEquationAt)
+    .def("evaluate_equation_with_x_gradient_at",
+        &AGraph::EvaluateEquationWithXGradientAt)
+    .def("evaluate_equation_with_local_opt_gradient",
+        &AGraph::EvaluateEquationWithLocalOptGradientAt)
+    .def("__str__", &AGraph::GetConsoleString)
+    .def("get_latex_string", &AGraph::GetLatexString)
+    .def("get_console_string", &AGraph::GetConsoleString)
+    .def("get_stack_string", &AGraph::GetStackString)
+    .def("get_complexity", &AGraph::GetComplexity)
+    .def("distance", &AGraph::Distance)
+    .def("copy", &AGraph::Copy);
+
   py::class_<AcyclicGraph>(m, "AcyclicGraph")
   .def(py::init<>())
   .def(py::init<AcyclicGraph &>())
@@ -96,6 +128,7 @@ PYBIND11_MODULE(bingocpp, m) {
   .def("utilized_commands", &AcyclicGraph::utilized_commands)
   .def("complexity", &AcyclicGraph::complexity)
   .def("__str__", &AcyclicGraph::print_stack);
+
   py::class_<AcyclicGraphManipulator>(m, "AcyclicGraphManipulator")
   .def(py::init<int &, int &, int &, float &, float &, int &>(),
        py::arg("nvars") = 3, py::arg("ag_size") = 15, py::arg("nloads") = 1,
@@ -147,8 +180,3 @@ PYBIND11_MODULE(bingocpp, m) {
   m.def("GramPoly", &GramPoly);
   m.def("GramWeight", &GramWeight);
 }
-
-
-
-
-

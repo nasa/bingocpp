@@ -40,17 +40,7 @@ namespace bingo {
  */
 class AGraph {
  public:
-  AGraph(
-      int genetic_age = 0,
-      double fitness = 1e9,
-      bool fit_set = false,
-      Eigen::ArrayX3i command_array = Eigen::ArrayX3i(0, 3),
-      Eigen::ArrayX3i short_command_array = Eigen::ArrayX3i(0, 3),
-      Eigen::VectorXd constants = Eigen::VectorXd(0),
-      int needs_opt = false,
-      int num_constants = 0,
-      bool manual_constants = false
-      );
+  AGraph(bool manual_consants = false);
 
   AGraph(const AGraph& agraph);
 
@@ -102,6 +92,9 @@ class AGraph {
    * @return false otherwise
    */
   bool IsFitnessSet() const;
+
+
+  void SetFitnessStatus(bool val);
 
   /**
    * @brief Set the Genetic Age of this AGraph
@@ -264,7 +257,7 @@ class AGraph {
   Eigen::VectorXd constants_;
   bool needs_opt_;
   int num_constants_;
-  bool manual_constants_ = false;
+  bool manual_constants_;
   double fitness_;
   bool fit_set_;
   int genetic_age_;

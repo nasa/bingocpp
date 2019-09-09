@@ -43,35 +43,28 @@ std::string get_stack_element_string(const AGraph& individual,
                                      const Eigen::ArrayX3i& stack_element);
 } // namespace
 
-AGraph::AGraph(
-    int genetic_age,
-    double fitness,
-    bool fit_set,
-    Eigen::ArrayX3i command_array,
-    Eigen::ArrayX3i short_command_array,
-    Eigen::VectorXd constants,
-    int needs_opt,
-    int num_constants,
-    bool manual_constants) {
-  command_array_ = command_array;
-  short_command_array_ = short_command_array;
-  constants_ = constants;
-  num_constants_ = num_constants;
+AGraph::AGraph(bool manual_constants) {
+  command_array_ = Eigen::ArrayX3i(0, 3);
+  short_command_array_ = Eigen::ArrayX3i(0, 3);
+  constants_ = Eigen::VectorXd(0);
+  needs_opt_ = false;
+  num_constants_ = 0;
   manual_constants_ = manual_constants;
-  needs_opt_ = needs_opt;
-  fitness_ = fitness;
-  fit_set_ = fit_set;
-  genetic_age_ = genetic_age;
+  fitness_ = kFitnessNotSet;
+  fit_set_ = false;
+  genetic_age_ = 0;
 }
-
+    
 AGraph::AGraph(const AGraph& agraph) {
-  this->SetCommandArray(agraph.GetCommandArray());
-  constants_ = agraph.GetLocalOptimizationParams();
-  needs_opt_ = agraph.NeedsLocalOptimization();
-  num_constants_ = agraph.GetNumberLocalOptimizationParams();
-  fitness_ = agraph.GetFitness();
-  fit_set_ = agraph.IsFitnessSet();
-  genetic_age_ = agraph.GetGeneticAge();
+  command_array_ = agraph.command_array_;
+  short_command_array_ = agraph.short_command_array_;
+  constants_ = agraph.constants_;
+  needs_opt_ = agraph.needs_opt_;
+  num_constants_ = agraph.num_constants_;
+  manual_constants_ = agraph.manual_constants_;
+  fitness_ = agraph.fitness_;
+  fit_set_ = agraph.fit_set_;
+  genetic_age_ = agraph.genetic_age_;
 }
 
 AGraph AGraph::Copy() {
@@ -104,6 +97,10 @@ void AGraph::SetFitness(double fitness) {
 
 bool AGraph::IsFitnessSet() const {
   return fit_set_;
+}
+
+void AGraph::SetFitnessStatus(bool val) {
+  fit_set_ = val;
 }
 
 void AGraph::SetGeneticAge(const int age) {
