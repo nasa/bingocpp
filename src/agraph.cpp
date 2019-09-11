@@ -54,7 +54,7 @@ AGraph::AGraph(bool manual_constants) {
   fit_set_ = false;
   genetic_age_ = 0;
 }
-    
+  
 AGraph::AGraph(const AGraph& agraph) {
   command_array_ = agraph.command_array_;
   short_command_array_ = agraph.short_command_array_;
@@ -72,6 +72,10 @@ AGraph AGraph::Copy() {
 }
 
 const Eigen::ArrayX3i& AGraph::GetCommandArray() const {
+  return command_array_;
+}
+
+Eigen::ArrayX3i& AGraph::GetCommandArrayModifiable() {
   return command_array_;
 }
 
@@ -128,7 +132,11 @@ void AGraph::SetLocalOptimizationParams(Eigen::VectorXd params) {
   needs_opt_ = false;
 }
 
-Eigen::VectorXd AGraph::GetLocalOptimizationParams() const {
+const Eigen::VectorXd& AGraph::GetLocalOptimizationParams() const {
+  return constants_;
+}
+
+Eigen::VectorXd& AGraph::GetLocalOptimizationParamsModifiable() {
   return constants_;
 }
 
@@ -223,7 +231,7 @@ void AGraph::ForceRenumberConstants() {
 }
 
 int AGraph::Distance(const AGraph& agraph) {
-  return (command_array_ != agraph.GetCommandArray()).sum();
+  return (command_array_ != agraph.GetCommandArray()).count();
 }
 
 bool AGraph::HasArityTwo(int node) {
@@ -288,7 +296,6 @@ std::string get_formatted_string_using(
   for (auto stack_element : short_command_array.rowwise()) {
     std::string temp_string = get_formatted_element_string(
         agraph, stack_element, string_list, format_map);
-    std::cout << temp_string << std::endl;
     string_list.push_back(temp_string);
   }
   return string_list.back();

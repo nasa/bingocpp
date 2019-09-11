@@ -51,12 +51,17 @@ class AGraph {
    */
   AGraph Copy();
 
+  inline bool IsCpp() { return true; }
+
   /**
    * @brief Get the Command Array object
    * 
    * @return Eigen::ArrayX3i The command array for this graph.
    */
   const Eigen::ArrayX3i& GetCommandArray() const;
+
+
+  Eigen::ArrayX3i& GetCommandArrayModifiable();
   
   /**
    * @brief Set the Command Array object
@@ -158,7 +163,9 @@ class AGraph {
    * 
    * @return Eigen::VectorXd The constants in the AGraph
    */
-  Eigen::VectorXd GetLocalOptimizationParams() const;
+  const Eigen::VectorXd& GetLocalOptimizationParams() const;
+
+  Eigen::VectorXd& GetLocalOptimizationParamsModifiable();
 
   /**
    * @brief Evaluate the AGraph equatoin
