@@ -78,9 +78,12 @@ PYBIND11_MODULE(bingocpp, m) {
   m.def("rand_init", &rand_init);
 
   py::class_<AGraph>(m, "AGraph")
-    .def(py::init<bool &>(), py::arg("manual_constants") = false)
+    .def(py::init<bool &, AGraph *>(),
+        py::arg("manual_constants") = false,
+        py::arg("agraph_copy") = nullptr)
+    .def("is_cpp", &AGraph::IsCpp)
     .def_property("command_array",
-                  &AGraph::GetCommandArray,
+                  &AGraph::GetCommandArrayModifiable,
                   &AGraph::SetCommandArray)
     .def_property("fitness",
                   &AGraph::GetFitness,
@@ -88,17 +91,25 @@ PYBIND11_MODULE(bingocpp, m) {
     .def_property("fit_set",
                   &AGraph::IsFitnessSet,
                   &AGraph::SetFitness)
+    .def_property("genetic_age",
+                  &AGraph::GetGeneticAge,
+                  &AGraph::SetGeneticAge)
+    .def_property("constants",
+                  &AGraph::GetLocalOptimizationParamsModifiable,
+                  &AGraph::SetLocalOptimizationParams)
     .def("notify_command_array_modification",
          &AGraph::NotifyCommandArrayModificiation)
     .def("needs_local_optimization", &AGraph::NeedsLocalOptimization)
     .def("get_utilized_commands", &AGraph::GetUtilizedCommands)
     .def("get_number_local_optimization_params",
         &AGraph::GetNumberLocalOptimizationParams)
+    .def("get_local_optimization_params",
+        &AGraph::GetLocalOptimizationParamsModifiable)
     .def("set_local_optimization_params", &AGraph::SetLocalOptimizationParams)
     .def("evaluate_equation_at", &AGraph::EvaluateEquationAt)
     .def("evaluate_equation_with_x_gradient_at",
         &AGraph::EvaluateEquationWithXGradientAt)
-    .def("evaluate_equation_with_local_opt_gradient",
+    .def("evaluate_equation_with_local_opt_gradient_at",
         &AGraph::EvaluateEquationWithLocalOptGradientAt)
     .def("__str__", &AGraph::GetConsoleString)
     .def("get_latex_string", &AGraph::GetLatexString)
