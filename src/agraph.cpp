@@ -144,7 +144,7 @@ Eigen::ArrayXXd
 AGraph::EvaluateEquationAt(Eigen::ArrayXXd& x) {
   Eigen::ArrayXXd f_of_x; 
   try {
-    f_of_x = backend::Evaluate(this->command_array_,
+    f_of_x = backend::Evaluate(this->short_command_array_,
                                x,
                                this->constants_);
     return f_of_x;
@@ -159,7 +159,7 @@ EvalAndDerivative
 AGraph::EvaluateEquationWithXGradientAt(Eigen::ArrayXXd& x) {
   EvalAndDerivative df_dx;
   try {
-    df_dx = backend::EvaluateWithDerivative(this->command_array_,
+    df_dx = backend::EvaluateWithDerivative(this->short_command_array_,
                                             x,
                                             this->constants_,
                                             true);
@@ -179,7 +179,7 @@ EvalAndDerivative
 AGraph::EvaluateEquationWithLocalOptGradientAt(Eigen::ArrayXXd& x) {
   EvalAndDerivative df_dc;
   try {
-    df_dc = backend::EvaluateWithDerivative(this->command_array_,
+    df_dc = backend::EvaluateWithDerivative(this->short_command_array_,
                                             x,
                                             this->constants_,
                                             false);
