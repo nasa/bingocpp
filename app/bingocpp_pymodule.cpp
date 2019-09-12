@@ -78,9 +78,7 @@ PYBIND11_MODULE(bingocpp, m) {
   m.def("rand_init", &rand_init);
 
   py::class_<AGraph>(m, "AGraph")
-    .def(py::init<bool &, AGraph *>(),
-        py::arg("manual_constants") = false,
-        py::arg("agraph_copy") = nullptr)
+    .def(py::init<bool &, >(), py::arg("manual_constants") = false)
     .def("is_cpp", &AGraph::IsCpp)
     .def_property("command_array",
                   &AGraph::GetCommandArrayModifiable,
