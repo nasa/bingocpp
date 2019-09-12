@@ -63,12 +63,12 @@ inline bingo::AGraph init_sample_agraph_1() {
                         6, 2, 2,
                         2, 0, 1,
                         2, 3, 1;
-  test_graph.setCommandArray(test_command_array);
-  test_graph.setGeneticAge(10);
+  test_graph.SetCommandArray(test_command_array);
+  test_graph.SetGeneticAge(10);
   Eigen::VectorXd local_opt_params(1);
   local_opt_params << 1.0;
-  test_graph.setLocalOptimizationParams(local_opt_params);
-  test_graph.setFitness(1);
+  test_graph.SetLocalOptimizationParams(local_opt_params);
+  test_graph.SetFitness(1);
   return test_graph;
 }
 
@@ -81,12 +81,12 @@ inline bingo::AGraph init_sample_agraph_2() {
                         4, 0, 2,
                         2, 0, 1,
                         6, 3, 0;
-  test_graph.setCommandArray(test_command_array);
-  test_graph.setGeneticAge(20);
+  test_graph.SetCommandArray(test_command_array);
+  test_graph.SetGeneticAge(20);
   Eigen::VectorXd local_opt_params(2);
   local_opt_params << 1.0, 1.0;
-  test_graph.setLocalOptimizationParams(local_opt_params);
-  test_graph.setFitness(2);
+  test_graph.SetLocalOptimizationParams(local_opt_params);
+  test_graph.SetFitness(2);
   return test_graph;
 }
 } // namespace testutils

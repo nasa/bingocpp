@@ -14,8 +14,8 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
 */
-#ifndef INCLUDE_BINGOCPP_AGRAPH_H_
-#define INCLUDE_BINGOCPP_AGRAPH_H_
+#ifndef BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_H_
+#define BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_H_
 
 #include <set>
 #include <unordered_map>
@@ -27,6 +27,7 @@
 #include <Eigen/Core>
 
 typedef std::unordered_map<int, std::string> PrintMap;
+typedef std::vector<std::vector<std::string>> PrintVector;
 typedef std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvalAndDerivative;
 
 namespace bingo {
@@ -39,7 +40,7 @@ namespace bingo {
  */
 class AGraph {
  public:
-  AGraph();
+  AGraph(bool manual_consants = false);
 
   AGraph(const AGraph& agraph);
 
@@ -48,41 +49,46 @@ class AGraph {
    * 
    * @return AGraph
    */
-  AGraph copy();
+  AGraph Copy();
+
+  inline bool IsCpp() { return true; }
 
   /**
    * @brief Get the Command Array object
    * 
    * @return Eigen::ArrayX3i The command array for this graph.
    */
-  Eigen::ArrayX3i getCommandArray() const;
+  const Eigen::ArrayX3i& GetCommandArray() const;
+
+
+  Eigen::ArrayX3i& GetCommandArrayModifiable();
   
   /**
    * @brief Set the Command Array object
    * 
    * @param command_array A copy of the new Command Array
    */
-  void setCommandArray(Eigen::ArrayX3i command_array);
+  void SetCommandArray(Eigen::ArrayX3i command_array);
 
   /**
    * @brief Nofity individual of inplace modification of command array.
    * 
    */
-  void notifyCommandArrayModificiation();
+  void NotifyCommandArrayModificiation();
 
   /**
    * @brief Get the Fitness of this AGraph
    * 
    * @return double 
    */
-  double getFitness() const;
+  double GetFitness() const;
 
   /**
    * @brief Set the Fitness for this AGraph
    * 
    * @param fitness 
    */
-  void setFitness(double fitness);
+  void SetFitness(double fitness);
 
   /**
    * @brief Check if fitness has been set for this AGraph object.
@@ -90,21 +96,24 @@ class AGraph {
    * @return true if set
    * @return false otherwise
    */
-  bool isFitnessSet() const;
+  bool IsFitnessSet() const;
+
+
+  void SetFitnessStatus(bool val);
 
   /**
    * @brief Set the Genetic Age of this AGraph
    * 
    * @param age The age of this AGraph
    */
-  void setGeneticAge(const int age);
+  void SetGeneticAge(const int age);
 
   /**
    * @brief Get the Genetic Age of this AGraph
    * 
    * @return int 
    */
-  int getGeneticAge() const;
+  int GetGeneticAge() const;
 
   /**
    * @brief Get the Utilized Commands for the CommandArray
@@ -115,7 +124,7 @@ class AGraph {
    * 
    * @return std::vector<bool> The mask.
    */
-  std::vector<bool> getUtilizedCommands() const;
+  std::vector<bool> GetUtilizedCommands() const;
 
   /**
    * @brief The AGraph needs local optimization.
@@ -125,7 +134,7 @@ class AGraph {
    * @return true Needs optimization.
    * @return false Has been optimized
    */
-  bool needsLocalOptimization() const;
+  bool NeedsLocalOptimization() const;
 
   /**
    * @brief Get the Number Local Optimization Params
@@ -135,7 +144,7 @@ class AGraph {
    * 
    * @return int The number of parameters to optimize.
    */
-  int getNumberLocalOptimizationParams() const;
+  int GetNumberLocalOptimizationParams() const;
 
   /**
    * @brief Set the Local Optimization Params
@@ -144,7 +153,7 @@ class AGraph {
    * 
    * @param params The optimized constants.
    */
-  void setLocalOptimizationParams(Eigen::VectorXd params);
+  void SetLocalOptimizationParams(Eigen::VectorXd params);
 
   /**
    * @brief Get the constants in the graph.
@@ -154,7 +163,9 @@ class AGraph {
    * 
    * @return Eigen::VectorXd The constants in the AGraph
    */
-  Eigen::VectorXd getLocalOptimizationParams() const;
+  const Eigen::VectorXd& GetLocalOptimizationParams() const;
+
+  Eigen::VectorXd& GetLocalOptimizationParamsModifiable();
 
   /**
    * @brief Evaluate the AGraph equatoin
@@ -166,7 +177,7 @@ class AGraph {
    * 
    * @return Eigen::ArrayXXd The evaluation of function at points x.
    */
-  Eigen::ArrayXXd evaluateEquationAt(Eigen::ArrayXXd& x);
+  Eigen::ArrayXXd EvaluateEquationAt(Eigen::ArrayXXd& x);
 
   /**
    * @brief Evaluate the AGraph and get its derivatives
@@ -180,7 +191,7 @@ class AGraph {
    * @return EvalAndDerivative The evaluation of the function of this AGraph
    * along the points x and the derivative of the equation with respect to x.
    */
-  EvalAndDerivative evaluateEquationWithXGradientAt(Eigen::ArrayXXd& x);
+  EvalAndDerivative EvaluateEquationWithXGradientAt(Eigen::ArrayXXd& x);
 
   /**
    * @brief Evluate the AGraph and get its derivatives.
@@ -195,35 +206,39 @@ class AGraph {
    * along the points x and the derivative of the equation with respect to 
    * the constants of the equation.
    */
-  EvalAndDerivative evaluateEquationWithLocalOptGradientAt(Eigen::ArrayXXd& x);
+  EvalAndDerivative EvaluateEquationWithLocalOptGradientAt(Eigen::ArrayXXd& x);
 
   /**
    * @brief Get the Latex String of this AGraph equation.
    * 
    * @return std::string 
    */
-  std::string getLatexString() const;
+  std::string GetLatexString() const;
 
   /**
    * @brief Get the Console String this AGraph equation.
    * 
    * @return std::string 
    */
-  std::string getConsoleString() const;
+  std::string GetConsoleString() const;
 
   /**
    * @brief Get the Stack String this AGraph equation.
    * 
    * @return std::string 
    */
-  std::string getStackString() const;
+  std::string GetStackString() const;
 
   /**
    * @brief Get the Complexity of this AGraph equation.
    * 
    * @return int 
    */
-  int getComplexity() const;
+  int GetComplexity() const;
+
+  void ForceRenumberConstants();
+
+  int Distance(const AGraph& agraph);
 
   /**
    * @brief Determines if the equation operation has arity two.
@@ -232,7 +247,7 @@ class AGraph {
    * @return true If the operation requires to parameters.
    * @return false Otherwise.
    */
-  static bool hasArityTwo(int node);
+  static bool HasArityTwo(int node);
 
   /**
    * @brief Determines if the equation operation is loading a value.
@@ -241,7 +256,7 @@ class AGraph {
    * @return true If the node loads a value.
    * @return false It has arity greater than 0.
    */
-  static bool isTerminal(int node);
+  static bool IsTerminal(int node);
 
  private:
   Eigen::ArrayX3i command_array_;
@@ -249,6 +264,7 @@ class AGraph {
   Eigen::VectorXd constants_;
   bool needs_opt_;
   int num_constants_;
+  bool manual_constants_;
   double fitness_;
   bool fit_set_;
   int genetic_age_;
@@ -256,16 +272,8 @@ class AGraph {
   // To string operator when passed into stream
   friend std::ostream& operator<<(std::ostream&, const AGraph&);
 
-  // Maps for operation nodes.
-  static const bool kIsArity2Map[13]; 
-  static const bool kIsTerminalMap[13];
-
   // Helper Functions
   void process_modified_command_array();
-  void renumber_constants(const std::vector<bool>& utilized_commands);
-  void update_short_command_array(const std::vector<bool>& utilized_commands);
-  std::string get_stack_string(const bool is_short=false) const;
-  std::string get_formatted_string_using(const PrintMap& format_map) const;
 };
 } // namespace bingo
-#endif //INCLUDE_BINGOCPP_AGRAPH_H_
+#endif //BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_H_

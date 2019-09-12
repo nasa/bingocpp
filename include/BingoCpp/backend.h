@@ -38,7 +38,7 @@ namespace backend{
  * 
  * @return true 
  */
-inline bool isCpp() { return true; }
+inline bool IsCpp() { return true; }
 
 /**
  * @brief Evauluate the equation.
@@ -55,7 +55,7 @@ inline bool isCpp() { return true; }
  * 
  * @return Eigen::ArrayXXd The evaluation of the graph with x as the input data.
  */
-Eigen::ArrayXXd evaluate(const Eigen::ArrayX3i& stack,
+Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3i& stack,
                          const Eigen::ArrayXXd& x,
                          const Eigen::VectorXd& constants);
 
@@ -77,7 +77,7 @@ Eigen::ArrayXXd evaluate(const Eigen::ArrayX3i& stack,
  * 
  * @return EvalAndDerivative Derivatives of all dimensions of x/constants at location x.
  */
-EvalAndDerivative evaluateWithDerivative(
+EvalAndDerivative EvaluateWithDerivative(
     const Eigen::ArrayX3i& stack,
     const Eigen::ArrayXXd& x,
     const Eigen::VectorXd& constants,
@@ -100,7 +100,7 @@ EvalAndDerivative evaluateWithDerivative(
  * 
  * @return Eigen::ArrayXXd The evaluation of the graph with x as the input data.
  */
-Eigen::ArrayXXd simplifyAndEvaluate(const Eigen::ArrayX3i& stack,
+Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i& stack,
                                     const Eigen::ArrayXXd& x,
                                     const Eigen::VectorXd& constants);
 
@@ -123,7 +123,7 @@ Eigen::ArrayXXd simplifyAndEvaluate(const Eigen::ArrayX3i& stack,
  * 
  * @return EvalAndDerivative Derivatives of all dimensions of x/constants at location x.
  */
-EvalAndDerivative simplifyAndEvaluateWithDerivative(
+EvalAndDerivative SimplifyAndEvaluateWithDerivative(
     const Eigen::ArrayX3i& stack,
     const Eigen::ArrayXXd& x,
     const Eigen::VectorXd& constants,
@@ -139,7 +139,7 @@ EvalAndDerivative simplifyAndEvaluateWithDerivative(
  *
  * @return Simplified stack.
  */
-Eigen::ArrayX3i simplifyStack(const Eigen::ArrayX3i& stack);
+Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i& stack);
 
 /**
  * @brief Finds which commands are utilized in a stack.
@@ -151,7 +151,7 @@ Eigen::ArrayX3i simplifyStack(const Eigen::ArrayX3i& stack);
  *
  * @return vector describing which commands in the stack are used.
  */
-std::vector<bool> getUtilizedCommands(const Eigen::ArrayX3i& stack);
+std::vector<bool> GetUtilizedCommands(const Eigen::ArrayX3i& stack);
 } // namespace backend
 } // namespace bingo
 #endif

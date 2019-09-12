@@ -61,7 +61,7 @@ class AGraphTest : public ::testing::TestWithParam<std::string> {
 
   AGraph init_invalid_graph(AGraph& agraph) {
     AGraph return_val = AGraph();
-    return_val.setCommandArray(agraph.getCommandArray());
+    return_val.SetCommandArray(agraph.GetCommandArray());
     return return_val;
   }
 
@@ -79,7 +79,7 @@ class AGraphTest : public ::testing::TestWithParam<std::string> {
 
   AGraph init_all_funcs_graph() {
     AGraph test_graph = AGraph();
-    test_graph.setGeneticAge(10);
+    test_graph.SetGeneticAge(10);
     Eigen::ArrayX3i command_array(13, 3);
     command_array << 0, 0, 0,
                      1, 0, 0,
@@ -94,10 +94,10 @@ class AGraphTest : public ::testing::TestWithParam<std::string> {
                      10, 9, 0,
                      11, 10, 0,
                      12, 11, 0;
-    test_graph.setCommandArray(command_array);
+    test_graph.SetCommandArray(command_array);
     Eigen::VectorXd local_opt_params(2);
     local_opt_params << 1.0, 1.0;
-    test_graph.setLocalOptimizationParams(local_opt_params);
+    test_graph.SetLocalOptimizationParams(local_opt_params);
     return test_graph;
   }
 
@@ -129,25 +129,25 @@ class AGraphTest : public ::testing::TestWithParam<std::string> {
 };
 
 TEST_F(AGraphTest, copy) {
-  AGraph agraph_copy = sample_agraph_1.copy();
+  AGraph agraph_copy = sample_agraph_1.Copy();
 
-  Eigen::ArrayX3i command_array = sample_agraph_1.getCommandArray();
+  Eigen::ArrayX3i command_array = sample_agraph_1.GetCommandArray();
   command_array(1, 1) = 100;
-  sample_agraph_1.setCommandArray(command_array);
-  Eigen::VectorXd constants = sample_agraph_1.getLocalOptimizationParams();
+  sample_agraph_1.SetCommandArray(command_array);
+  Eigen::VectorXd constants = sample_agraph_1.GetLocalOptimizationParams();
   constants[0] = 100;
-  sample_agraph_1.setLocalOptimizationParams(constants);
+  sample_agraph_1.SetLocalOptimizationParams(constants);
 
-  ASSERT_EQ(agraph_copy.getGeneticAge(), 10);
-  ASSERT_EQ(agraph_copy.getCommandArray()(1,1), 0);
-  ASSERT_DOUBLE_EQ(agraph_copy.getLocalOptimizationParams()[0], 1.0);
+  ASSERT_EQ(agraph_copy.GetGeneticAge(), 10);
+  ASSERT_EQ(agraph_copy.GetCommandArray()(1,1), 0);
+  ASSERT_DOUBLE_EQ(agraph_copy.GetLocalOptimizationParams()[0], 1.0);
 }
 
 TEST_P(AGraphTest, latex_print) {
   std::string agraph_name = GetParam();
   std::string string_rep = map_to_graph_string.at(agraph_name).at("latex string");
   AGraph agraph = map_to_graph.at(agraph_name);
-  ASSERT_STREQ(string_rep.c_str(), agraph.getLatexString().c_str());
+  ASSERT_STREQ(string_rep.c_str(), agraph.GetLatexString().c_str());
 }
 
 TEST_P(AGraphTest, console_print) {
@@ -163,7 +163,7 @@ TEST_P(AGraphTest, complexity_print) {
   std::string agraph_name = GetParam();
   int complexity_val = std::stoi(map_to_graph_string.at(agraph_name).at("complexity"));
   AGraph agraph = map_to_graph.at(agraph_name);
-  ASSERT_EQ(complexity_val, agraph.getComplexity());
+  ASSERT_EQ(complexity_val, agraph.GetComplexity());
 }
 
 INSTANTIATE_TEST_CASE_P(,AGraphTest, ::testing::Values(
@@ -184,7 +184,7 @@ TEST_F(AGraphTest, stack_print) {
                    "(2) <= (0) + (1)\n"
                    "(3) <= sin (2)\n"
                    "(4) <= (3) + (1)\n";
-  ASSERT_STREQ(expected_str.str().c_str(), sample_agraph_1.getStackString().c_str());
+  ASSERT_STREQ(expected_str.str().c_str(), sample_agraph_1.GetStackString().c_str());
 }
 
 TEST_F(AGraphTest, invalid_stack_print) {
@@ -202,19 +202,19 @@ TEST_F(AGraphTest, invalid_stack_print) {
                    "(2) <= (0) + (1)\n"
                    "(3) <= sin (2)\n"
                    "(4) <= (3) + (1)\n";
-  ASSERT_STREQ(expected_str.str().c_str(), invalid_graph.getStackString().c_str());
+  ASSERT_STREQ(expected_str.str().c_str(), invalid_graph.GetStackString().c_str());
 }
 
 TEST_F(AGraphTest, evaluateAt) {
   ASSERT_TRUE(testutils::almost_equal(
     sample_agraph_1_values.f_of_x,
-    sample_agraph_1.evaluateEquationAt(sample_agraph_1_values.x)
+    sample_agraph_1.EvaluateEquationAt(sample_agraph_1_values.x)
   ));
 }
 
 TEST_F(AGraphTest, evaluatWithXDerivative) {
   Eigen::ArrayXXd x = sample_agraph_1_values.x;
-  EvalAndDerivative result = sample_agraph_1.evaluateEquationWithXGradientAt(x);
+  EvalAndDerivative result = sample_agraph_1.EvaluateEquationWithXGradientAt(x);
   Eigen::ArrayXXd f_of_x = result.first;
   Eigen::ArrayXXd df_dx = result.second;
   ASSERT_TRUE(testutils::almost_equal(sample_agraph_1_values.f_of_x, f_of_x));
@@ -223,49 +223,57 @@ TEST_F(AGraphTest, evaluatWithXDerivative) {
 
 TEST_F(AGraphTest, evaluatWithCDerivative) {
   Eigen::ArrayXXd x = sample_agraph_1_values.x;
-  EvalAndDerivative result = sample_agraph_1.evaluateEquationWithLocalOptGradientAt(x);
+  EvalAndDerivative result = sample_agraph_1.EvaluateEquationWithLocalOptGradientAt(x);
   Eigen::ArrayXXd f_of_x = result.first;
   Eigen::ArrayXXd df_dc = result.second;
   ASSERT_TRUE(testutils::almost_equal(sample_agraph_1_values.f_of_x, f_of_x));
   ASSERT_TRUE(testutils::almost_equal(sample_agraph_1_values.grad_c, df_dc));
 }
 
-TEST_F(AGraphTest, get_number_of_optimization_params) {
-  ASSERT_TRUE(invalid_graph.needsLocalOptimization());
+TEST_F(AGraphTest, NeedsLocalOptimization) {
+  ASSERT_TRUE(invalid_graph.NeedsLocalOptimization());
 }
 
 TEST_F(AGraphTest, getNumberOfOptimizationParams) {
-  ASSERT_EQ(invalid_graph.getNumberLocalOptimizationParams(), 1);
+  ASSERT_EQ(invalid_graph.GetNumberLocalOptimizationParams(), 1);
 }
 
 TEST_F(AGraphTest, setOptimizationParams) {
   Eigen::VectorXd opt_params(1);
   opt_params << 1.0;
-  invalid_graph.setLocalOptimizationParams(opt_params);
-  ASSERT_FALSE(invalid_graph.needsLocalOptimization());
+  invalid_graph.SetLocalOptimizationParams(opt_params);
+  ASSERT_FALSE(invalid_graph.NeedsLocalOptimization());
   ASSERT_TRUE(testutils::almost_equal(
-    invalid_graph.evaluateEquationAt(sample_agraph_1_values.x),
-    sample_agraph_1.evaluateEquationAt(sample_agraph_1_values.x))
+    invalid_graph.EvaluateEquationAt(sample_agraph_1_values.x),
+    sample_agraph_1.EvaluateEquationAt(sample_agraph_1_values.x))
   );
 }
 
 TEST_F(AGraphTest, setting_fitness_updates_fit_set) {
   AGraph new_graph = AGraph();
-  ASSERT_FALSE(new_graph.isFitnessSet());
-  new_graph.setFitness(2.0);
-  ASSERT_TRUE(new_graph.isFitnessSet());
+  ASSERT_FALSE(new_graph.IsFitnessSet());
+  new_graph.SetFitness(2.0);
+  ASSERT_TRUE(new_graph.IsFitnessSet());
 }
 
 TEST_F(AGraphTest, notify_command_array_mod) {
-  ASSERT_TRUE(sample_agraph_1.isFitnessSet());
-  sample_agraph_1.notifyCommandArrayModificiation();
-  ASSERT_FALSE(sample_agraph_1.isFitnessSet());
+  ASSERT_TRUE(sample_agraph_1.IsFitnessSet());
+  sample_agraph_1.NotifyCommandArrayModificiation();
+  ASSERT_FALSE(sample_agraph_1.IsFitnessSet());
 }
 
 TEST_F(AGraphTest, setting_command_array_unsets_fitness) {
-  ASSERT_TRUE(sample_agraph_1.isFitnessSet());
-  sample_agraph_1.setCommandArray(Eigen::ArrayX3i::Ones(1, 3));
-  ASSERT_FALSE(sample_agraph_1.isFitnessSet());
+  ASSERT_TRUE(sample_agraph_1.IsFitnessSet());
+  sample_agraph_1.SetCommandArray(Eigen::ArrayX3i::Ones(1, 3));
+  ASSERT_FALSE(sample_agraph_1.IsFitnessSet());
+}
+
+TEST_F(AGraphTest, TestDistanceBetweenGraphs) {
+  ASSERT_EQ(sample_agraph_1.Distance(sample_agraph_1), 0);
+  AGraph other_agraph = sample_agraph_1.Copy();
+  other_agraph.GetCommandArrayModifiable().row(2) << 6, 1, 0;
+  ASSERT_EQ(sample_agraph_1.Distance(other_agraph), 3);
+
 }
 
 // class AGraphExceptionTest : public ::testing::Test {
