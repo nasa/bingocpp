@@ -10,16 +10,29 @@
 
 namespace bingo {
 
-std::unordered_set<std::string> kMeanAbsoluteError;
-std::unordered_set<std::string> kMeanSquaredError;
-std::unordered_set<std::string> kRootMeanSquaredError;
+std::unordered_set<std::string> kMeanAbsoluteError = {
+  "mean_absolute_error",
+  "mae"
+};
+
+std::unordered_set<std::string> kMeanSquaredError = {
+  "mean_squared_error",
+  "mse"
+};
+
+std::unordered_set<std::string> kRootMeanSquaredError = {
+  "root_mean_squared_error",
+  "rmse"
+};
 
 class FitnessFunction {
  public:
   inline FitnessFunction(TrainingData* training_data = nullptr) :
     eval_count_(0), training_data_(training_data) { }
+  virtual ~FitnessFunction() { }
   virtual double EvaluateIndividualFitness(AGraph& individual) = 0;
- private:
+  inline void IncrementCount() { eval_count_ ++; }
+ protected:
   int eval_count_;
   TrainingData* training_data_;
 };
@@ -45,12 +58,14 @@ class VectorBasedFunction : public FitnessFunction {
     }
   }
 
+  virtual ~VectorBasedFunction() { }
+
   inline double EvaluateIndividualFitness(AGraph& individual) {
     Eigen::ArrayXXd fitness_vector = EvaluateFitnessVector(individual);
     return (this->*metric_function_)(fitness_vector);
   }
 
-  virtual const Eigen::ArrayXXd& EvaluateFitnessVector(AGraph& individual) = 0;
+  virtual Eigen::ArrayXXd EvaluateFitnessVector(AGraph& individual) = 0;
 
  protected:
   inline double mean_absolute_error(
@@ -70,21 +85,6 @@ class VectorBasedFunction : public FitnessFunction {
 
  private:
   double (VectorBasedFunction::*metric_function_)(const Eigen::ArrayXXd&);
-};
-
-std::unordered_set<std::string> kMeanAbsoluteError = {
-  "mean_absolute_error",
-  "mae"
-};
-
-std::unordered_set<std::string> kMeanSquaredError = {
-  "mean_squared_error",
-  "mse"
-};
-
-std::unordered_set<std::string> kRootMeanSquaredError = {
-  "root_mean_squared_error",
-  "rmse"
 };
 } // namespace bingo
 
