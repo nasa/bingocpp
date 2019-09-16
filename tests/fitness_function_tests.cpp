@@ -20,10 +20,10 @@ struct SampleTrainingData : public bingo::TrainingData {
   SampleTrainingData() : TrainingData() {}
   SampleTrainingData(Eigen::ArrayXXd& x, Eigen::ArrayXXd& y) : 
       x(x), y(y) { }
-  SampleTrainingData* get_item(std::list<int> items) {
+  SampleTrainingData* GetItem(const std::vector<int>& items) {
     throw new std::logic_error("Not implemented Exception");
   }
-  int size() { return x.rows(); }
+  int Size() { return x.rows(); }
 };
 
 class SampleFitnessFunction : public bingo::VectorBasedFunction {

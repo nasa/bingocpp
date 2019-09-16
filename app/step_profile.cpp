@@ -50,13 +50,13 @@ Island::Island(std::vector<AcyclicGraph> p, AcyclicGraphManipulator m,
 }
 
 std::vector<double> Island::fit_func(AcyclicGraph ind) {
-  std::list<int> items;
+  std::vector<int> items;
 
   for (int i = 0; i < 15; ++i) {
     items.push_back(i * 2);
   }
 
-  ExplicitTrainingData *data = train.get_item(items);
+  ExplicitTrainingData *data = train.GetItem(items);
   std::vector<double> fitv;
   fitv.push_back(fit.evaluate_fitness(ind, *data));
   return fitv;

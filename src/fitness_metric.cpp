@@ -57,7 +57,7 @@ void FitnessMetric::optimize_constants(AcyclicGraph &indv,
   LMFunctor functor;
   functor.train = &train;
   functor.fit = this;
-  functor.m = functor.train->size();
+  functor.m = functor.train->Size();
   // indv.input_constants();
   functor.n = indv.count_constants();
   functor.agraphIndv = indv;
