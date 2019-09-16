@@ -26,6 +26,8 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
+#include "BingoCpp/equation.h"
+
 typedef std::unordered_map<int, std::string> PrintMap;
 typedef std::vector<std::vector<std::string>> PrintVector;
 typedef std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvalAndDerivative;
@@ -38,7 +40,7 @@ namespace bingo {
  * This class contains most of the code necessary for the representation of an
  * acyclic graph (linear stack) in symbolic regression.
  */
-class AGraph {
+class AGraph : public Equation {
  public:
   AGraph(bool manual_consants = false);
 
@@ -177,7 +179,8 @@ class AGraph {
    * 
    * @return Eigen::ArrayXXd The evaluation of function at points x.
    */
-  Eigen::ArrayXXd EvaluateEquationAt(Eigen::ArrayXXd& x);
+  Eigen::ArrayXXd 
+  EvaluateEquationAt(const Eigen::ArrayXXd& x) const;
 
   /**
    * @brief Evaluate the AGraph and get its derivatives
@@ -191,7 +194,8 @@ class AGraph {
    * @return EvalAndDerivative The evaluation of the function of this AGraph
    * along the points x and the derivative of the equation with respect to x.
    */
-  EvalAndDerivative EvaluateEquationWithXGradientAt(Eigen::ArrayXXd& x);
+  EvalAndDerivative
+  EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd& x) const;
 
   /**
    * @brief Evluate the AGraph and get its derivatives.
@@ -206,7 +210,8 @@ class AGraph {
    * along the points x and the derivative of the equation with respect to 
    * the constants of the equation.
    */
-  EvalAndDerivative EvaluateEquationWithLocalOptGradientAt(Eigen::ArrayXXd& x);
+  EvalAndDerivative
+  EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd& x) const;
 
   /**
    * @brief Get the Latex String of this AGraph equation.

@@ -141,7 +141,7 @@ Eigen::VectorXd& AGraph::GetLocalOptimizationParamsModifiable() {
 }
 
 Eigen::ArrayXXd 
-AGraph::EvaluateEquationAt(Eigen::ArrayXXd& x) {
+AGraph::EvaluateEquationAt(const Eigen::ArrayXXd& x) const {
   Eigen::ArrayXXd f_of_x; 
   try {
     f_of_x = backend::Evaluate(this->short_command_array_,
@@ -156,7 +156,7 @@ AGraph::EvaluateEquationAt(Eigen::ArrayXXd& x) {
 }
 
 EvalAndDerivative
-AGraph::EvaluateEquationWithXGradientAt(Eigen::ArrayXXd& x) {
+AGraph::EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd& x) const {
   EvalAndDerivative df_dx;
   try {
     df_dx = backend::EvaluateWithDerivative(this->short_command_array_,
@@ -176,7 +176,7 @@ AGraph::EvaluateEquationWithXGradientAt(Eigen::ArrayXXd& x) {
 }
 
 EvalAndDerivative
-AGraph::EvaluateEquationWithLocalOptGradientAt(Eigen::ArrayXXd& x) {
+AGraph::EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd& x) const {
   EvalAndDerivative df_dc;
   try {
     df_dc = backend::EvaluateWithDerivative(this->short_command_array_,

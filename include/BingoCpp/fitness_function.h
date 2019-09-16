@@ -1,26 +1,27 @@
-#ifndef BINGOCCP_INCLUDE_BINGOCPP_FITNESS_FUNCTION_H_
-#define BINGOCCP_INCLUDE_BINGOCPP_FITNESS_FUNCTION_H_
+#ifndef BINGOCPP_INCLUDE_BINGOCPP_FITNESS_FUNCTION_H_
+#define BINGOCPP_INCLUDE_BINGOCPP_FITNESS_FUNCTION_H_
 
 #include <stdexcept>
 #include <string>
 #include <unordered_set>
 
 #include <BingoCpp/agraph.h>
+#include <BingoCpp/equation.h>
 #include <BingoCpp/training_data.h>
 
 namespace bingo {
 
-std::unordered_set<std::string> kMeanAbsoluteError = {
+const std::unordered_set<std::string> kMeanAbsoluteError = {
   "mean_absolute_error",
   "mae"
 };
 
-std::unordered_set<std::string> kMeanSquaredError = {
+const std::unordered_set<std::string> kMeanSquaredError = {
   "mean_squared_error",
   "mse"
 };
 
-std::unordered_set<std::string> kRootMeanSquaredError = {
+const std::unordered_set<std::string> kRootMeanSquaredError = {
   "root_mean_squared_error",
   "rmse"
 };
@@ -29,9 +30,13 @@ class FitnessFunction {
  public:
   inline FitnessFunction(TrainingData* training_data = nullptr) :
     eval_count_(0), training_data_(training_data) { }
+
   virtual ~FitnessFunction() { }
-  virtual double EvaluateIndividualFitness(AGraph& individual) = 0;
+
+  virtual double EvaluateIndividualFitness(const Equation& individual) = 0;
+
   inline void IncrementCount() { eval_count_ ++; }
+
  protected:
   int eval_count_;
   TrainingData* training_data_;
@@ -60,12 +65,12 @@ class VectorBasedFunction : public FitnessFunction {
 
   virtual ~VectorBasedFunction() { }
 
-  inline double EvaluateIndividualFitness(AGraph& individual) {
+  inline double EvaluateIndividualFitness(const Equation& individual) {
     Eigen::ArrayXXd fitness_vector = EvaluateFitnessVector(individual);
     return (this->*metric_function_)(fitness_vector);
   }
 
-  virtual Eigen::ArrayXXd EvaluateFitnessVector(AGraph& individual) = 0;
+  virtual Eigen::ArrayXXd EvaluateFitnessVector(const Equation& individual) = 0;
 
  protected:
   inline double mean_absolute_error(
@@ -88,4 +93,4 @@ class VectorBasedFunction : public FitnessFunction {
 };
 } // namespace bingo
 
-#endif // BINGOCCP_INCLUDE_BINGOCPP_FITNESS_FUNCTION_H_
+#endif // BINGOCPP_INCLUDE_BINGOCPP_FITNESS_FUNCTION_H_
