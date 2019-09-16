@@ -30,6 +30,10 @@ ExplicitTrainingData::ExplicitTrainingData(
   y = vy;
 }
 
+ExplicitTrainingData* ExplicitTrainingData::GetItem(int item) {
+  return new ExplicitTrainingData(x.row(item), y.row(item));
+}
+
 ExplicitTrainingData* ExplicitTrainingData::GetItem(
     const std::vector<int>& items) {
   return (ExplicitTrainingData*) copy_data(items, x, y);
@@ -45,6 +49,10 @@ ImplicitTrainingData::ImplicitTrainingData(Eigen::ArrayXXd vx,
     Eigen::ArrayXXd vdx_dt) {
   x = vx;
   dx_dt = vdx_dt;
+}
+
+ImplicitTrainingData* ImplicitTrainingData::GetItem(int item) {
+  return new ImplicitTrainingData(x.row(item), dx_dt.row(item));
 }
 
 ImplicitTrainingData* ImplicitTrainingData::GetItem(

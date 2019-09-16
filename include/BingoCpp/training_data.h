@@ -46,7 +46,7 @@ struct TrainingData {
  public:
   TrainingData() { }
 
-  // virtual TrainingData* GetItem(int item) = 0 ;
+  virtual TrainingData* GetItem(int item) = 0 ;
   /*! \brief gets a new training data with certain rows
   *
   *  \param[in] items The rows to retrieve. std::list<int>
@@ -69,7 +69,7 @@ struct ExplicitTrainingData : TrainingData {
   Eigen::ArrayXXd x;
   Eigen::ArrayXXd y;
   ExplicitTrainingData(Eigen::ArrayXXd vx, Eigen::ArrayXXd vy);
-  // ExplicitTrainingData* GetItem(int item);
+  ExplicitTrainingData* GetItem(int item);
   ExplicitTrainingData* GetItem(const std::vector<int>& items);
   int Size() { return x.rows(); }
 };
@@ -84,7 +84,7 @@ struct ImplicitTrainingData : TrainingData {
   Eigen::ArrayXXd dx_dt;
   ImplicitTrainingData(Eigen::ArrayXXd vx);
   ImplicitTrainingData(Eigen::ArrayXXd vx, Eigen::ArrayXXd vdx_dt);
-  // ImplicitTrainingData* GetItem(int item);
+  ImplicitTrainingData* GetItem(int item);
   ImplicitTrainingData* GetItem(const std::vector<int>& items);
   int Size() {
     return x.rows();

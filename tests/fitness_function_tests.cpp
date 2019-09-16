@@ -20,6 +20,9 @@ struct SampleTrainingData : public bingo::TrainingData {
   SampleTrainingData() : TrainingData() {}
   SampleTrainingData(Eigen::ArrayXXd& x, Eigen::ArrayXXd& y) : 
       x(x), y(y) { }
+  SampleTrainingData* GetItem(int item) {
+    throw new std::logic_error("Not implemented Exception");
+  }
   SampleTrainingData* GetItem(const std::vector<int>& items) {
     throw new std::logic_error("Not implemented Exception");
   }
