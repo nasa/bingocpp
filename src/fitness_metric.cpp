@@ -7,12 +7,15 @@
  * This file contains the cpp version of FitnessMetric.py
  */
 
-#include "BingoCpp/fitness_metric.h"
 #include <iostream>
-#include <stdlib.h>
+
 #include <Eigen/Dense>
 #include <Eigen/Core>
+
 #include <unsupported/Eigen/NonLinearOptimization>
+
+#include "BingoCpp/explicit_regression.h"
+#include "BingoCpp/fitness_metric.h"
 
 namespace bingo {
   

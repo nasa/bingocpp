@@ -60,20 +60,6 @@ struct TrainingData {
   virtual int Size() = 0;
 };
 
-/*! \struct ExplicitTrainingData
- *  \brief This struct holds data for Explicit regression.
- */
-struct ExplicitTrainingData : TrainingData {
- public:
-  ExplicitTrainingData() : TrainingData() { }
-  Eigen::ArrayXXd x;
-  Eigen::ArrayXXd y;
-  ExplicitTrainingData(Eigen::ArrayXXd vx, Eigen::ArrayXXd vy);
-  ExplicitTrainingData* GetItem(int item);
-  ExplicitTrainingData* GetItem(const std::vector<int>& items);
-  int Size() { return x.rows(); }
-};
-
 /*! \struct ImplicitTrainingData
  *  \brief This struct holds data for Implicit regression.
  */

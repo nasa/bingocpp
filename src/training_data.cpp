@@ -23,22 +23,6 @@ TrainingData* copy_data(const std::vector<int>& items,
                         bool implicit = false);
 } // namespace (anonymous)
 
-ExplicitTrainingData::ExplicitTrainingData(
-    Eigen::ArrayXXd vx,
-    Eigen::ArrayXXd vy) {
-  x = vx;
-  y = vy;
-}
-
-ExplicitTrainingData* ExplicitTrainingData::GetItem(int item) {
-  return new ExplicitTrainingData(x.row(item), y.row(item));
-}
-
-ExplicitTrainingData* ExplicitTrainingData::GetItem(
-    const std::vector<int>& items) {
-  return (ExplicitTrainingData*) copy_data(items, x, y);
-}
-
 ImplicitTrainingData::ImplicitTrainingData(Eigen::ArrayXXd vx) {
   std::vector<Eigen::ArrayXXd> temp = calculate_partials(vx);
   x = temp[0];
@@ -72,9 +56,7 @@ TrainingData* copy_data(const std::vector<int>& items,
     temp_in.block(row, 0, 1, input.cols()) = input.block(items[row], 0, 1, input.cols());
     temp_out.block(row, 0, 1, output.cols()) = output.block(items[row], 0, 1, output.cols());
   }
-  return implicit ?
-        (TrainingData*)new ImplicitTrainingData(temp_in, temp_out) :
-        (TrainingData*)new ExplicitTrainingData(temp_in, temp_out);
+  return (TrainingData*)new ImplicitTrainingData(temp_in, temp_out);
 }
 } // namespace (anonymous)
 } // namespace bingo

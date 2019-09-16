@@ -169,20 +169,20 @@ PYBIND11_MODULE(bingocpp, m) {
        py::arg("required_params") = 0, py::arg("normalize_dot") = false,
        py::arg("acceptable_nans") = 0.1)
   .def("evaluate_fitness_vector", &ImplicitRegression::evaluate_fitness_vector);
-  py::class_<TrainingData>(m, "TrainingData");
-  py::class_<ExplicitTrainingData, TrainingData>(m, "ExplicitTrainingData")
-  .def_readwrite("x", &ExplicitTrainingData::x)
-  .def_readwrite("y", &ExplicitTrainingData::y)
-  .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
-  .def("__getitem__", &ExplicitTrainingData::get_item)
-  .def("size", &ExplicitTrainingData::size);
-  py::class_<ImplicitTrainingData, TrainingData>(m, "ImplicitTrainingData")
-  .def_readwrite("x", &ImplicitTrainingData::x)
-  .def_readwrite("dx_dt", &ImplicitTrainingData::dx_dt)
-  .def(py::init<Eigen::ArrayXXd &>())
-  .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
-  .def("__getitem__", &ImplicitTrainingData::get_item)
-  .def("size", &ImplicitTrainingData::size);
+  // py::class_<TrainingData>(m, "TrainingData");
+  // py::class_<ExplicitTrainingData, TrainingData>(m, "ExplicitTrainingData")
+  // .def_readwrite("x", &ExplicitTrainingData::x)
+  // .def_readwrite("y", &ExplicitTrainingData::y)
+  // .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
+  // .def("__getitem__", &ExplicitTrainingData::get_item)
+  // .def("size", &ExplicitTrainingData::size);
+  // py::class_<ImplicitTrainingData, TrainingData>(m, "ImplicitTrainingData")
+  // .def_readwrite("x", &ImplicitTrainingData::x)
+  // .def_readwrite("dx_dt", &ImplicitTrainingData::dx_dt)
+  // .def(py::init<Eigen::ArrayXXd &>())
+  // .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
+  // .def("__getitem__", &ImplicitTrainingData::get_item)
+  // .def("size", &ImplicitTrainingData::size);
   m.def("calculate_partials", &calculate_partials);
   m.def("savitzky_golay", &savitzky_golay);
   m.def("GenFact", &GenFact);

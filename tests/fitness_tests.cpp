@@ -15,6 +15,7 @@
 #include "gtest/gtest.h"
 #include <unsupported/Eigen/NonLinearOptimization>
 
+#include "BingoCpp/explicit_regression.h"
 #include "BingoCpp/fitness_metric.h"
 #include "BingoCpp/graph_manip.h"
 #include "BingoCpp/acyclic_graph.h"

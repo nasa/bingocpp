@@ -17,6 +17,8 @@
 #include <vector>
 #include <string>
 #include <sstream>
+
+#include "BingoCpp/explicit_regression.h"
 #include "BingoCpp/graph_manip.h"
 #include "BingoCpp/training_data.h"
 #include "BingoCpp/fitness_metric.h"
