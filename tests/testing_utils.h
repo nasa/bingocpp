@@ -42,7 +42,8 @@ inline bool non_comparable_matrices(const Eigen::ArrayXXd& array1,
 } // namespace
 
 inline bool almost_equal(const Eigen::ArrayXXd& array1,
-                         const Eigen::ArrayXXd& array2) {
+                         const Eigen::ArrayXXd& array2,
+                         double tolerance = TESTING_TOL) {
   if (non_comparable_matrices(array1, array2)) {
     print_difference(array1, array2);
     return false;
@@ -58,8 +59,9 @@ inline bool almost_equal(const Eigen::ArrayXXd& array1,
   }
 
   double frobenius_norm = matrix_diff.norm();
-  bool equal = (frobenius_norm < TESTING_TOL ? true : false);
+  bool equal = (frobenius_norm < tolerance ? true : false);
   if (!equal) {
+    std::cout << "Frobenius Norm: " << frobenius_norm << std::endl;
     print_difference(array1, array2);
   }
   return equal;

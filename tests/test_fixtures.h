@@ -2,11 +2,34 @@
 #define BINGO_TESTS_TEST_FIXTURES_H_
 
 #include <BingoCpp/agraph.h>
+#include <BingoCpp/equation.h>
 #include <BingoCpp/graph_manip.h>
 
 #include "testing_utils.h"
 
 namespace testutils {
+
+class SumEquation : public bingo::Equation {
+ public:
+  Eigen::ArrayXXd EvaluateEquationAt(const Eigen::ArrayXXd& x) const {
+    return x.rowwise().sum();
+  }
+
+  EvalAndDerivative EvaluateEquationWithXGradientAt(
+      const Eigen::ArrayXXd& x) const {
+    return std::make_pair(EvaluateEquationAt(x), x);
+  }
+
+  EvalAndDerivative EvaluateEquationWithLocalOptGradientAt(
+      const Eigen::ArrayXXd& x) const {
+    return std::make_pair(EvaluateEquationAt(x), x);
+  }
+
+  std::string GetLatexString() const { return ""; }
+  std::string GetConsoleString() const { return ""; }
+  std::string GetStackString() const { return ""; }
+  int GetComplexity() const  { return 0; }
+};
 
 inline Eigen::ArrayXXd one_to_nine_3_by_3() {
   Eigen::ArrayXXd x_vals(3, 3);
@@ -88,6 +111,10 @@ inline bingo::AGraph init_sample_agraph_2() {
   test_graph.SetLocalOptimizationParams(local_opt_params);
   test_graph.SetFitness(2);
   return test_graph;
+}
+
+inline SumEquation init_sum_equation() {
+  return SumEquation();
 }
 } // namespace testutils
 #endif //BINGO_TESTS_TEST_FIXTURES_H_
