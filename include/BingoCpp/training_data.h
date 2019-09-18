@@ -46,6 +46,8 @@ struct TrainingData {
  public:
   TrainingData() { }
 
+  virtual ~TrainingData() { }
+
   virtual TrainingData* GetItem(int item) = 0 ;
   /*! \brief gets a new training data with certain rows
   *
@@ -64,7 +66,6 @@ struct TrainingData {
  *  \brief This struct holds data for Implicit regression.
  */
 struct ImplicitTrainingData : TrainingData {
- public:
   ImplicitTrainingData() : TrainingData() { }
   Eigen::ArrayXXd x;
   Eigen::ArrayXXd dx_dt;

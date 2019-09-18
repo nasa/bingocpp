@@ -13,8 +13,6 @@ namespace {
 
 class TestExplicitRegression : public testing::Test {
  public:
-  Eigen::ArrayXXd x_;
-  Eigen::ArrayXXd y_;
   ExplicitTrainingData* training_data_;
   testutils::SumEquation sum_equation_;
 
@@ -51,5 +49,26 @@ TEST_F(TestExplicitRegression, EvaluateIndividualFitnessWithNaN) {
   ExplicitRegression regressor(training_data_);
   double fitness = regressor.EvaluateIndividualFitness(sum_equation_);
   ASSERT_TRUE(std::isnan(fitness));
+}
+
+TEST_F(TestExplicitRegression, GetSubsetOfTrainingData) {
+  Eigen::ArrayXXd data_input = Eigen::ArrayXd::LinSpaced(5, 0, 4);
+  ExplicitTrainingData* training_data = new ExplicitTrainingData(data_input, data_input);
+  ExplicitTrainingData* subset_training_data = training_data->GetItem(std::vector<int>{0, 2, 3});
+
+  Eigen::ArrayXXd expected_subset(3, 1);
+  expected_subset << 0, 2, 3;
+  ASSERT_TRUE(subset_training_data->x.isApprox(expected_subset));
+  ASSERT_TRUE(subset_training_data->y.isApprox(expected_subset));
+  delete training_data, subset_training_data;
+}
+
+TEST_F(TestExplicitRegression, CorrectTrainingDataSize) {
+  for (int size : std::vector<int> {2, 5, 50}) {
+    Eigen::ArrayXXd data_input = Eigen::ArrayXd::LinSpaced(size, 0, 10);
+    ExplicitTrainingData* training_data = new ExplicitTrainingData(data_input, data_input);
+    ASSERT_EQ(training_data->Size(), size);
+    delete training_data;
+  }
 }
 } // namespace 

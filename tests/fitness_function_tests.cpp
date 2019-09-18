@@ -19,6 +19,7 @@ struct SampleTrainingData : public bingo::TrainingData {
   Eigen::ArrayXXd x;
   Eigen::ArrayXXd y;
   SampleTrainingData() : TrainingData() {}
+  ~SampleTrainingData() {}
   SampleTrainingData(Eigen::ArrayXXd& x, Eigen::ArrayXXd& y) : 
       x(x), y(y) { }
   SampleTrainingData* GetItem(int item) {
