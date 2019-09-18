@@ -30,19 +30,19 @@ using namespace bingo;
 class Island {
  public:
   Island(std::vector<AcyclicGraph> p, AcyclicGraphManipulator m,
-         StandardRegression, ExplicitTrainingData t);
+         StandardRegression, ExplicitTrainingData* t);
   int age;
   int fit_eval;
   std::vector<AcyclicGraph> pop;
   AcyclicGraphManipulator manip;
   StandardRegression fit;
-  ExplicitTrainingData train;
+  ExplicitTrainingData* train;
   void step();
   std::vector<double> fit_func(AcyclicGraph ind);
 };
 
 Island::Island(std::vector<AcyclicGraph> p, AcyclicGraphManipulator m,
-               StandardRegression f, ExplicitTrainingData t) {
+               StandardRegression f, ExplicitTrainingData* t) {
   age = 0;
   fit_eval = 0;
   pop = p;
@@ -58,7 +58,7 @@ std::vector<double> Island::fit_func(AcyclicGraph ind) {
     items.push_back(i * 2);
   }
 
-  ExplicitTrainingData *data = train.GetItem(items);
+  ExplicitTrainingData *data = train->GetItem(items);
   std::vector<double> fitv;
   fitv.push_back(fit.evaluate_fitness(ind, *data));
   return fitv;
@@ -1173,7 +1173,7 @@ int main() {
   AcyclicGraphManipulator manip = AcyclicGraphManipulator(x.cols(), 64, 2, 10.0,
                                   .1, 0);
   StandardRegression stan = StandardRegression();
-  ExplicitTrainingData train = ExplicitTrainingData(x, y);
+  ExplicitTrainingData train(x, y);
   manip.add_node_type(2);
   manip.add_node_type(3);
   manip.add_node_type(4);
@@ -1194,7 +1194,7 @@ int main() {
 
   not_useful = 0;
   cross_useful = 0;
-  Island is = Island(pops, manip, stan, train);
+  Island is = Island(pops, manip, stan, &train);
 
   for (int i = 0; i < 5; ++i) {
     is.step();
