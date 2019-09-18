@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "gtest/gtest.h"
+#include "BingoCpp/explicit_regression.h"
 #include "BingoCpp/training_data.h"
 #include "BingoCpp/utils.h"
 #include <Eigen/Dense>
@@ -38,11 +39,11 @@ TEST(TrainingDataTest, ExplicitGetItem) {
   Eigen::ArrayXXd y(4, 2);
   x << 1, 2, 3, 4, 5, 6, 7, 8, 9, 7, 4, 7;
   y << 6, 7, 1, 2, 4, 5, 8, 9;
-  std::list<int> items;
+  std::vector<int> items;
   items.push_back(1);
   items.push_back(3);
   ExplicitTrainingData ex = ExplicitTrainingData(x, y);
-  ExplicitTrainingData* slice = ex.get_item(items);
+  ExplicitTrainingData* slice = ex.GetItem(items);
   Eigen::ArrayXXd truth_x(2, 3);
   Eigen::ArrayXXd truth_y(2, 2);
   truth_x << 4, 5, 6, 7, 4, 7;
@@ -63,7 +64,7 @@ TEST(TrainingDataTest, ExplicitSize) {
   x << 1, 2, 3, 4, 5, 6, 7, 8, 9, 7, 4, 7;
   y << 6, 7, 1, 2, 4, 5, 8, 9;
   ExplicitTrainingData ex = ExplicitTrainingData(x, y);
-  ASSERT_EQ(4, ex.size());
+  ASSERT_EQ(4, ex.Size());
 }
 
 TEST(TrainingDataTest, ImplicitConstruct) {
@@ -87,11 +88,11 @@ TEST(TrainingDataTest, ImplicitGetItem) {
   Eigen::ArrayXXd dx_dt(4, 2);
   x << 1, 2, 3, 4, 5, 6, 7, 8, 9, 7, 4, 7;
   dx_dt << 6, 7, 1, 2, 4, 5, 8, 9;
-  std::list<int> items;
+  std::vector<int> items;
   items.push_back(1);
   items.push_back(3);
   ImplicitTrainingData im = ImplicitTrainingData(x, dx_dt);
-  ImplicitTrainingData* slice = im.get_item(items);
+  ImplicitTrainingData* slice = im.GetItem(items);
   Eigen::ArrayXXd truth_x(2, 3);
   Eigen::ArrayXXd truth_dx_dt(2, 2);
   truth_x << 4, 5, 6, 7, 4, 7;
@@ -112,7 +113,7 @@ TEST(TrainingDataTest, ImplicitSize) {
   x << 1, 2, 3, 4, 5, 6, 7, 8, 9, 7, 4, 7;
   dx_dt << 6, 7, 1, 2, 4, 5, 8, 9;
   ImplicitTrainingData im = ImplicitTrainingData(x, dx_dt);
-  ASSERT_EQ(4, im.size());
+  ASSERT_EQ(4, im.Size());
 }
 
 TEST(UtilsTest, savitzky_golay) {

@@ -45,57 +45,35 @@ namespace bingo {
 struct TrainingData {
  public:
   TrainingData() { }
+
+  virtual ~TrainingData() { }
+
+  virtual TrainingData* GetItem(int item) = 0 ;
   /*! \brief gets a new training data with certain rows
   *
   *  \param[in] items The rows to retrieve. std::list<int>
   *  \return TrainingData* with the selected data
   */
-  virtual TrainingData* get_item(std::list<int> items) = 0;
+  virtual TrainingData* GetItem(const std::vector<int>& items) = 0;
   /*! \brief gets the size of x
   *
   *  \return int the amount of rows in x
   */
-  virtual int size() = 0;
-};
-
-/*! \struct ExplicitTrainingData
- *  \brief This struct holds data for Explicit regression.
- */
-struct ExplicitTrainingData : TrainingData {
- public:
-  ExplicitTrainingData() : TrainingData() { }
-  //! Eigen::ArrayXXd x
-  /*! x variabes for ExplicitTraining */
-  Eigen::ArrayXXd x;
-  //! Eigen::ArrayXXd y
-  /*! y variabes for ExplicitTraining */
-  Eigen::ArrayXXd y;
-  //! \brief Constructor
-  ExplicitTrainingData(Eigen::ArrayXXd vx, Eigen::ArrayXXd vy);
-  ExplicitTrainingData* get_item(std::list<int> items);
-  int size() {
-    return x.rows();
-  }
+  virtual int Size() = 0;
 };
 
 /*! \struct ImplicitTrainingData
  *  \brief This struct holds data for Implicit regression.
  */
 struct ImplicitTrainingData : TrainingData {
- public:
   ImplicitTrainingData() : TrainingData() { }
-  //! Eigen::ArrayXXd x
-  /*! x variabes for ImplicitTraining */
   Eigen::ArrayXXd x;
-  //! Eigen::ArrayXXd dx_dt
-  /*! dx_dt variabes for ImplicitTraining */
   Eigen::ArrayXXd dx_dt;
-  //! \brief Constructor
   ImplicitTrainingData(Eigen::ArrayXXd vx);
-  //! \brief Constructor
   ImplicitTrainingData(Eigen::ArrayXXd vx, Eigen::ArrayXXd vdx_dt);
-  ImplicitTrainingData* get_item(std::list<int> items);
-  int size() {
+  ImplicitTrainingData* GetItem(int item);
+  ImplicitTrainingData* GetItem(const std::vector<int>& items);
+  int Size() {
     return x.rows();
   }
 };

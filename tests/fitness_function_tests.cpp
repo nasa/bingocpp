@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 
+#include <BingoCpp/equation.h>
 #include <BingoCpp/fitness_function.h>
 #include <BingoCpp/training_data.h>
 
@@ -18,12 +19,16 @@ struct SampleTrainingData : public bingo::TrainingData {
   Eigen::ArrayXXd x;
   Eigen::ArrayXXd y;
   SampleTrainingData() : TrainingData() {}
+  ~SampleTrainingData() {}
   SampleTrainingData(Eigen::ArrayXXd& x, Eigen::ArrayXXd& y) : 
       x(x), y(y) { }
-  SampleTrainingData* get_item(std::list<int> items) {
+  SampleTrainingData* GetItem(int item) {
     throw new std::logic_error("Not implemented Exception");
   }
-  int size() { return x.rows(); }
+  SampleTrainingData* GetItem(const std::vector<int>& items) {
+    throw new std::logic_error("Not implemented Exception");
+  }
+  int Size() { return x.rows(); }
 };
 
 class SampleFitnessFunction : public bingo::VectorBasedFunction {
@@ -32,7 +37,7 @@ class SampleFitnessFunction : public bingo::VectorBasedFunction {
       std::string metric = "mae") :
       bingo::VectorBasedFunction(training_data, metric) {}
   ~SampleFitnessFunction() {} 
-  Eigen::ArrayXXd EvaluateFitnessVector(bingo::AGraph& individual) {
+  Eigen::ArrayXXd EvaluateFitnessVector(const bingo::Equation& individual) {
     Eigen::ArrayXXd f_of_x =
         individual.EvaluateEquationAt(((SampleTrainingData*)training_data_)->x);
     return f_of_x - ((SampleTrainingData*)training_data_)->y;
@@ -70,7 +75,7 @@ TEST_F(TestFitnessFunction, InvalidTrainingMetric) {
     SampleFitnessFunction test_function(&training_data_, "invalid_metric");
     FAIL() << "Expecting std::invalid_argument exception\n";
   } catch (std::invalid_argument& exception) {
-    ASSERT_TRUE(true);
+    SUCCEED();
   }
 }
 

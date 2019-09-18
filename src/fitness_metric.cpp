@@ -7,12 +7,15 @@
  * This file contains the cpp version of FitnessMetric.py
  */
 
-#include "BingoCpp/fitness_metric.h"
 #include <iostream>
-#include <stdlib.h>
+
 #include <Eigen/Dense>
 #include <Eigen/Core>
+
 #include <unsupported/Eigen/NonLinearOptimization>
+
+#include "BingoCpp/explicit_regression.h"
+#include "BingoCpp/fitness_metric.h"
 
 namespace bingo {
   
@@ -57,7 +60,7 @@ void FitnessMetric::optimize_constants(AcyclicGraph &indv,
   LMFunctor functor;
   functor.train = &train;
   functor.fit = this;
-  functor.m = functor.train->size();
+  functor.m = functor.train->Size();
   // indv.input_constants();
   functor.n = indv.count_constants();
   functor.agraphIndv = indv;
