@@ -1,6 +1,7 @@
 #ifndef BINGOCPP_INCLUDE_BINGOCPP_EXPLICIT_REGRESSION_H_
 #define BINGOCPP_INCLUDE_BINGOCPP_EXPLICIT_REGRESSION_H_
 
+#include <string>
 #include <vector>
 
 #include <Eigen/Core>
@@ -29,7 +30,8 @@ struct ExplicitTrainingData : TrainingData {
 
 class ExplicitRegression : public VectorBasedFunction {
  public:
-  ExplicitRegression(ExplicitTrainingData* training_data) : 
+  ExplicitRegression(ExplicitTrainingData* training_data,
+		     std::string metric="mae") : 
       VectorBasedFunction(training_data) {}
 
   ~ExplicitRegression() {}
