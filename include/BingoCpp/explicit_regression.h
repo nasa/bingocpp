@@ -32,7 +32,7 @@ class ExplicitRegression : public VectorBasedFunction {
  public:
   ExplicitRegression(ExplicitTrainingData* training_data,
 		     std::string metric="mae") : 
-      VectorBasedFunction(training_data) {}
+      VectorBasedFunction(training_data, metric) {}
 
   ~ExplicitRegression() {}
 
