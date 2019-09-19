@@ -43,7 +43,7 @@ InputAndDeriviative CalculatePartials(const Eigen::ArrayXXd &x) {
     for (int j = 0; j < x_seg.cols(); ++j) {
       Eigen::ArrayXXd temp(x_seg.rows(), 1);
       temp = x_seg.block(0, j, x_seg.rows(), 1);
-      time_deriv.block(0, j, x_seg.rows(), 1) = savitzky_golay(temp, 7, 3, 1);
+      time_deriv.block(0, j, x_seg.rows(), 1) = SavitzkyGolay(temp, 7, 3, 1);
     }
 
     Eigen::ArrayXXd x_seg_no_edge(x_seg.rows() - 7, x_seg.cols());
@@ -126,7 +126,7 @@ double GramWeight(double gw_i, double gw_t, double gw_m, double gw_n,
   return weight;
 }
 
-Eigen::ArrayXXd savitzky_golay(Eigen::ArrayXXd y, int window_size, int order,
+Eigen::ArrayXXd SavitzkyGolay(Eigen::ArrayXXd y, int window_size, int order,
                                int deriv) {
   int m = (window_size - 1) / 2;
   // fill weights

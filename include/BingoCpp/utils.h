@@ -106,7 +106,7 @@ double GramWeight(double gw_i, double gw_t, double gw_m, double gw_n,
  *                   only smoothing). int
  *  \return Eiggen::ArrayXXd the smoothed signal (or it's n-th derivative).
  */
-Eigen::ArrayXXd savitzky_golay(Eigen::ArrayXXd y, int window_size,
+Eigen::ArrayXXd SavitzkyGolay(Eigen::ArrayXXd y, int window_size,
                                int order, int deriv = 0);
 // Eigen::ArrayXXd savitzky_golay(Eigen::ArrayXXd y, int window_size,
 //                                     int order, int deriv=0, int rate=1);
