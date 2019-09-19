@@ -37,7 +37,7 @@ ImplicitTrainingData* ImplicitTrainingData::GetItem(
   Eigen::ArrayXXd temp_in(items.size(), x.cols());
   Eigen::ArrayXXd temp_out(items.size(), dx_dt.cols());
 
-  for (int row = 0; row < items.size(); row ++) {
+  for (std::size_t row = 0; row < items.size(); row ++) {
     temp_in.row(row) = x.row(items[row]);
     temp_out.row(row) = dx_dt.row(items[row]);
   }
@@ -45,7 +45,10 @@ ImplicitTrainingData* ImplicitTrainingData::GetItem(
 }
 
 void normalize_by_row(Eigen::ArrayXXd *data_array) {
-  *data_array = data_array->rowwise().norm();
+  Eigen::ArrayXXd norm_array = data_array->rowwise().norm();
+  for (int i = 0; i < norm_array.rows(); i ++) {
+    data_array->row(i) /= norm_array.row(i)[0];
+  }
 }
 
 Eigen::ArrayXXd dfdx_dot_dfdt(bool normalize_dot,
@@ -82,7 +85,6 @@ Eigen::ArrayXXd ImplicitRegression::EvaluateFitnessVector(
         ((ImplicitTrainingData*)training_data_)->x.rows(),
          std::numeric_limits<double>::infinity());
   }
-
   // NOTE: may need to verify eigen NaN conditions
   Eigen::ArrayXXd denominator = dot_product.abs().rowwise().sum();
   Eigen::ArrayXXd normalized_fitness = 
