@@ -34,6 +34,9 @@
 #include <Eigen/Core>
 
 namespace bingo {
+
+typedef std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> InputAndDeriviative;
+
 /*! \brief Calculate derivatves with respect to time (first dimension)
  *
  *   \param[in] x array in which derivatives will be calculated in the
@@ -43,7 +46,7 @@ namespace bingo {
  *   \return std::vector<Eigen::ArrayXXd> with x array and corresponding time
  *                                        derivatives
  */
-std::vector<Eigen::ArrayXXd> calculate_partials(Eigen::ArrayXXd x);
+InputAndDeriviative CalculatePartials(const Eigen::ArrayXXd &x);
 /*! \brief Generalized factorial
  *
  *   \param[in] a double

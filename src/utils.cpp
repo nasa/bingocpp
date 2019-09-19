@@ -8,12 +8,14 @@
  * sybolic regression problems in the bingo package
  */
 
-#include "BingoCpp/utils.h"
 #include <vector>
 #include <numeric>
 
+#include "BingoCpp/utils.h"
+
 namespace bingo {
-std::vector<Eigen::ArrayXXd> calculate_partials(Eigen::ArrayXXd x) {
+
+InputAndDeriviative CalculatePartials(const Eigen::ArrayXXd &x) {
   std::vector<int> break_points;
   break_points.push_back(0);
 
@@ -74,10 +76,7 @@ std::vector<Eigen::ArrayXXd> calculate_partials(Eigen::ArrayXXd x) {
     t_start += times_deriv_all_vec[i].rows();
   }
 
-  std::vector<Eigen::ArrayXXd> temp;
-  temp.push_back(x_all);
-  temp.push_back(times_deriv_all);
-  return temp;
+  return std::make_pair(x_all, times_deriv_all);
 }
 
 double GramPoly(double gp_i, double gp_m, double gp_k, double gp_s) {

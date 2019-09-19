@@ -11,6 +11,7 @@
 
 #include "gtest/gtest.h"
 #include "BingoCpp/explicit_regression.h"
+#include "BingoCpp/implicit_regression.h"
 #include "BingoCpp/training_data.h"
 #include "BingoCpp/utils.h"
 #include <Eigen/Dense>
@@ -112,7 +113,7 @@ TEST(TrainingDataTest, ImplicitSize) {
   Eigen::ArrayXXd dx_dt(4, 2);
   x << 1, 2, 3, 4, 5, 6, 7, 8, 9, 7, 4, 7;
   dx_dt << 6, 7, 1, 2, 4, 5, 8, 9;
-  ImplicitTrainingData im = ImplicitTrainingData(x, dx_dt);
+  ImplicitTrainingData im(x, dx_dt);
   ASSERT_EQ(4, im.Size());
 }
 
@@ -138,12 +139,12 @@ TEST(UtilsTest, calculate_partials) {
   Eigen::ArrayXXd time_deriv_truth(1, 3);
   x_truth << 5, 1, 4;
   time_deriv_truth << 1.53175, -.178571, -1.86905;
-  std::vector<Eigen::ArrayXXd> cal = calculate_partials(x);
+  InputAndDeriviative cal = CalculatePartials(x);
 
   for (int i = 0; i < 1; ++i) {
-    ASSERT_NEAR(cal[0](i, 0), x_truth(i, 0), .001);
-    ASSERT_NEAR(cal[0](i, 1), x_truth(i, 1), .001);
-    ASSERT_NEAR(cal[1](i, 0), time_deriv_truth(i, 0), .001);
-    ASSERT_NEAR(cal[1](i, 1), time_deriv_truth(i, 1), .001);
+    ASSERT_NEAR(cal.first(i, 0), x_truth(i, 0), .001);
+    ASSERT_NEAR(cal.first(i, 1), x_truth(i, 1), .001);
+    ASSERT_NEAR(cal.second(i, 0), time_deriv_truth(i, 0), .001);
+    ASSERT_NEAR(cal.second(i, 1), time_deriv_truth(i, 1), .001);
   }
 }

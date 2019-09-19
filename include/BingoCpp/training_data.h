@@ -61,21 +61,5 @@ struct TrainingData {
   */
   virtual int Size() = 0;
 };
-
-/*! \struct ImplicitTrainingData
- *  \brief This struct holds data for Implicit regression.
- */
-struct ImplicitTrainingData : TrainingData {
-  ImplicitTrainingData() : TrainingData() { }
-  Eigen::ArrayXXd x;
-  Eigen::ArrayXXd dx_dt;
-  ImplicitTrainingData(Eigen::ArrayXXd vx);
-  ImplicitTrainingData(Eigen::ArrayXXd vx, Eigen::ArrayXXd vdx_dt);
-  ImplicitTrainingData* GetItem(int item);
-  ImplicitTrainingData* GetItem(const std::vector<int>& items);
-  int Size() {
-    return x.rows();
-  }
-};
 } // namespace bingo
 #endif
