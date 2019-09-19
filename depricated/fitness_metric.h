@@ -128,15 +128,5 @@ struct FitnessMetric {
   */
   void optimize_constants(AcyclicGraph &indv, TrainingData &train);
 };
-
-/*! \struct StandardRegression
- *  \brief Traditional fitness evaluation
- */
-struct StandardRegression : FitnessMetric {
- public:
-  StandardRegression() : FitnessMetric() {}
-  Eigen::ArrayXXd evaluate_fitness_vector(AcyclicGraph &indv,
-                                          TrainingData &train);
-};
 } // namespace bingo
 #endif

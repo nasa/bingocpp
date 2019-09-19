@@ -67,17 +67,6 @@ add_library( bingo STATIC ${SOURCES} )
 add_dependencies(bingo eigen)
 target_link_libraries(bingo eigen)
 set_target_properties(bingo PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
-# target_link_libraries(bingo profiler)
-
-# ---------- main executable ----------
-add_executable(runBingoCpp app/driver.cpp)
-add_dependencies(runBingoCpp bingo)  
-target_link_libraries(runBingoCpp bingo)
-
-# ---------- benchmarking executable ----------
-add_executable(runBenchmark app/step_profile.cpp)
-add_dependencies(runBenchmark bingo)  
-target_link_libraries(runBenchmark bingo)
 
 # ---------- performance benchmark executable ----------
 add_executable(performanceBenchmark app/performance_benchmarks.cpp)

@@ -70,10 +70,4 @@ void FitnessMetric::optimize_constants(AcyclicGraph &indv,
   indv.set_constants(vec);
   indv.needs_opt = false;
 }
-
-Eigen::ArrayXXd StandardRegression::evaluate_fitness_vector(AcyclicGraph &indv,
-    TrainingData &train) {
-  ExplicitTrainingData* temp = dynamic_cast<ExplicitTrainingData*>(&train);
-  return (indv.evaluate(temp->x)) - temp->y;
-}
 } // namespace bingo 

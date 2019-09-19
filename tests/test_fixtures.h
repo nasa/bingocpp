@@ -3,7 +3,6 @@
 
 #include <BingoCpp/agraph.h>
 #include <BingoCpp/equation.h>
-#include <BingoCpp/graph_manip.h>
 
 #include "testing_utils.h"
 
