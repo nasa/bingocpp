@@ -60,7 +60,8 @@ TEST_F(TestImplicitRegression, GetSubsetOfData) {
   expected_subset << 0, 2, 3;
   ASSERT_TRUE(subset_training_data->x.isApprox(expected_subset));
   ASSERT_TRUE(subset_training_data->dx_dt.isApprox(expected_subset));
-  delete training_data, subset_training_data;
+  delete training_data;
+  delete subset_training_data;
 }
 
 TEST_F(TestImplicitRegression, CorrectTrainingDataSize) {
@@ -70,5 +71,17 @@ TEST_F(TestImplicitRegression, CorrectTrainingDataSize) {
     ASSERT_EQ(training_data->Size(), size);
     delete training_data;
   }
+}
+
+TEST(ImplicitRegressionPartials, PartialCalculationInTrainingData) {
+  auto data_input = Eigen::ArrayXd::LinSpaced(20, 0., 19.);
+  Eigen::ArrayXXd data_array(data_input.rows(), 3);
+  data_array << data_input * 0, data_input * 1, data_input * 2;
+  auto training_data = new ImplicitTrainingData(data_array);
+  Eigen::ArrayXXd expected_derivatives(13, 3);
+  expected_derivatives << Eigen::ArrayXd::Ones(13) * 0,
+                          Eigen::ArrayXd::Ones(13) * 1,
+                          Eigen::ArrayXd::Ones(13) * 2;
+  ASSERT_TRUE(training_data->dx_dt.isApprox(expected_derivatives));
 }
 } // namespace (anonymous)
