@@ -1,12 +1,3 @@
-/*!
- * \file training_data.cc
- *
- * \author Ethan Adams
- * \date
- *
- * This file contains the cpp version of TrainingData.py
- */
-
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
