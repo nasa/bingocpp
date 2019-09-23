@@ -83,5 +83,18 @@ TEST(ImplicitRegressionPartials, PartialCalculationInTrainingData) {
                           Eigen::ArrayXd::Ones(13) * 1,
                           Eigen::ArrayXd::Ones(13) * 2;
   ASSERT_TRUE(training_data->dx_dt.isApprox(expected_derivatives));
+  delete training_data;
+}
+
+TEST(ImplicitRegressionPartials, PartialCalculationInTrainingDataNaN) {
+  auto data_input = Eigen::ArrayXd::LinSpaced(20, 0., 19.) * 2;
+  Eigen::ArrayXXd data_array(data_input.rows() * 2 + 1, 1);
+  data_array << data_input,
+                std::numeric_limits<double>::quiet_NaN(),
+                data_input;
+  auto training_data = new ImplicitTrainingData(data_array);
+  Eigen::ArrayXd expected_derivative = Eigen::ArrayXd::Constant(26, 2.0);
+  ASSERT_TRUE(training_data->dx_dt.isApprox(expected_derivative));
+  delete training_data;
 }
 } // namespace (anonymous)
