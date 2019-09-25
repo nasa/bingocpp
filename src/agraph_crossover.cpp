@@ -9,12 +9,12 @@ namespace {
 // distro to be a member variable instead of creating a new instance each
 // call. Basically if CommandArray size is constant throughout the 
 // exeuction, we can optimize this.
-int find_random_int(std::mt19937& engine, int min, int max) {
+int find_random_int(std::mt19937 &engine, int min, int max) {
   std::uniform_int_distribution<int> dist(min, max);
   return dist(engine);
 }
 
-void perform_crossover(AGraph& child, AGraph& parent, int cross_point) {
+void perform_crossover(AGraph &child, AGraph &parent, int cross_point) {
   Eigen::ArrayX3i child_array = child.GetCommandArray();
   Eigen::ArrayX3i parent_array = parent.GetCommandArray();
   int num_modified_rows = parent_array.rows() - cross_point;
