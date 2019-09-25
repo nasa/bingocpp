@@ -24,8 +24,8 @@
  * the License.
  */
 
-#ifndef INCLUDE_BINGOCPP_UTILS_H_
-#define INCLUDE_BINGOCPP_UTILS_H_
+#ifndef BINGOCPP_INCLUDE_BINGOCPP_UTILS_H_
+#define BINGOCPP_INCLUDE_BINGOCPP_UTILS_H_
 
 #include <vector>
 

@@ -25,10 +25,10 @@
 #ifndef INCLUDE_BINGOCPP_TRAINING_DATA_H_
 #define INCLUDE_BINGOCPP_TRAINING_DATA_H_
 
+#include <vector>
+
 #include <Eigen/Dense>
 #include <Eigen/Core>
-#include <vector>
-#include <list>
 
 
 namespace bingo {
@@ -48,13 +48,13 @@ struct TrainingData {
 
   virtual ~TrainingData() { }
 
-  virtual TrainingData* GetItem(int item) = 0 ;
+  virtual TrainingData *GetItem(int item) = 0 ;
   /*! \brief gets a new training data with certain rows
   *
   *  \param[in] items The rows to retrieve. std::list<int>
   *  \return TrainingData* with the selected data
   */
-  virtual TrainingData* GetItem(const std::vector<int>& items) = 0;
+  virtual TrainingData *GetItem(const std::vector<int> &items) = 0;
   /*! \brief gets the size of x
   *
   *  \return int the amount of rows in x

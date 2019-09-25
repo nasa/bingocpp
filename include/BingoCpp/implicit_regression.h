@@ -17,13 +17,13 @@ struct ImplicitTrainingData : TrainingData {
   ImplicitTrainingData(const Eigen::ArrayXXd &input,
                        const Eigen::ArrayXXd &derivative);
   ImplicitTrainingData* GetItem(int item);
-  ImplicitTrainingData* GetItem(const std::vector<int>& items);
+  ImplicitTrainingData* GetItem(const std::vector<int> &items);
   int Size() { return x.rows(); }
 };
 
 class ImplicitRegression : public VectorBasedFunction {
  public:
-  ImplicitRegression(ImplicitTrainingData* training_data, 
+  ImplicitRegression(ImplicitTrainingData *training_data, 
                      int required_params = -1,
                      bool normalize_dot = false) :
       VectorBasedFunction(training_data) {

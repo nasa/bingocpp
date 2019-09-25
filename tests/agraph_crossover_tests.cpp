@@ -28,7 +28,7 @@ TEST_F(AGraphCrossoverTest, test_single_point_crossover) {
   CrossoverChildren children = crossover.Crossover(sample_agraph_1, sample_agraph_2);
 
   bool found_crossover_point = false;
-  for (size_t i = 0; i < sample_agraph_1.GetCommandArray().rows(); i ++) {
+  for (int i = 0; i < sample_agraph_1.GetCommandArray().rows(); i ++) {
     Eigen::ArrayX3i parent_1_op = sample_agraph_1.GetCommandArray().row(i);
     Eigen::ArrayX3i parent_2_op = sample_agraph_2.GetCommandArray().row(i);
     Eigen::ArrayX3i child_1_op = children.first.GetCommandArray().row(i); 

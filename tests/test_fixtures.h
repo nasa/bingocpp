@@ -10,17 +10,17 @@ namespace testutils {
 
 class SumEquation : public bingo::Equation {
  public:
-  Eigen::ArrayXXd EvaluateEquationAt(const Eigen::ArrayXXd& x) const {
+  Eigen::ArrayXXd EvaluateEquationAt(const Eigen::ArrayXXd &x) const {
     return x.rowwise().sum();
   }
 
   EvalAndDerivative EvaluateEquationWithXGradientAt(
-      const Eigen::ArrayXXd& x) const {
+      const Eigen::ArrayXXd &x) const {
     return std::make_pair(EvaluateEquationAt(x), x);
   }
 
   EvalAndDerivative EvaluateEquationWithLocalOptGradientAt(
-      const Eigen::ArrayXXd& x) const {
+      const Eigen::ArrayXXd &x) const {
     return std::make_pair(EvaluateEquationAt(x), x);
   }
 

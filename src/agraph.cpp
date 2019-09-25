@@ -1,13 +1,12 @@
 #include <limits>
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <utility>
 
-#include <BingoCpp/agraph.h>
-#include <BingoCpp/agraph_maps.h>
-#include <BingoCpp/backend.h>
-#include <BingoCpp/constants.h>
+#include "BingoCpp/agraph.h"
+#include "BingoCpp/agraph_maps.h"
+#include "BingoCpp/backend.h"
+#include "BingoCpp/constants.h"
 
 namespace bingo {
 namespace {
@@ -15,32 +14,32 @@ namespace {
 const double kFitnessNotSet = 1e9;
 
 bool check_optimization_requirement(
-    AGraph& agraph,
-    const std::vector<bool>& utilized_commands);
+    AGraph &agraph,
+    const std::vector<bool> &utilized_commands);
 
-int renumber_constants(const std::vector<bool>& utilized_commands,
-                       Eigen::ArrayX3i& command_array);
+int renumber_constants(const std::vector<bool> &utilized_commands,
+                       Eigen::ArrayX3i &command_array);
 
 std::string get_formatted_string_using(
-    const PrintMap& format_map,
-    const AGraph& agraph,
-    const Eigen::ArrayX3i& short_command_array);
+    const PrintMap &format_map,
+    const AGraph &agraph,
+    const Eigen::ArrayX3i &short_command_array);
 
-std::string get_formatted_element_string(const AGraph& individual,
-                                         const Eigen::ArrayX3i& stack_element,
+std::string get_formatted_element_string(const AGraph &individual,
+                                         const Eigen::ArrayX3i &stack_element,
                                          std::vector<std::string> string_list,
-                                         const PrintMap& format_map);
+                                         const PrintMap &format_map);
 
-std::string print_string_with_args(const std::string& string,
-                                   const std::string& arg1,
-                                   const std::string& arg2);
+std::string print_string_with_args(const std::string &string,
+                                   const std::string &arg1,
+                                   const std::string &arg2);
 
-std::string get_stack_string(const AGraph& agraph,
-                             const Eigen::ArrayX3i& command_array);
+std::string get_stack_string(const AGraph &agraph,
+                             const Eigen::ArrayX3i &command_array);
 
-std::string get_stack_element_string(const AGraph& individual,
+std::string get_stack_element_string(const AGraph &individual,
                                      int command_index,
-                                     const Eigen::ArrayX3i& stack_element);
+                                     const Eigen::ArrayX3i &stack_element);
 } // namespace
 
 AGraph::AGraph(bool manual_constants) {
@@ -55,7 +54,7 @@ AGraph::AGraph(bool manual_constants) {
   genetic_age_ = 0;
 }
   
-AGraph::AGraph(const AGraph& agraph) {
+AGraph::AGraph(const AGraph &agraph) {
   command_array_ = agraph.command_array_;
   short_command_array_ = agraph.short_command_array_;
   constants_ = agraph.constants_;
@@ -71,11 +70,11 @@ AGraph AGraph::Copy() {
   return AGraph(*this);
 }
 
-const Eigen::ArrayX3i& AGraph::GetCommandArray() const {
+const Eigen::ArrayX3i &AGraph::GetCommandArray() const {
   return command_array_;
 }
 
-Eigen::ArrayX3i& AGraph::GetCommandArrayModifiable() {
+Eigen::ArrayX3i &AGraph::GetCommandArrayModifiable() {
   return command_array_;
 }
 
@@ -132,31 +131,31 @@ void AGraph::SetLocalOptimizationParams(Eigen::VectorXd params) {
   needs_opt_ = false;
 }
 
-const Eigen::VectorXd& AGraph::GetLocalOptimizationParams() const {
+const Eigen::VectorXd &AGraph::GetLocalOptimizationParams() const {
   return constants_;
 }
 
-Eigen::VectorXd& AGraph::GetLocalOptimizationParamsModifiable() {
+Eigen::VectorXd &AGraph::GetLocalOptimizationParamsModifiable() {
   return constants_;
 }
 
 Eigen::ArrayXXd 
-AGraph::EvaluateEquationAt(const Eigen::ArrayXXd& x) const {
+AGraph::EvaluateEquationAt(const Eigen::ArrayXXd &x) const {
   Eigen::ArrayXXd f_of_x; 
   try {
     f_of_x = backend::Evaluate(this->short_command_array_,
                                x,
                                this->constants_);
     return f_of_x;
-  } catch (const std::underflow_error& ue) {
+  } catch (const std::underflow_error &ue) {
     return Eigen::ArrayXXd::Constant(x.rows(), x.cols(), kNaN);
-  } catch (const std::overflow_error& oe) {
+  } catch (const std::overflow_error &oe) {
     return Eigen::ArrayXXd::Constant(x.rows(), x.cols(), kNaN);
   } 
 }
 
 EvalAndDerivative
-AGraph::EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd& x) const {
+AGraph::EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd &x) const {
   EvalAndDerivative df_dx;
   try {
     df_dx = backend::EvaluateWithDerivative(this->short_command_array_,
@@ -164,11 +163,11 @@ AGraph::EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd& x) const {
                                             this->constants_,
                                             true);
     return df_dx;
-  } catch (const std::underflow_error& ue) {
+  } catch (const std::underflow_error &ue) {
     Eigen::ArrayXXd nan_array =
         Eigen::ArrayXXd::Constant(x.rows(), x.cols(), kNaN);
     return std::make_pair(nan_array, nan_array);
-  } catch (const std::overflow_error& oe) {
+  } catch (const std::overflow_error &oe) {
     Eigen::ArrayXXd nan_array =
         Eigen::ArrayXXd::Constant(x.rows(), x.cols(), kNaN);
     return std::make_pair(nan_array, nan_array);
@@ -176,7 +175,7 @@ AGraph::EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd& x) const {
 }
 
 EvalAndDerivative
-AGraph::EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd& x) const {
+AGraph::EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x) const {
   EvalAndDerivative df_dc;
   try {
     df_dc = backend::EvaluateWithDerivative(this->short_command_array_,
@@ -184,18 +183,18 @@ AGraph::EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd& x) const {
                                             this->constants_,
                                             false);
     return df_dc;
-  } catch (const std::underflow_error& ue) {
+  } catch (const std::underflow_error &ue) {
     Eigen::ArrayXXd nan_array =
         Eigen::ArrayXXd::Constant(x.rows(), x.cols(), kNaN);
     return std::make_pair(nan_array, nan_array);
-  } catch (const std::overflow_error& oe) {
+  } catch (const std::overflow_error &oe) {
     Eigen::ArrayXXd nan_array =
         Eigen::ArrayXXd::Constant(x.rows(), x.cols(), kNaN);
     return std::make_pair(nan_array, nan_array);
   }
 }
 
-std::ostream& operator<<(std::ostream& strm, const AGraph& graph) {
+std::ostream &operator<<(std::ostream &strm, const AGraph &graph) {
   return strm << graph.GetConsoleString();
 }
 
@@ -230,7 +229,7 @@ void AGraph::ForceRenumberConstants() {
   renumber_constants(util_commands, command_array_);
 }
 
-int AGraph::Distance(const AGraph& agraph) {
+int AGraph::Distance(const AGraph &agraph) {
   return (command_array_ != agraph.GetCommandArray()).count();
 }
 
@@ -258,8 +257,8 @@ void AGraph::process_modified_command_array() {
 namespace {
 
 bool check_optimization_requirement(
-    AGraph& agraph,
-    const std::vector<bool>& utilized_commands) {
+    AGraph &agraph,
+    const std::vector<bool> &utilized_commands) {
   Eigen::ArrayX3i command_array = agraph.GetCommandArray();
   for (int i = 0; i < command_array.rows(); i++) {
     if (utilized_commands[i] &&
@@ -274,8 +273,8 @@ bool check_optimization_requirement(
   return false;
 }
 
-int renumber_constants (const std::vector<bool>& utilized_commands,
-                        Eigen::ArrayX3i& command_array) {
+int renumber_constants (const std::vector<bool> &utilized_commands,
+                        Eigen::ArrayX3i &command_array) {
   int const_num = 0;
   int command_array_depth = command_array.rows();
   for (int i = 0; i < command_array_depth; i++) {
@@ -289,9 +288,9 @@ int renumber_constants (const std::vector<bool>& utilized_commands,
 }
 
 std::string get_formatted_string_using(
-    const PrintMap& format_map,
-    const AGraph& agraph,
-    const Eigen::ArrayX3i& short_command_array){
+    const PrintMap &format_map,
+    const AGraph &agraph,
+    const Eigen::ArrayX3i &short_command_array){
   std::vector<std::string> string_list;
   for (auto stack_element : short_command_array.rowwise()) {
     std::string temp_string = get_formatted_element_string(
@@ -301,10 +300,10 @@ std::string get_formatted_string_using(
   return string_list.back();
 }
 
-std::string get_formatted_element_string(const AGraph& individual,
-                                         const Eigen::ArrayX3i& stack_element,
+std::string get_formatted_element_string(const AGraph &individual,
+                                         const Eigen::ArrayX3i &stack_element,
                                          std::vector<std::string> string_list,
-                                         const PrintMap& format_map) {
+                                         const PrintMap &format_map) {
   int node = stack_element(0, ArrayProps::kNodeIdx);
   int param1 = stack_element(0, ArrayProps::kOp1);
   int param2 = stack_element(0, ArrayProps::kOp2);
@@ -328,9 +327,9 @@ std::string get_formatted_element_string(const AGraph& individual,
   return temp_string;
 }
 
-std::string print_string_with_args(const std::string& string,
-                                   const std::string& arg1,
-                                   const std::string& arg2) {
+std::string print_string_with_args(const std::string &string,
+                                   const std::string &arg1,
+                                   const std::string &arg2) {
   std::stringstream stream;
   bool first_found = false;
   for (std::string::const_iterator character = string.begin();
@@ -347,8 +346,8 @@ std::string print_string_with_args(const std::string& string,
 }
 
 std::string get_stack_string(
-    const AGraph& agraph,
-    const Eigen::ArrayX3i& command_array) {
+    const AGraph &agraph,
+    const Eigen::ArrayX3i &command_array) {
   std::string temp_string;
   for (int i = 0; i < command_array.rows(); i++) {
     temp_string += get_stack_element_string(agraph, i, command_array.row(i));
@@ -356,9 +355,9 @@ std::string get_stack_string(
   return temp_string;
 }
 
-std::string get_stack_element_string(const AGraph& individual,
+std::string get_stack_element_string(const AGraph &individual,
                                      int command_index,
-                                     const Eigen::ArrayX3i& stack_element) {
+                                     const Eigen::ArrayX3i &stack_element) {
   int node = stack_element(0, ArrayProps::kNodeIdx);
   int param1 = stack_element(0, ArrayProps::kOp1);
   int param2 = stack_element(0, ArrayProps::kOp2);

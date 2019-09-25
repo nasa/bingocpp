@@ -19,12 +19,12 @@ ImplicitTrainingData::ImplicitTrainingData(
   dx_dt = derivative;
 }
 
-ImplicitTrainingData* ImplicitTrainingData::GetItem(int item) {
+ImplicitTrainingData *ImplicitTrainingData::GetItem(int item) {
   return new ImplicitTrainingData(x.row(item), dx_dt.row(item));
 }
 
-ImplicitTrainingData* ImplicitTrainingData::GetItem(
-    const std::vector<int>& items) {
+ImplicitTrainingData *ImplicitTrainingData::GetItem(
+    const std::vector<int> &items) {
   Eigen::ArrayXXd temp_in(items.size(), x.cols());
   Eigen::ArrayXXd temp_out(items.size(), dx_dt.cols());
 
@@ -62,7 +62,7 @@ bool not_enough_parameters_used(int required_params,
 }
 
 Eigen::ArrayXXd ImplicitRegression::EvaluateFitnessVector(
-    const Equation& individual) {
+    const Equation &individual) {
   EvalAndDerivative eval_and_grad = individual.EvaluateEquationWithXGradientAt(
       ((ImplicitTrainingData*)training_data_)->x);
   Eigen::ArrayXXd dot_product = dfdx_dot_dfdt(
