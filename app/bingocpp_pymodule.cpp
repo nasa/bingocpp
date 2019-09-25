@@ -135,6 +135,21 @@ PYBIND11_MODULE(bingocpp, m) {
          (ExplicitTrainingData *(ExplicitTrainingData::*)(const std::vector<int>&))
          &ExplicitTrainingData::GetItem)
     .def("__len__", &ExplicitTrainingData::Size);
+  
+  py::class_<ExplicitRegression>(m, "ExplicitRegression")
+    .def(py::init<ExplicitTrainingData *, std::string &>(),
+        py::arg("training_data"),
+        py::arg("metric")="mae")
+    .def("__call__", &ExplicitRegression::EvaluateIndividualFitness)
+    .def("evaluate_fitness_vector", &ExplicitRegression::EvaluateFitnessVector);
+  
+  py::class_<ImplicitRegression>(m, "ImplicitRegression")
+    .def(py::init<ImplicitTrainingData *, int &, bool &>(),
+         py::arg("training_data"),
+         py::arg("required_params") = -1,
+         py::arg("normalize_dot") = false)
+    .def("__call__", &ImplicitRegression::EvaluateIndividualFitness)
+    .def("evaluate_fitness_vector", &ImplicitRegression::EvaluateFitnessVector);
 
   m.def("calculate_partials", &CalculatePartials);
   m.def("savitzky_golay", &SavitzkyGolay);
