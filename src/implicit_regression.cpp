@@ -4,6 +4,8 @@
 #include "BingoCpp/implicit_regression.h"
 #include "BingoCpp/utils.h"
 
+
+#include <iostream>
 namespace bingo {
 
 ImplicitTrainingData::ImplicitTrainingData(const Eigen::ArrayXXd &input) {
@@ -57,8 +59,8 @@ Eigen::ArrayXXd dfdx_dot_dfdt(bool normalize_dot,
 
 bool not_enough_parameters_used(int required_params, 
                                 const Eigen::ArrayXXd &dot_product) {
-  int num_params_used = (dot_product > 1e-16).count();
-  return (num_params_used >= required_params);
+  auto num_params_used = (dot_product.abs() > 1e-16).rowwise().count();
+  return !(num_params_used >= required_params).any();
 }
 
 Eigen::ArrayXXd ImplicitRegression::EvaluateFitnessVector(
