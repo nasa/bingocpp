@@ -11,21 +11,12 @@ using namespace bingo;
 
 namespace {
 
-class TestImplicitRegression : public testing::Test {
+class ImplicitRegressionFixture {
  public:
   ImplicitTrainingData *training_data_;
   testutils::SumEquation sum_equation_;
 
-  void SetUp() {
-    training_data_ = init_sample_training_data();
-    sum_equation_ = testutils::init_sum_equation();
-  }
-
-  void TearDown() {
-    delete training_data_;
-  }
-
- private:
+ protected:
   ImplicitTrainingData* init_sample_training_data() {
     const int num_points = 50;
     const int num_data_per_feature = 10;
@@ -45,14 +36,72 @@ class TestImplicitRegression : public testing::Test {
   }
 };
 
-TEST_F(TestImplicitRegression, EvaluateFinessIndividual) {
-  ImplicitRegression *regressor = new ImplicitRegression(training_data_, -1, true);
+class ImplicitRegressionTestNormalize : public ImplicitRegressionFixture,
+                                        public testing::TestWithParam<bool> {
+ public:
+  virtual void SetUp() {
+    training_data_ = init_sample_training_data();
+    sum_equation_ = testutils::init_sum_equation();
+  }
+
+  virtual void TearDown() {
+    delete training_data_;
+  }
+};
+
+TEST_P(ImplicitRegressionTestNormalize, EvaluateIndividualFitness) {
+  bool normalize_dot_product = GetParam();
+  auto regressor
+      = new ImplicitRegression(training_data_, -1, normalize_dot_product);
   double fitness = regressor->EvaluateIndividualFitness(sum_equation_);
   ASSERT_TRUE(0.14563031020 - fitness < 1e-10);
   delete regressor;
 }
+INSTANTIATE_TEST_CASE_P(,ImplicitRegressionTestNormalize, testing::Bool());
 
-TEST_F(TestImplicitRegression, GetSubsetOfData) {
+class ImplicitRegressionTestNonNormalized : 
+    public ImplicitRegressionFixture,
+    public testing::TestWithParam<std::tuple<int, bool>> {
+ public:
+  virtual void SetUp() {
+    training_data_ = init_sample_training_data();
+    sum_equation_ = testutils::init_sum_equation();
+  }
+
+  virtual void TearDown() {
+    delete training_data_;
+  }
+};
+
+TEST_P(ImplicitRegressionTestNonNormalized, EvaluateIndividualFitness) {
+  auto const &param = GetParam();
+  auto required_params = std::get<0>(param);
+  auto infinite_fitness = std::get<1>(param);
+  auto regressor = new ImplicitRegression(training_data_,
+                                          required_params,
+                                          infinite_fitness);
+  double fitness = regressor->EvaluateIndividualFitness(sum_equation_);
+  ASSERT_TRUE(!std::isfinite(fitness) == infinite_fitness);
+  delete regressor;
+}
+INSTANTIATE_TEST_CASE_P(instance_one, ImplicitRegressionTestNonNormalized,
+  ::testing::Values(std::make_tuple(4, false), std::make_tuple(5, true))
+);
+
+class ImplicitRegressionTest : public ImplicitRegressionFixture,
+                               public testing::Test {
+ public:
+  virtual void SetUp() {
+    training_data_ = init_sample_training_data();
+    sum_equation_ = testutils::init_sum_equation();
+  }
+
+  virtual void TearDown() {
+    delete training_data_;
+  }
+};
+
+TEST_F(ImplicitRegressionTest, GetSubsetOfData) {
   auto data_input = Eigen::ArrayXd::LinSpaced(5, 0, 4);
   auto training_data = new ImplicitTrainingData(data_input, data_input);
   auto subset_training_data = training_data->GetItem(std::vector<int>{0, 2, 3});
@@ -64,7 +113,7 @@ TEST_F(TestImplicitRegression, GetSubsetOfData) {
   delete subset_training_data;
 }
 
-TEST_F(TestImplicitRegression, CorrectTrainingDataSize) {
+TEST_F(ImplicitRegressionTest, CorrectTrainingDataSize) {
   for (int size : std::vector<int> {2, 5, 50}) {
     Eigen::ArrayXXd data_input = Eigen::ArrayXd::LinSpaced(size, 0, 10);
     auto training_data = new ImplicitTrainingData(data_input, data_input);
