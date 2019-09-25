@@ -24,7 +24,7 @@ struct ImplicitTrainingData : TrainingData {
 class ImplicitRegression : public VectorBasedFunction {
  public:
   ImplicitRegression(ImplicitTrainingData *training_data, 
-                     int required_params = -1,
+                     int required_params = kNoneRequired,
                      bool normalize_dot = false) :
       VectorBasedFunction(training_data) {
     required_params_ = required_params;
@@ -36,6 +36,7 @@ class ImplicitRegression : public VectorBasedFunction {
  private:
   int required_params_;
   bool normalize_dot_;
+  static const int kNoneRequired = -1;
 };
 
 class ImplicitRegressionSchmidt : VectorBasedFunction {

@@ -72,13 +72,13 @@ Eigen::ArrayXXd ImplicitRegression::EvaluateFitnessVector(
       ((ImplicitTrainingData*)training_data_)->dx_dt,
       eval_and_grad.second);
 
-  if (required_params_ != -1
+  if (required_params_ != kNoneRequired
       && not_enough_parameters_used(required_params_, dot_product)) {
     return Eigen::ArrayXd::Constant(
         ((ImplicitTrainingData*)training_data_)->x.rows(),
          std::numeric_limits<double>::infinity());
   }
-  // NOTE: may need to verify eigen NaN conditions
+  // NOTE tylertownsend: may need to verify eigen NaN conditions
   Eigen::ArrayXXd denominator = dot_product.abs().rowwise().sum();
   Eigen::ArrayXXd normalized_fitness = 
       dot_product.rowwise().sum() / denominator;
