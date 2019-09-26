@@ -55,8 +55,9 @@ InputAndDeriviative CalculatePartials(const Eigen::ArrayXXd &x) {
   set_break_points(x, &break_points);
 
   int start = 0;
-  Eigen::ArrayXXd x_return;
-  Eigen::ArrayXXd time_deriv_return;
+  int return_value_rows = (x.rows() - kPartialEdgeSize) * break_points.size();
+  Eigen::ArrayXXd x_return(return_value_rows, x.cols());
+  Eigen::ArrayXXd time_deriv_return(x_return.rows(), x_return.cols());
   for (std::vector<int>::iterator break_point = break_points.begin();
       break_point != break_points.end();
       break_point ++) {
