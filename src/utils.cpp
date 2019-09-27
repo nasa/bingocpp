@@ -50,6 +50,12 @@ void update_return_values (int start,
   }
 }
 
+Eigen::ArrayXXd shave_edges_and_nan_from_array (
+    const Eigen::ArrayXXd &filtered_data) {
+  return filtered_data.block(kPartialEdgeSize, 0, 
+      filtered_data.rows() - kPartialWindowSize, filtered_data.cols());
+}
+
 InputAndDeriviative CalculatePartials(const Eigen::ArrayXXd &x) {
   std::vector<int> break_points;
   set_break_points(x, &break_points);
@@ -67,19 +73,11 @@ InputAndDeriviative CalculatePartials(const Eigen::ArrayXXd &x) {
     Eigen::ArrayXXd time_deriv(x_segment.rows(), x_segment.cols());
     for (int col = 0; col < x_segment.cols(); col ++) {
       time_deriv.col(col) = SavitzkyGolay(x_segment.col(col),
-                                          kPartialWindowSize,
-                                          kPartialEdgeSize,
-                                          kDerivativeOrder);
+          kPartialWindowSize, kPartialEdgeSize, kDerivativeOrder);
     }
-    time_deriv = time_deriv.block(kPartialEdgeSize, 0, 
-                                  time_deriv.rows() - kPartialWindowSize,
-                                  time_deriv.cols());
-    x_segment = x_segment.block(kPartialEdgeSize, 0,
-                                x_segment.rows() - kPartialWindowSize,
-                                x_segment.cols());
-    
-    update_return_values(start, x_segment, time_deriv, 
-                         &x_return, &time_deriv_return);
+    Eigen::ArrayXXd deriv_temp = shave_edges_and_nan_from_array(time_deriv);
+    Eigen::ArrayXXd x_temp = shave_edges_and_nan_from_array(x_segment);
+    update_return_values(start, x_temp, deriv_temp, &x_return, &time_deriv_return);
     start = *break_point + 1;
   }
   return std::make_pair(x_return, time_deriv_return);
