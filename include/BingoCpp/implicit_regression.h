@@ -25,8 +25,9 @@ class ImplicitRegression : public VectorBasedFunction {
  public:
   ImplicitRegression(ImplicitTrainingData *training_data, 
                      int required_params = kNoneRequired,
-                     bool normalize_dot = false) :
-      VectorBasedFunction(training_data) {
+                     bool normalize_dot = false,
+                     std::string metric="mae") :
+      VectorBasedFunction(training_data, metric) {
     required_params_ = required_params;
     normalize_dot_ = normalize_dot;
   }
