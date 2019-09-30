@@ -20,7 +20,7 @@ struct AGraphValues {
 Eigen::ArrayXXd x_vals;
 Eigen::VectorXd constants;
 AGraphValues() {}
-AGraphValues(Eigen::ArrayXXd& x, Eigen::VectorXd& c) : 
+AGraphValues(Eigen::ArrayXXd &x, Eigen::VectorXd &c) : 
   x_vals(x), constants(c) {}
 };
 
@@ -68,7 +68,7 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
 }
 
 std::vector<Eigen::ArrayXXd> init_op_evals_x0(
-    const AGraphValues& sample_agraph_1_values) {
+    const AGraphValues &sample_agraph_1_values) {
   Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals.col(0);
   double constant = sample_agraph_1_values.constants[0];
   Eigen::ArrayXXd c_0 = constant * Eigen::ArrayXd::Ones(x_0.rows());
@@ -93,7 +93,7 @@ std::vector<Eigen::ArrayXXd> init_op_evals_x0(
 }
 
 std::vector<Eigen::ArrayXXd> init_op_x_derivs(
-    const AGraphValues& sample_agraph_1_values) {
+    const AGraphValues &sample_agraph_1_values) {
   Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals.col(0);
   int size = x_0.rows();
 
@@ -123,7 +123,7 @@ std::vector<Eigen::ArrayXXd> init_op_x_derivs(
 }
 
 std::vector<Eigen::ArrayXXd> init_op_c_derivs(
-    const AGraphValues& sample_agraph_1_values) {
+    const AGraphValues &sample_agraph_1_values) {
   int size = sample_agraph_1_values.x_vals.rows();
   Eigen::ArrayXXd c_1 = sample_agraph_1_values.constants[1] * Eigen::ArrayXd::Ones(size);
 
@@ -249,7 +249,7 @@ TEST_F(AGraphBackend, mask_evaluate_and_derivative) {
 TEST_F(AGraphBackend, get_utilized_commands) {
   std::vector<bool> used_commands = GetUtilizedCommands(simple_stack);
   int num_used_commands = 0;
-  for (auto const& command_is_used : used_commands) {
+  for (auto const &command_is_used : used_commands) {
     if (command_is_used) {
       ++num_used_commands;
     }

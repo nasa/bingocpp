@@ -59,7 +59,7 @@ class AGraphTest : public ::testing::TestWithParam<std::string> {
 
   void TearDown() {}
 
-  AGraph init_invalid_graph(AGraph& agraph) {
+  AGraph init_invalid_graph(AGraph &agraph) {
     AGraph return_val = AGraph();
     return_val.SetCommandArray(agraph.GetCommandArray());
     return return_val;

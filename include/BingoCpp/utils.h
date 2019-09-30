@@ -1,6 +1,7 @@
 /*!
  * \file utils.h
  *
+ * \author Tyler Townsend
  * \author Ethan Adams
  * \date
  *
@@ -23,17 +24,18 @@
  * the License.
  */
 
-#ifndef INCLUDE_BINGOCPP_UTILS_H_
-#define INCLUDE_BINGOCPP_UTILS_H_
+#ifndef BINGOCPP_INCLUDE_BINGOCPP_UTILS_H_
+#define BINGOCPP_INCLUDE_BINGOCPP_UTILS_H_
 
-#include <iostream>
-#include <stdlib.h>
 #include <vector>
-#include <cmath>
+
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
 namespace bingo {
+
+typedef std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> InputAndDeriviative;
+
 /*! \brief Calculate derivatves with respect to time (first dimension)
  *
  *   \param[in] x array in which derivatives will be calculated in the
@@ -43,7 +45,7 @@ namespace bingo {
  *   \return std::vector<Eigen::ArrayXXd> with x array and corresponding time
  *                                        derivatives
  */
-std::vector<Eigen::ArrayXXd> calculate_partials(Eigen::ArrayXXd x);
+InputAndDeriviative CalculatePartials(const Eigen::ArrayXXd &x);
 /*! \brief Generalized factorial
  *
  *   \param[in] a double
@@ -60,7 +62,10 @@ double GenFact(double a, double b);
  *   \param[in] gp_s double
  *   \return double polynomial
  */
-double GramPoly(double gp_i, double gp_m, double gp_k, double gp_s);
+double GramPoly(double eval_point,
+                double num_points,
+                double polynomial_order,
+                double derivative_order);
 /*! \brief Calculates the weight of the gw_i'th data point for the gw_t'th
  *         Least-Square point of the gw_s'th derivative over 2gw_m+1 points,
  *         order gw_n
@@ -72,8 +77,11 @@ double GramPoly(double gp_i, double gp_m, double gp_k, double gp_s);
  *   \param[in] gw_s double
  *   \return double weight
  */
-double GramWeight(double gw_i, double gw_t, double gw_m, double gw_n,
-                  double gw_s);
+double GramWeight(double eval_point_start,
+                  double eval_point_end,
+                  double num_points,
+                  double ploynomial_order,
+                  double derivative_order);
 /*! \brief Smooth (and optionally differentiate) data with a Savitzky-Golay filter
  *    The Savitzky-Golay filter removes high frequency noise from data.
  *    It has the advantage of preserving the original shape and
@@ -103,9 +111,9 @@ double GramWeight(double gw_i, double gw_t, double gw_m, double gw_n,
  *                   only smoothing). int
  *  \return Eiggen::ArrayXXd the smoothed signal (or it's n-th derivative).
  */
-Eigen::ArrayXXd savitzky_golay(Eigen::ArrayXXd y, int window_size,
-                               int order, int deriv = 0);
-// Eigen::ArrayXXd savitzky_golay(Eigen::ArrayXXd y, int window_size,
-//                                     int order, int deriv=0, int rate=1);
-} // namespace  bingo 
-#endif
+Eigen::ArrayXXd SavitzkyGolay(Eigen::ArrayXXd y,
+                              int window_size,
+                              int polynomial_order,
+                              int derivative_order = 0);
+} // namespace bingo 
+#endif // BINGOCPP_INCLUDE_BINGOCPP_UTILS_H_

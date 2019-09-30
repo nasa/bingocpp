@@ -14,8 +14,8 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
 */
-#ifndef INCLUDE_BINGOCPP_CONSTANTS_H_
-#define INCLUDE_BINGOCPP_CONSTANTS_H_
+#ifndef BINGOCPP_INCLUDE_BINGOCPP_CONSTANTS_H_
+#define BINGOCPP_INCLUDE_BINGOCPP_CONSTANTS_H_
 
 namespace bingo {
 
@@ -46,5 +46,5 @@ enum Op : signed int {
   ABS = 11,
   SQRT = 12
 };
-}
-#endif
+} // namespace bingo
+#endif // BINGOCPP_INCLUDE_BINGOCPP_CONSTANTS_H_

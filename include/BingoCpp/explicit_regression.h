@@ -23,7 +23,7 @@ struct ExplicitTrainingData : TrainingData {
 
   ExplicitTrainingData* GetItem(int item);
 
-  ExplicitTrainingData* GetItem(const std::vector<int>& items);
+  ExplicitTrainingData* GetItem(const std::vector<int> &items);
 
   int Size() { return x.rows(); }
 };
@@ -36,7 +36,7 @@ class ExplicitRegression : public VectorBasedFunction {
 
   ~ExplicitRegression() {}
 
-  Eigen::ArrayXXd EvaluateFitnessVector(const Equation& individual);
+  Eigen::ArrayXXd EvaluateFitnessVector(const Equation &individual);
 };
 } // namespace bingo
 #endif // BINGOCPP_INCLUDE_BINGOCPP_EXPLICIT_REGRESSION_H_

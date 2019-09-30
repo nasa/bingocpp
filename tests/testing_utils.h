@@ -10,8 +10,8 @@ namespace {
 
 const double TESTING_TOL = 1e-7;
 
-inline void print_difference(const Eigen::ArrayXXd& array1,
-                             const Eigen::ArrayXXd& array2) {
+inline void print_difference(const Eigen::ArrayXXd &array1,
+                             const Eigen::ArrayXXd &array2) {
   std::cout << "  Actual: \n" << array1 << "\n";
   std::cout << "Expected: \n" << array2 << "\n";
 }
@@ -26,8 +26,8 @@ inline double difference(double val_1, double val_2) {
   }
 }
 
-inline bool non_comparable_matrices(const Eigen::ArrayXXd& array1,
-                                    const Eigen::ArrayXXd& array2) {
+inline bool non_comparable_matrices(const Eigen::ArrayXXd &array1,
+                                    const Eigen::ArrayXXd &array2) {
   int rows_array1 = array1.rows();
   int rows_array2 = array2.rows();
   int cols_array1 = array1.cols();
@@ -41,8 +41,8 @@ inline bool non_comparable_matrices(const Eigen::ArrayXXd& array1,
 }
 } // namespace
 
-inline bool almost_equal(const Eigen::ArrayXXd& array1,
-                         const Eigen::ArrayXXd& array2,
+inline bool almost_equal(const Eigen::ArrayXXd &array1,
+                         const Eigen::ArrayXXd &array2,
                          double tolerance = TESTING_TOL) {
   if (non_comparable_matrices(array1, array2)) {
     print_difference(array1, array2);

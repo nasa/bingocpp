@@ -20,12 +20,12 @@ struct SampleTrainingData : public bingo::TrainingData {
   Eigen::ArrayXXd y;
   SampleTrainingData() : TrainingData() {}
   ~SampleTrainingData() {}
-  SampleTrainingData(Eigen::ArrayXXd& x, Eigen::ArrayXXd& y) : 
+  SampleTrainingData(Eigen::ArrayXXd &x, Eigen::ArrayXXd &y) : 
       x(x), y(y) { }
-  SampleTrainingData* GetItem(int item) {
+  SampleTrainingData* GetItem(int) {
     throw new std::logic_error("Not implemented Exception");
   }
-  SampleTrainingData* GetItem(const std::vector<int>& items) {
+  SampleTrainingData* GetItem(const std::vector<int> &) {
     throw new std::logic_error("Not implemented Exception");
   }
   int Size() { return x.rows(); }
@@ -37,7 +37,7 @@ class SampleFitnessFunction : public bingo::VectorBasedFunction {
       std::string metric = "mae") :
       bingo::VectorBasedFunction(training_data, metric) {}
   ~SampleFitnessFunction() {} 
-  Eigen::ArrayXXd EvaluateFitnessVector(const bingo::Equation& individual) {
+  Eigen::ArrayXXd EvaluateFitnessVector(const bingo::Equation &individual) {
     Eigen::ArrayXXd f_of_x =
         individual.EvaluateEquationAt(((SampleTrainingData*)training_data_)->x);
     return f_of_x - ((SampleTrainingData*)training_data_)->y;
@@ -74,7 +74,7 @@ TEST_F(TestFitnessFunction, InvalidTrainingMetric) {
   try {
     SampleFitnessFunction test_function(&training_data_, "invalid_metric");
     FAIL() << "Expecting std::invalid_argument exception\n";
-  } catch (std::invalid_argument& exception) {
+  } catch (std::invalid_argument &exception) {
     SUCCEED();
   }
 }

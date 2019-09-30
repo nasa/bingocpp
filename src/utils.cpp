@@ -8,164 +8,180 @@
  * sybolic regression problems in the bingo package
  */
 
-#include "BingoCpp/utils.h"
 #include <vector>
 #include <numeric>
 
-namespace bingo {
-std::vector<Eigen::ArrayXXd> calculate_partials(Eigen::ArrayXXd x) {
-  std::vector<int> break_points;
-  break_points.push_back(0);
+#include "BingoCpp/utils.h"
 
+namespace bingo {
+
+const int kPartialWindowSize = 7;
+const int kPartialEdgeSize = 3;
+const int kDerivativeOrder = 1;
+
+void set_break_points(const Eigen::ArrayXXd &x,
+                      std::vector<int> *break_points) {
   for (int i = 0; i < x.rows(); ++i) {
     if (std::isnan(x(i))) {
-      break_points.push_back(i);
+      break_points->push_back(i);
     }
   }
-
-  break_points.push_back(x.rows());
-  std::vector<Eigen::ArrayXXd> x_all_vec;
-  int x_rows = 0;
-  int x_cols = 0;
-  std::vector<Eigen::ArrayXXd> times_deriv_all_vec;
-  int t_rows = 0;
-  int t_cols = 0;
-
-  for (int i = 0; i < break_points.size() - 1; ++i) {
-    int start = break_points[i];
-    int row_size = break_points[i + 1] - start;
-    Eigen::ArrayXXd x_seg(row_size, x.cols());
-    x_seg = x.block(start, 0, row_size, x.cols());
-    Eigen::ArrayXXd time_deriv(x_seg.rows(), x_seg.cols());
-
-    for (int j = 0; j < x_seg.cols(); ++j) {
-      Eigen::ArrayXXd temp(x_seg.rows(), 1);
-      temp = x_seg.block(0, j, x_seg.rows(), 1);
-      time_deriv.block(0, j, x_seg.rows(), 1) = savitzky_golay(temp, 7, 3, 1);
-    }
-
-    Eigen::ArrayXXd x_seg_no_edge(x_seg.rows() - 7, x_seg.cols());
-    x_seg_no_edge = x_seg.block(3, 0, x_seg_no_edge.rows(), x_seg.cols());
-    Eigen::ArrayXXd time_deriv_no_edge(time_deriv.rows() - 7, time_deriv.cols());
-    time_deriv_no_edge = time_deriv.block(3, 0, time_deriv_no_edge.rows(),
-                                          time_deriv.cols());
-    x_all_vec.push_back(x_seg_no_edge);
-    x_rows += x_seg_no_edge.rows();
-    x_cols += x_seg_no_edge.cols();
-    times_deriv_all_vec.push_back(time_deriv_no_edge);
-    t_rows += time_deriv_no_edge.rows();
-    t_cols += time_deriv_no_edge.cols();
-  }
-
-  Eigen::ArrayXXd x_all(x_rows, x_cols);
-  Eigen::ArrayXXd times_deriv_all(t_rows, t_cols);
-  int x_start = 0;
-
-  for (int i = 0; i < x_all_vec.size(); ++i) {
-    x_all.block(x_start, 0, x_all_vec[i].rows(), x_all.cols()) = x_all_vec[i];
-    x_start += x_all_vec[i].rows();
-  }
-
-  int t_start = 0;
-
-  for (int i = 0; i < times_deriv_all_vec.size(); ++i) {
-    times_deriv_all.block(t_start, 0, times_deriv_all_vec[i].rows(),
-                          times_deriv_all.cols()) = times_deriv_all_vec[i];
-    t_start += times_deriv_all_vec[i].rows();
-  }
-
-  std::vector<Eigen::ArrayXXd> temp;
-  temp.push_back(x_all);
-  temp.push_back(times_deriv_all);
-  return temp;
+  break_points->push_back(x.rows());
 }
 
-double GramPoly(double gp_i, double gp_m, double gp_k, double gp_s) {
-  double gram_poly = 0;
-
-  if (gp_k > 0) {
-    gram_poly = (4. * gp_k - 2.) / (gp_k * (2. * gp_m - gp_k + 1.)) *
-                (gp_i * GramPoly(gp_i, gp_m, gp_k - 1., gp_s) +
-                 gp_s * GramPoly(gp_i, gp_m, gp_k - 1., gp_s - 1.)) -
-                ((gp_k - 1.) * (2. * gp_m + gp_k)) /
-                (gp_k * (2. * gp_m - gp_k + 1.)) *
-                GramPoly(gp_i, gp_m, gp_k - 2, gp_s);
-
+void update_return_values (int start,
+                           const Eigen::ArrayXXd &x_segment,
+                           const Eigen::ArrayXXd &time_deriv,
+                           Eigen::ArrayXXd *x_return,
+                           Eigen::ArrayXXd *time_deriv_return) {
+  if (start ==  0) {
+    x_return->resize(x_segment.rows(), x_segment.cols());
+    *x_return << x_segment;
+    time_deriv_return->resize(time_deriv.rows(), time_deriv.cols());
+    *time_deriv_return << time_deriv;
   } else {
-    if (gp_k == 0 && gp_s == 0) {
-      gram_poly = 1.;
-
-    } else {
-      gram_poly = 0.;
-    }
+    Eigen::ArrayXXd x_temp = *x_return;
+    x_return->resize(x_return->rows() + x_segment.rows(), x_return->cols());
+    *x_return << x_temp, x_segment;
+    Eigen::ArrayXXd deriv_temp = *time_deriv_return;
+    time_deriv_return->resize(time_deriv_return->rows() + time_deriv.rows(),
+                              time_deriv_return->cols());
+    *time_deriv_return << deriv_temp, time_deriv;
   }
+}
 
-  return gram_poly;
+Eigen::ArrayXXd shave_edges_and_nan_from_array (
+    const Eigen::ArrayXXd &filtered_data) {
+  return filtered_data.block(kPartialEdgeSize, 0, 
+      filtered_data.rows() - kPartialWindowSize, filtered_data.cols());
+}
+
+InputAndDeriviative CalculatePartials(const Eigen::ArrayXXd &x) {
+  std::vector<int> break_points;
+  set_break_points(x, &break_points);
+
+  int start = 0;
+  int return_value_rows = (x.rows() - kPartialEdgeSize) * break_points.size();
+  Eigen::ArrayXXd x_return(return_value_rows, x.cols());
+  Eigen::ArrayXXd time_deriv_return(x_return.rows(), x_return.cols());
+  for (std::vector<int>::iterator break_point = break_points.begin();
+      break_point != break_points.end();
+      break_point ++) {
+    Eigen::ArrayXXd x_segment = x.block(start, 0, 
+                                        *break_point - start,
+                                        x.cols());
+    Eigen::ArrayXXd time_deriv(x_segment.rows(), x_segment.cols());
+    for (int col = 0; col < x_segment.cols(); col ++) {
+      time_deriv.col(col) = SavitzkyGolay(x_segment.col(col),
+          kPartialWindowSize, kPartialEdgeSize, kDerivativeOrder);
+    }
+    Eigen::ArrayXXd deriv_temp = shave_edges_and_nan_from_array(time_deriv);
+    Eigen::ArrayXXd x_temp = shave_edges_and_nan_from_array(x_segment);
+    update_return_values(start, x_temp, deriv_temp, &x_return, &time_deriv_return);
+    start = *break_point + 1;
+  }
+  return std::make_pair(x_return, time_deriv_return);
+}
+
+double GramPoly(double eval_point,
+                double num_points,
+                double polynomial_order,
+                double derivative_order) {
+
+  double result = 0;
+  if (polynomial_order > 0) {
+    result = (4. * polynomial_order - 2.) / 
+             (polynomial_order * (2. * num_points - polynomial_order + 1.)) *
+             (eval_point *
+                 GramPoly(eval_point, num_points, 
+                          polynomial_order - 1.,
+                          derivative_order)
+             +
+             derivative_order *
+                GramPoly(eval_point, num_points,
+                         polynomial_order - 1.,
+                         derivative_order - 1.))
+             -
+             ((polynomial_order - 1.) * (2. * num_points + polynomial_order)) /
+             (polynomial_order * (2. * num_points - polynomial_order + 1.)) *
+             GramPoly(eval_point, num_points,
+                      polynomial_order - 2,
+                      derivative_order);
+  } else if (polynomial_order == 0 && derivative_order == 0) {
+    result = 1.;
+  } else {
+    result = 0.;
+  }
+  return result;
 }
 
 double GenFact(double a, double b) {
   int fact = 1;
-
   for (int i = a - b + 1; i < a + 1; ++i) {
     fact *= i;
   }
-
   return fact;
 }
 
-double GramWeight(double gw_i, double gw_t, double gw_m, double gw_n,
-                  double gw_s) {
+double GramWeight(double eval_point_start,
+                  double eval_point_end,
+                  double num_points,
+                  double ploynomial_order,
+                  double derivative_order) {
   double weight = 0;
 
-  for (int i = 0; i < gw_n + 1; ++i) {
-    weight += (2. * i + 1.) * GenFact(2. * gw_m, i) /
-              GenFact(2. * gw_m + i + 1, i + 1) *
-              GramPoly(gw_i, gw_m, i, 0) *
-              GramPoly(gw_t, gw_m, i, gw_s);
+  for (int i = 0; i < ploynomial_order + 1; ++i) {
+    weight += (2. * i + 1.) * GenFact(2. * num_points, i) /
+              GenFact(2. * num_points + i + 1, i + 1) *
+              GramPoly(eval_point_start, num_points, i, 0) *
+              GramPoly(eval_point_end, num_points, i, derivative_order);
   }
 
   return weight;
 }
 
-Eigen::ArrayXXd savitzky_golay(Eigen::ArrayXXd y, int window_size, int order,
-                               int deriv) {
-  int m = (window_size - 1) / 2;
-  // fill weights
-  Eigen::ArrayXXd weights(2 * m + 1, 2 * m + 1);
-
-  for (int i = m * -1; i < m + 1; ++i) {
-    for (int j = m * -1; j < m + 1; ++j) {
-      weights(i + m, j + m) = GramWeight(i, j, m, order, deriv);
-    }
-  }
-
-  // convolution
-  int y_center = 0;
+Eigen::ArrayXXd convolution(const Eigen::ArrayXXd &data_points,
+                            int half_filter_size,
+                            const Eigen::ArrayXXd &weights) {
+  int data_points_center = 0;
   int w_ind = 0;
-  int y_len = y.rows();
-  Eigen::ArrayXXd f(y_len, 1);
+  int data_points_len = data_points.rows();
+  Eigen::ArrayXXd convolution(data_points_len, 1);
 
-  for (int i = 0; i < y_len; ++i) {
-    if (i < m) {
-      y_center = m;
+  for (int i = 0; i < data_points_len; ++i) {
+    if (i < half_filter_size) {
+      data_points_center = half_filter_size;
       w_ind = i;
 
-    } else if (y_len - i <= m) {
-      y_center = y_len - m - 1;
-      w_ind = 2 * m + 1 - (y_len - i);
+    } else if (data_points_len - i <= half_filter_size) {
+      data_points_center = data_points_len - half_filter_size - 1;
+      w_ind = 2 * half_filter_size + 1 - (data_points_len - i);
 
     } else {
-      y_center = i;
-      w_ind = m;
+      data_points_center = i;
+      w_ind = half_filter_size;
     }
-
-    f(i) = 0;
-
-    for (int j = m * -1; j < m + 1; ++j) {
-      f(i) += y(y_center + j) * weights(j + m, w_ind);
+    convolution(i) = 0;
+    for (int j = half_filter_size * -1; j < half_filter_size + 1; ++j) {
+      convolution(i) += data_points(data_points_center + j)
+                       * weights(j + half_filter_size, w_ind);
     }
   }
+  return convolution;
+}
 
-  return f;
+Eigen::ArrayXXd SavitzkyGolay(Eigen::ArrayXXd y,
+                              int window_size,
+                              int polynomial_order,
+                              int derivative_order) {
+  int m = (window_size - 1) / 2;
+  Eigen::ArrayXXd weights(2 * m + 1, 2 * m + 1);
+  for (int i = m * -1; i < m + 1; ++i) {
+    for (int j = m * -1; j < m + 1; ++j) {
+      weights(i + m, j + m) = 
+        GramWeight(i, j, m, polynomial_order, derivative_order);
+    }
+  }
+  return convolution(y, m, weights);
 }
-}
+} // namespace bingo

@@ -11,14 +11,14 @@ void do_benchmarking() {
   run_benchmarks(benchmark_test_data);
 }
 
-void load_benchmark_data(BenchMarkTestData& benchmark_test_data) {
+void load_benchmark_data(BenchMarkTestData &benchmark_test_data) {
   std::vector<AGraphValues> indv_list= std::vector<AGraphValues>();
   load_agraph_indvidual_data(indv_list);
   Eigen::ArrayXXd x_vals = load_agraph_x_vals();
   benchmark_test_data = BenchMarkTestData(indv_list, x_vals);
 }
 
-void load_agraph_indvidual_data(std::vector<AGraphValues>& indv_list) {
+void load_agraph_indvidual_data(std::vector<AGraphValues> &indv_list) {
   std::ifstream stack_filestream;
   std::ifstream const_filestream;
   stack_filestream.open(STACK_FILE);
@@ -26,7 +26,7 @@ void load_agraph_indvidual_data(std::vector<AGraphValues>& indv_list) {
 
   std::string stack_file_line;
   std::string const_file_line;
-  while ((stack_filestream >> stack_file_line) && 
+  while ((stack_filestream >> stack_file_line) &&
       (const_filestream >> const_file_line)) {
     AGraphValues curr_indv = AGraphValues();
     set_indv_stack(curr_indv, stack_file_line);
@@ -37,7 +37,7 @@ void load_agraph_indvidual_data(std::vector<AGraphValues>& indv_list) {
   const_filestream.close();
 }
 
-void set_indv_constants(AGraphValues& indv, std::string& const_string) {
+void set_indv_constants(AGraphValues &indv, std::string &const_string) {
   std::stringstream string_stream(const_string);
   std::string num_constants;
   std::getline(string_stream, num_constants, ',');
@@ -50,7 +50,7 @@ void set_indv_constants(AGraphValues& indv, std::string& const_string) {
   indv.constants = curr_const;
 }
 
-void set_indv_stack(AGraphValues& indv, std::string& stack_string) {
+void set_indv_stack(AGraphValues &indv, std::string &stack_string) {
   std::stringstream string_stream(stack_string);
   Eigen::ArrayX3i curr_stack = Eigen::ArrayX3i(STACK_SIZE, STACK_COLS);
 
@@ -78,7 +78,7 @@ Eigen::ArrayXXd load_agraph_x_vals() {
   return x_vals;
 }
 
-void run_benchmarks(const BenchMarkTestData& benchmark_test_data) {
+void run_benchmarks(const BenchMarkTestData &benchmark_test_data) {
   Eigen::ArrayXd evaluate_times = time_benchmark(benchmark_evaluate, benchmark_test_data);
   Eigen::ArrayXd x_derivative_times = time_benchmark(benchmark_evaluate_w_x_derivative, benchmark_test_data);
   Eigen::ArrayXd c_derivative_times = time_benchmark(benchmark_evaluate_w_c_derivative, benchmark_test_data);
@@ -104,8 +104,8 @@ Eigen::ArrayXd time_benchmark(
   return times; 
 }
 
-void benchmark_evaluate(const std::vector<AGraphValues>& indv_list,
-                        const Eigen::ArrayXXd& x_vals) {
+void benchmark_evaluate(const std::vector<AGraphValues> &indv_list,
+                        const Eigen::ArrayXXd &x_vals) {
   std::vector<AGraphValues>::const_iterator indv;
   for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
     bingo::backend::SimplifyAndEvaluate(indv->command_array,
@@ -114,8 +114,8 @@ void benchmark_evaluate(const std::vector<AGraphValues>& indv_list,
   } 
 }
 
-void benchmark_evaluate_w_x_derivative(const std::vector<AGraphValues>& indv_list,
-                                       const Eigen::ArrayXXd& x_vals) {
+void benchmark_evaluate_w_x_derivative(const std::vector<AGraphValues> &indv_list,
+                                       const Eigen::ArrayXXd &x_vals) {
   std::vector<AGraphValues>::const_iterator indv;
   for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
     bingo::backend::SimplifyAndEvaluateWithDerivative(indv->command_array,
@@ -125,8 +125,8 @@ void benchmark_evaluate_w_x_derivative(const std::vector<AGraphValues>& indv_lis
   }
 }
 
-void benchmark_evaluate_w_c_derivative(const std::vector<AGraphValues>& indv_list,
-                                       const Eigen::ArrayXXd& x_vals) {
+void benchmark_evaluate_w_c_derivative(const std::vector<AGraphValues> &indv_list,
+                                       const Eigen::ArrayXXd &x_vals) {
   std::vector<AGraphValues>::const_iterator indv;
   for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
     bingo::backend::SimplifyAndEvaluateWithDerivative(indv->command_array,
@@ -146,7 +146,7 @@ void print_header() {
   std::cout << bottom << std::endl;
 }
 
-void print_results(const Eigen::ArrayXd& run_times, const std::string& name) {
+void print_results(const Eigen::ArrayXd &run_times, const std::string &name) {
   double std_dev = standard_deviation(run_times);
   double average = run_times.mean();
   double max = run_times.maxCoeff();
@@ -164,9 +164,9 @@ std::string string_precision(double val, int precision) {
   return stream.str();
 }
 
-void output_params(const std::string& name, const std::string& mean, 
-                   const std::string& std, const std::string& min, 
-                   const std::string& max) {
+void output_params(const std::string &name, const std::string &mean, 
+                   const std::string &std, const std::string &min, 
+                   const std::string &max) {
   std::cout << std::setw(25) << std::left << name << "   "
             << std::setw(10) << std::right << mean << " +- "
             << std::setw(10) << std::left << std << "     "
@@ -175,6 +175,6 @@ void output_params(const std::string& name, const std::string& mean,
             << std::endl;
 }
 
-double standard_deviation(const Eigen::ArrayXd& vec) {
+double standard_deviation(const Eigen::ArrayXd &vec) {
   return std::sqrt((vec - vec.mean()).square().sum()/(vec.size()-1));
 }

@@ -44,7 +44,7 @@ class AGraph : public Equation {
  public:
   AGraph(bool manual_consants = false);
 
-  AGraph(const AGraph& agraph);
+  AGraph(const AGraph &agraph);
 
   /**
    * @brief Creates a copy of this AGraph
@@ -60,10 +60,10 @@ class AGraph : public Equation {
    * 
    * @return Eigen::ArrayX3i The command array for this graph.
    */
-  const Eigen::ArrayX3i& GetCommandArray() const;
+  const Eigen::ArrayX3i &GetCommandArray() const;
 
 
-  Eigen::ArrayX3i& GetCommandArrayModifiable();
+  Eigen::ArrayX3i &GetCommandArrayModifiable();
   
   /**
    * @brief Set the Command Array object
@@ -165,9 +165,9 @@ class AGraph : public Equation {
    * 
    * @return Eigen::VectorXd The constants in the AGraph
    */
-  const Eigen::VectorXd& GetLocalOptimizationParams() const;
+  const Eigen::VectorXd &GetLocalOptimizationParams() const;
 
-  Eigen::VectorXd& GetLocalOptimizationParamsModifiable();
+  Eigen::VectorXd &GetLocalOptimizationParamsModifiable();
 
   /**
    * @brief Evaluate the AGraph equatoin
@@ -180,7 +180,7 @@ class AGraph : public Equation {
    * @return Eigen::ArrayXXd The evaluation of function at points x.
    */
   Eigen::ArrayXXd 
-  EvaluateEquationAt(const Eigen::ArrayXXd& x) const;
+  EvaluateEquationAt(const Eigen::ArrayXXd &x) const;
 
   /**
    * @brief Evaluate the AGraph and get its derivatives
@@ -195,7 +195,7 @@ class AGraph : public Equation {
    * along the points x and the derivative of the equation with respect to x.
    */
   EvalAndDerivative
-  EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd& x) const;
+  EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd &x) const;
 
   /**
    * @brief Evluate the AGraph and get its derivatives.
@@ -211,7 +211,7 @@ class AGraph : public Equation {
    * the constants of the equation.
    */
   EvalAndDerivative
-  EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd& x) const;
+  EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x) const;
 
   /**
    * @brief Get the Latex String of this AGraph equation.
@@ -243,7 +243,7 @@ class AGraph : public Equation {
 
   void ForceRenumberConstants();
 
-  int Distance(const AGraph& agraph);
+  int Distance(const AGraph &agraph);
 
   /**
    * @brief Determines if the equation operation has arity two.
@@ -275,7 +275,7 @@ class AGraph : public Equation {
   int genetic_age_;
 
   // To string operator when passed into stream
-  friend std::ostream& operator<<(std::ostream&, const AGraph&);
+  friend std::ostream &operator<<(std::ostream&, const AGraph&);
 
   // Helper Functions
   void process_modified_command_array();

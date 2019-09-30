@@ -5,7 +5,7 @@
 namespace bingo {
 
 Eigen::ArrayXXd ExplicitRegression::EvaluateFitnessVector(
-    const Equation& individual) {
+    const Equation &individual) {
   ++ eval_count_;
   const Eigen::ArrayXXd x = ((ExplicitTrainingData*)training_data_)->x;
   Eigen::ArrayXXd f_of_x = individual.EvaluateEquationAt(x);
@@ -19,16 +19,16 @@ ExplicitTrainingData::ExplicitTrainingData(
   y = output;
 }
 
-ExplicitTrainingData* ExplicitTrainingData::GetItem(int item) {
+ExplicitTrainingData *ExplicitTrainingData::GetItem(int item) {
   return new ExplicitTrainingData(x.row(item), y.row(item));
 }
 
-ExplicitTrainingData* ExplicitTrainingData::GetItem(
-    const std::vector<int>& items) {
+ExplicitTrainingData *ExplicitTrainingData::GetItem(
+    const std::vector<int> &items) {
   Eigen::ArrayXXd temp_in(items.size(), x.cols());
   Eigen::ArrayXXd temp_out(items.size(), y.cols());
 
-  for (int row = 0; row < items.size(); row ++) {
+  for (unsigned int row = 0; row < items.size(); row ++) {
     temp_in.row(row) = x.row(items[row]);
     temp_out.row(row) = y.row(items[row]);
   }

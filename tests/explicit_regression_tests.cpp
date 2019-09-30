@@ -60,7 +60,8 @@ TEST_F(TestExplicitRegression, GetSubsetOfTrainingData) {
   expected_subset << 0, 2, 3;
   ASSERT_TRUE(subset_training_data->x.isApprox(expected_subset));
   ASSERT_TRUE(subset_training_data->y.isApprox(expected_subset));
-  delete training_data, subset_training_data;
+  delete training_data,
+  delete subset_training_data;
 }
 
 TEST_F(TestExplicitRegression, CorrectTrainingDataSize) {

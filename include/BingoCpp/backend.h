@@ -24,7 +24,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
-#include <BingoCpp/agraph.h>
+#include "BingoCpp/agraph.h"
 
 namespace bingo {
 /**
@@ -55,9 +55,9 @@ inline bool IsCpp() { return true; }
  * 
  * @return Eigen::ArrayXXd The evaluation of the graph with x as the input data.
  */
-Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3i& stack,
-                         const Eigen::ArrayXXd& x,
-                         const Eigen::VectorXd& constants);
+Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3i &stack,
+                         const Eigen::ArrayXXd &x,
+                         const Eigen::VectorXd &constants);
 
 /**
  * @brief Evaluate equation and take derivative.
@@ -78,9 +78,9 @@ Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3i& stack,
  * @return EvalAndDerivative Derivatives of all dimensions of x/constants at location x.
  */
 EvalAndDerivative EvaluateWithDerivative(
-    const Eigen::ArrayX3i& stack,
-    const Eigen::ArrayXXd& x,
-    const Eigen::VectorXd& constants,
+    const Eigen::ArrayX3i &stack,
+    const Eigen::ArrayXXd &x,
+    const Eigen::VectorXd &constants,
     const bool param_x_or_c = true);
 
 /**
@@ -100,9 +100,9 @@ EvalAndDerivative EvaluateWithDerivative(
  * 
  * @return Eigen::ArrayXXd The evaluation of the graph with x as the input data.
  */
-Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i& stack,
-                                    const Eigen::ArrayXXd& x,
-                                    const Eigen::VectorXd& constants);
+Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i &stack,
+                                    const Eigen::ArrayXXd &x,
+                                    const Eigen::VectorXd &constants);
 
 /**
  * @brief Evaluate equation and take derivative.
@@ -124,9 +124,9 @@ Eigen::ArrayXXd SimplifyAndEvaluate(const Eigen::ArrayX3i& stack,
  * @return EvalAndDerivative Derivatives of all dimensions of x/constants at location x.
  */
 EvalAndDerivative SimplifyAndEvaluateWithDerivative(
-    const Eigen::ArrayX3i& stack,
-    const Eigen::ArrayXXd& x,
-    const Eigen::VectorXd& constants,
+    const Eigen::ArrayX3i &stack,
+    const Eigen::ArrayXXd &x,
+    const Eigen::VectorXd &constants,
     const bool param_x_or_c = true);
 
 /**
@@ -139,7 +139,7 @@ EvalAndDerivative SimplifyAndEvaluateWithDerivative(
  *
  * @return Simplified stack.
  */
-Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i& stack);
+Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i &stack);
 
 /**
  * @brief Finds which commands are utilized in a stack.
@@ -151,7 +151,7 @@ Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i& stack);
  *
  * @return vector describing which commands in the stack are used.
  */
-std::vector<bool> GetUtilizedCommands(const Eigen::ArrayX3i& stack);
+std::vector<bool> GetUtilizedCommands(const Eigen::ArrayX3i &stack);
 } // namespace backend
 } // namespace bingo
 #endif

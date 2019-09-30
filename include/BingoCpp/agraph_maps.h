@@ -1,3 +1,5 @@
+#ifndef BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_MAPS_H_
+#define BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_MAPS_H_
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -97,3 +99,4 @@ const PrintVector kOperatorNames {
   std::vector<std::string> {"square root", "sqrt"}
 };
 } // namespace bingo
+#endif // BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_MAPS_H_

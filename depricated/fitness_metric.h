@@ -128,36 +128,5 @@ struct FitnessMetric {
   */
   void optimize_constants(AcyclicGraph &indv, TrainingData &train);
 };
-
-/*! \struct StandardRegression
- *  \brief Traditional fitness evaluation
- */
-struct StandardRegression : FitnessMetric {
- public:
-  StandardRegression() : FitnessMetric() {}
-  Eigen::ArrayXXd evaluate_fitness_vector(AcyclicGraph &indv,
-                                          TrainingData &train);
-};
-
-/*! \struct ImplicitRegression
- *  \brief Implicit Regression
- */
-struct ImplicitRegression : FitnessMetric {
- public:
-  //! int required_params
-  /*! minimum number of non zero components of dot */
-  int required_params;
-  //! bool normalize_dot
-  /*! normalize the terms in the dot product */
-  bool normalize_dot;
-  //! double acceptable_finite_fracion
-  /*! yea */
-  double acceptable_finite_fracion;
-  // ImplicitRegression() : FitnessMetric() {}
-  ImplicitRegression(int required_params = 0, bool normalize_dot = false,
-                     double acceptable_nans = 0.1);
-  Eigen::ArrayXXd evaluate_fitness_vector(AcyclicGraph &indv,
-                                          TrainingData &train);
-};
 } // namespace bingo
 #endif
