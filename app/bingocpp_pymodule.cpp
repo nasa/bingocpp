@@ -51,6 +51,8 @@
 #include "BingoCpp/implicit_regression.h"
 #include "BingoCpp/utils.h"
 
+#include "python/py_equation.h"
+
 namespace py = pybind11;
 using namespace bingo;
 
@@ -70,6 +72,19 @@ PYBIND11_MODULE(bingocpp, m) {
         "get the commands that are utilized in a stack");
   m.def("simplify_stack", &backend::SimplifyStack,
         "simplify stack to only utilized commands");
+
+  py::class_<Equation, PyEquation /* <---trampoline */>(m, "Equation")
+    .def(py::init<>())
+    .def("evaluate_equation_at",
+         &Equation::EvaluateEquationAt)
+    .def("evaluate_equation_with_x_gradient_at",
+         &Equation::EvaluateEquationWithXGradientAt)
+    .def("evaluate_equation_with_local_opt_gradient_at",
+          &Equation::EvaluateEquationWithLocalOptGradientAt)
+    .def("get_latex_string", &Equation::GetLatexString)
+    .def("get_stack_string", &Equation::GetStackString)
+    .def("get_console_string", &Equation::GetConsoleString)
+    .def("get_complexity", &Equation::GetComplexity);
 
   py::class_<AGraph>(m, "AGraph")
     .def(py::init<bool & >(), py::arg("manual_constants") = false)
@@ -153,7 +168,7 @@ PYBIND11_MODULE(bingocpp, m) {
 
   m.def("calculate_partials", &CalculatePartials);
   m.def("savitzky_golay", &SavitzkyGolay);
-  m.def("GenFact", &GenFact);
-  m.def("GramPoly", &GramPoly);
-  m.def("GramWeight", &GramWeight);
+  m.def("gen_fact", &GenFact);
+  m.def("gram_poly", &GramPoly);
+  m.def("gram_weight", &GramWeight);
 }
