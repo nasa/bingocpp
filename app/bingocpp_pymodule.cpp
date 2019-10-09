@@ -86,7 +86,7 @@ PYBIND11_MODULE(bingocpp, m) {
     .def("get_console_string", &Equation::GetConsoleString)
     .def("get_complexity", &Equation::GetComplexity);
 
-  py::class_<AGraph>(m, "AGraph")
+  py::class_<AGraph, Equation>(m, "AGraph")
     .def(py::init<bool & >(), py::arg("manual_constants") = false)
     .def("is_cpp", &AGraph::IsCpp)
     .def_property("command_array",
@@ -128,7 +128,7 @@ PYBIND11_MODULE(bingocpp, m) {
   
   py::class_<ImplicitTrainingData>(m, "ImplicitTrainingData")
     .def(py::init<Eigen::ArrayXXd &>())
-    .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd&>())
+    .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
     .def_readwrite("x", &ImplicitTrainingData::x)
     .def_readwrite("dx_dt", &ImplicitTrainingData::dx_dt)
     .def("__getitem__", 
@@ -159,10 +159,11 @@ PYBIND11_MODULE(bingocpp, m) {
     .def("evaluate_fitness_vector", &ExplicitRegression::EvaluateFitnessVector);
   
   py::class_<ImplicitRegression>(m, "ImplicitRegression")
-    .def(py::init<ImplicitTrainingData *, int &, bool &>(),
+    .def(py::init<ImplicitTrainingData *, int &, bool &, std::string &>(),
          py::arg("training_data"),
          py::arg("required_params") = -1,
-         py::arg("normalize_dot") = false)
+         py::arg("normalize_dot") = false,
+         py::arg("metric") = "mae")
     .def("__call__", &ImplicitRegression::EvaluateIndividualFitness)
     .def("evaluate_fitness_vector", &ImplicitRegression::EvaluateFitnessVector);
 
