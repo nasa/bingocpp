@@ -43,7 +43,7 @@ class FitnessFunction {
 };
 
 inline bool metric_found(const std::unordered_set<std::string> &set,
-                  std::string metric) {
+                         std::string metric) {
   return set.find(metric) != set.end();
 }
 

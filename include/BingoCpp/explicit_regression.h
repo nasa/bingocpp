@@ -17,24 +17,37 @@ struct ExplicitTrainingData : TrainingData {
 
   Eigen::ArrayXXd y;
 
-  ExplicitTrainingData(Eigen::ArrayXXd input, Eigen::ArrayXXd output);
+  ExplicitTrainingData(const Eigen::ArrayXXd &input,
+                       const Eigen::ArrayXXd &output) {
+    x = input;
+    y = output;
+  }
+
+  ExplicitTrainingData(const ExplicitTrainingData &other) {
+    x = other.x;
+    y = other.y;
+  }
 
   ~ExplicitTrainingData() { }
 
-  ExplicitTrainingData* GetItem(int item);
+  ExplicitTrainingData *GetItem(int item);
 
-  ExplicitTrainingData* GetItem(const std::vector<int> &items);
+  ExplicitTrainingData *GetItem(const std::vector<int> &items);
 
-  int Size() { return x.rows(); }
+  int Size() {
+    return x.rows();
+  }
 };
 
 class ExplicitRegression : public VectorBasedFunction {
  public:
-  ExplicitRegression(ExplicitTrainingData* training_data,
-		     std::string metric="mae") : 
-      VectorBasedFunction(training_data, metric) {}
+  ExplicitRegression(ExplicitTrainingData *training_data,
+                     std::string metric="mae") : 
+      VectorBasedFunction(new ExplicitTrainingData(*training_data), metric) {}
 
-  ~ExplicitRegression() {}
+  ~ExplicitRegression() {
+    delete training_data_;
+  }
 
   Eigen::ArrayXXd EvaluateFitnessVector(const Equation &individual);
 };
