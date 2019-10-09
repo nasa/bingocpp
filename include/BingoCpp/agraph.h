@@ -70,7 +70,7 @@ class AGraph : public Equation {
    * 
    * @param command_array A copy of the new Command Array
    */
-  void SetCommandArray(Eigen::ArrayX3i command_array);
+  void SetCommandArray(const Eigen::ArrayX3i &command_array);
 
   /**
    * @brief Nofity individual of inplace modification of command array.
