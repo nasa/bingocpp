@@ -78,7 +78,7 @@ Eigen::ArrayX3i &AGraph::GetCommandArrayModifiable() {
   return command_array_;
 }
 
-void AGraph::SetCommandArray(Eigen::ArrayX3i command_array) {
+void AGraph::SetCommandArray(const Eigen::ArrayX3i &command_array) {
   command_array_ = command_array;
   NotifyCommandArrayModificiation();
 }

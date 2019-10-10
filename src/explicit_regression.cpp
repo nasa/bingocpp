@@ -4,21 +4,6 @@
 
 namespace bingo {
 
-Eigen::ArrayXXd ExplicitRegression::EvaluateFitnessVector(
-    const Equation &individual) {
-  ++ eval_count_;
-  const Eigen::ArrayXXd x = ((ExplicitTrainingData*)training_data_)->x;
-  Eigen::ArrayXXd f_of_x = individual.EvaluateEquationAt(x);
-  return f_of_x - ((ExplicitTrainingData*)training_data_)->y;
-}
-
-ExplicitTrainingData::ExplicitTrainingData(
-    Eigen::ArrayXXd input,
-    Eigen::ArrayXXd output) {
-  x = input;
-  y = output;
-}
-
 ExplicitTrainingData *ExplicitTrainingData::GetItem(int item) {
   return new ExplicitTrainingData(x.row(item), y.row(item));
 }
@@ -35,4 +20,14 @@ ExplicitTrainingData *ExplicitTrainingData::GetItem(
 
   return new ExplicitTrainingData(temp_in, temp_out);
 }
+
+Eigen::ArrayXXd ExplicitRegression::EvaluateFitnessVector(
+    const Equation &individual) {
+  ++ eval_count_;
+  const Eigen::ArrayXXd x = ((ExplicitTrainingData*)training_data_)->x;
+  Eigen::ArrayXXd f_of_x = individual.EvaluateEquationAt(x);
+  return f_of_x - ((ExplicitTrainingData*)training_data_)->y;
+}
+
+
 } // namespace bingo

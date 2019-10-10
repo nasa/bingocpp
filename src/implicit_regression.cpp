@@ -2,24 +2,8 @@
 #include <Eigen/Core>
 
 #include "BingoCpp/implicit_regression.h"
-#include "BingoCpp/utils.h"
 
-
-#include <iostream>
 namespace bingo {
-
-ImplicitTrainingData::ImplicitTrainingData(const Eigen::ArrayXXd &input) {
-  InputAndDeriviative input_and_deriv = CalculatePartials(input);
-  x = input_and_deriv.first;
-  dx_dt = input_and_deriv.second;
-}
-
-ImplicitTrainingData::ImplicitTrainingData(
-    const Eigen::ArrayXXd &input,
-    const Eigen::ArrayXXd &derivative) {
-  x = input; 
-  dx_dt = derivative;
-}
 
 ImplicitTrainingData *ImplicitTrainingData::GetItem(int item) {
   return new ImplicitTrainingData(x.row(item), dx_dt.row(item));
@@ -35,6 +19,38 @@ ImplicitTrainingData *ImplicitTrainingData::GetItem(
     temp_out.row(row) = dx_dt.row(items[row]);
   }
   return new ImplicitTrainingData(temp_in, temp_out);
+}
+
+void normalize_by_row(Eigen::ArrayXXd *data_array);
+Eigen::ArrayXXd dfdx_dot_dfdt(bool normalize_dot,
+                              const Eigen::ArrayXXd &dx_dt,
+                              const Eigen::ArrayXXd &grad);
+bool not_enough_parameters_used(int required_params, 
+                                const Eigen::ArrayXXd &dot_product);
+
+Eigen::ArrayXXd ImplicitRegression::EvaluateFitnessVector(
+    const Equation &individual) {
+  EvalAndDerivative eval_and_grad 
+      = individual.EvaluateEquationWithXGradientAt(
+      ((ImplicitTrainingData*)training_data_)->x);
+  Eigen::ArrayXXd dot_product = dfdx_dot_dfdt(
+      normalize_dot_,
+      ((ImplicitTrainingData*)training_data_)->dx_dt,
+      eval_and_grad.second);
+
+  if (required_params_ != kNoneRequired
+      && not_enough_parameters_used(required_params_, dot_product)) {
+    return Eigen::ArrayXd::Constant(
+        ((ImplicitTrainingData*)training_data_)->x.rows(),
+         std::numeric_limits<double>::infinity());
+  }
+  // NOTE tylertownsend: may need to verify eigen NaN conditions
+  Eigen::ArrayXXd denominator = dot_product.abs().rowwise().sum();
+  Eigen::ArrayXXd normalized_fitness = 
+      dot_product.rowwise().sum() / denominator;
+  return normalized_fitness.unaryExpr([](double v) { 
+    return std::isfinite(v) ? v : std::numeric_limits<double>::infinity();
+  });
 }
 
 void normalize_by_row(Eigen::ArrayXXd *data_array) {
@@ -61,29 +77,5 @@ bool not_enough_parameters_used(int required_params,
                                 const Eigen::ArrayXXd &dot_product) {
   auto num_params_used = (dot_product.abs() > 1e-16).rowwise().count();
   return !(num_params_used >= required_params).any();
-}
-
-Eigen::ArrayXXd ImplicitRegression::EvaluateFitnessVector(
-    const Equation &individual) {
-  EvalAndDerivative eval_and_grad = individual.EvaluateEquationWithXGradientAt(
-      ((ImplicitTrainingData*)training_data_)->x);
-  Eigen::ArrayXXd dot_product = dfdx_dot_dfdt(
-      normalize_dot_,
-      ((ImplicitTrainingData*)training_data_)->dx_dt,
-      eval_and_grad.second);
-
-  if (required_params_ != kNoneRequired
-      && not_enough_parameters_used(required_params_, dot_product)) {
-    return Eigen::ArrayXd::Constant(
-        ((ImplicitTrainingData*)training_data_)->x.rows(),
-         std::numeric_limits<double>::infinity());
-  }
-  // NOTE tylertownsend: may need to verify eigen NaN conditions
-  Eigen::ArrayXXd denominator = dot_product.abs().rowwise().sum();
-  Eigen::ArrayXXd normalized_fitness = 
-      dot_product.rowwise().sum() / denominator;
-  return normalized_fitness.unaryExpr([](double v) { 
-    return std::isfinite(v) ? v : std::numeric_limits<double>::infinity();
-  });
 }
 } // namespace bingo
