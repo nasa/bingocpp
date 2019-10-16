@@ -33,12 +33,10 @@ class FitnessFunction {
 
   virtual ~FitnessFunction() { }
 
-  virtual double EvaluateIndividualFitness(const Equation &individual) = 0;
-
-  inline void IncrementCount() { eval_count_ ++; }
+  virtual double EvaluateIndividualFitness(const Equation &individual) const = 0;
 
  protected:
-  int eval_count_;
+  mutable int eval_count_;
   TrainingData* training_data_;
 };
 
@@ -49,47 +47,50 @@ inline bool metric_found(const std::unordered_set<std::string> &set,
 
 class VectorBasedFunction : public FitnessFunction {
  public:
-  inline VectorBasedFunction(
-      TrainingData *training_data = nullptr,
-      std::string metric = "mae") : FitnessFunction(training_data) {
+  typedef double (VectorBasedFunction::* MetricFunctionPointer)(const Eigen::ArrayXXd&);
+  VectorBasedFunction(TrainingData *training_data = nullptr,
+                      std::string metric = "mae") :
+      FitnessFunction(training_data) {
+    metric_function_ = GetMetric(metric);
+  }
+
+  virtual ~VectorBasedFunction() { }
+
+  double EvaluateIndividualFitness(const Equation &individual) const {
+    Eigen::ArrayXXd fitness_vector = EvaluateFitnessVector(individual);
+    return (const_cast<VectorBasedFunction*>(this)->*metric_function_)(fitness_vector);
+  }
+
+  virtual Eigen::ArrayXXd
+  EvaluateFitnessVector(const Equation &individual) const = 0;
+
+ protected:
+  double mean_absolute_error(const Eigen::ArrayXXd &fitness_vector) {
+    return fitness_vector.abs().mean();
+  }
+
+  double root_mean_square_error(const Eigen::ArrayXXd &fitness_vector) {
+    return sqrt(fitness_vector.square().mean());
+  }
+
+  double mean_squared_error(const Eigen::ArrayXXd &fitness_vector) {
+    return fitness_vector.square().mean();
+  }
+
+  MetricFunctionPointer GetMetric(std::string metric) {
     if (metric_found(kMeanAbsoluteError, metric)) {
-      metric_function_ = &VectorBasedFunction::mean_absolute_error;
+      return &VectorBasedFunction::mean_absolute_error;
     } else if (metric_found(kMeanSquaredError, metric)) {
-      metric_function_ = &VectorBasedFunction::mean_squared_error;
+      return &VectorBasedFunction::mean_squared_error;
     } else if (metric_found(kRootMeanSquaredError, metric)) {
-      metric_function_ = &VectorBasedFunction::root_mean_square_error;
+      return &VectorBasedFunction::root_mean_square_error;
     } else {
       throw std::invalid_argument("Invalid metric for Fitness Function");
     }
   }
 
-  virtual ~VectorBasedFunction() { }
-
-  inline double EvaluateIndividualFitness(const Equation &individual) {
-    Eigen::ArrayXXd fitness_vector = EvaluateFitnessVector(individual);
-    return (this->*metric_function_)(fitness_vector);
-  }
-
-  virtual Eigen::ArrayXXd EvaluateFitnessVector(const Equation &individual) = 0;
-
- protected:
-  inline double mean_absolute_error(
-      const Eigen::ArrayXXd &fitness_vector) {
-    return fitness_vector.abs().mean();
-  }
-
-  inline double root_mean_square_error(
-      const Eigen::ArrayXXd &fitness_vector) {
-    return sqrt(fitness_vector.square().mean());
-  }
-
-  inline double mean_squared_error(
-      const Eigen::ArrayXXd &fitness_vector) {
-    return fitness_vector.square().mean();
-  }
-
  private:
-  double (VectorBasedFunction::*metric_function_)(const Eigen::ArrayXXd&);
+  mutable MetricFunctionPointer metric_function_;
 };
 } // namespace bingo
 

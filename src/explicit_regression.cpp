@@ -22,7 +22,7 @@ ExplicitTrainingData *ExplicitTrainingData::GetItem(
 }
 
 Eigen::ArrayXXd ExplicitRegression::EvaluateFitnessVector(
-    const Equation &individual) {
+    const Equation &individual) const {
   ++ eval_count_;
   const Eigen::ArrayXXd x = ((ExplicitTrainingData*)training_data_)->x;
   Eigen::ArrayXXd f_of_x = individual.EvaluateEquationAt(x);

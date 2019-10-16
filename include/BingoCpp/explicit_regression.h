@@ -49,7 +49,7 @@ class ExplicitRegression : public VectorBasedFunction {
     delete training_data_;
   }
 
-  Eigen::ArrayXXd EvaluateFitnessVector(const Equation &individual);
+  Eigen::ArrayXXd EvaluateFitnessVector(const Equation &individual) const;
 };
 } // namespace bingo
 #endif // BINGOCPP_INCLUDE_BINGOCPP_EXPLICIT_REGRESSION_H_
