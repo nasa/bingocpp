@@ -53,13 +53,6 @@ set(TEST_MAIN unit_tests.x)  # Default name for test executable.
 
 
 # ------------------------------------------------------------------------------
-#                                 Pybind
-# ------------------------------------------------------------------------------
-
-
-
-
-# ------------------------------------------------------------------------------
 #                            Build!
 # ------------------------------------------------------------------------------
 # Compile all sources into a library.
@@ -80,6 +73,11 @@ set_target_properties(benchmarking PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 add_executable(performanceBenchmark app/performance_benchmarks.cpp)
 add_dependencies(performanceBenchmark bingo benchmarking )  
 target_link_libraries(performanceBenchmark bingo benchmarking)
+
+#----------- fitness benchmark executable ---------------
+add_executable(fitnessBenchmark app/fitness_benchmarks.cpp)
+add_dependencies(fitnessBenchmark bingo benchmarking)
+target_link_libraries(fitnessBenchmark bingo benchmarking)
 
 
 configure_file(app/test-agraph-stacks.csv test-agraph-stacks.csv COPYONLY)
