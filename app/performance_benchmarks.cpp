@@ -7,40 +7,40 @@
 #define X_DERIVATIVE "pure c++: x derivative"
 #define C_DERIVATIVE "pure c++: c derivative"
 
-void do_benchmarking();
-Eigen::ArrayXd time_benchmark(
+void DoBenchmarking();
+Eigen::ArrayXd TimeBenchmark(
   void (*benchmark)(const std::vector<AGraph>&, const Eigen::ArrayXXd&), 
   const BenchmarkTestData &test_data, int number=100, int repeat=10);
-void run_benchmarks(const BenchmarkTestData &benchmark_test_data);
-void benchmark_evaluate(const std::vector<AGraph> &indv_list,
-                        const Eigen::ArrayXXd &x_vals);
-void benchmark_evaluate_w_x_derivative(const std::vector<AGraph> &indv_list,
-                                       const Eigen::ArrayXXd &x_vals);
-void benchmark_evaluate_w_c_derivative(const std::vector<AGraph> &indv_list,
-                                       const Eigen::ArrayXXd &x_vals);
+void RunBenchmarks(const BenchmarkTestData &benchmark_test_data);
+void BenchmarkEvaluate(const std::vector<AGraph> &indv_list,
+                       const Eigen::ArrayXXd &x_vals);
+void BenchmarkEvaluateAndXDerivative(const std::vector<AGraph> &indv_list,
+                                     const Eigen::ArrayXXd &x_vals);
+void BenchmarkEvaluateAndCDerivative(const std::vector<AGraph> &indv_list,
+                                     const Eigen::ArrayXXd &x_vals);
 
 int main() {
-  do_benchmarking();
+  DoBenchmarking();
   return 0;
 }
 
-void do_benchmarking() {
+void DoBenchmarking() {
   BenchmarkTestData benchmark_test_data =  BenchmarkTestData();
-  load_benchmark_data(benchmark_test_data);
-  run_benchmarks(benchmark_test_data);
+  LoadBenchmarkData(benchmark_test_data);
+  RunBenchmarks(benchmark_test_data);
 }
 
-void run_benchmarks(const BenchmarkTestData &benchmark_test_data) {
-  Eigen::ArrayXd evaluate_times = time_benchmark(benchmark_evaluate, benchmark_test_data);
-  Eigen::ArrayXd x_derivative_times = time_benchmark(benchmark_evaluate_w_x_derivative, benchmark_test_data);
-  Eigen::ArrayXd c_derivative_times = time_benchmark(benchmark_evaluate_w_c_derivative, benchmark_test_data);
-  print_header();
-  print_results(evaluate_times, EVALUATE);
-  print_results(x_derivative_times, X_DERIVATIVE);
-  print_results(c_derivative_times, C_DERIVATIVE);
+void RunBenchmarks(const BenchmarkTestData &benchmark_test_data) {
+  Eigen::ArrayXd evaluate_times = TimeBenchmark(BenchmarkEvaluate, benchmark_test_data);
+  Eigen::ArrayXd x_derivative_times = TimeBenchmark(BenchmarkEvaluateAndXDerivative, benchmark_test_data);
+  Eigen::ArrayXd c_derivative_times = TimeBenchmark(BenchmarkEvaluateAndCDerivative, benchmark_test_data);
+  PrintHeader();
+  PrintResults(evaluate_times, EVALUATE);
+  PrintResults(x_derivative_times, X_DERIVATIVE);
+  PrintResults(c_derivative_times, C_DERIVATIVE);
 }
 
-Eigen::ArrayXd time_benchmark(
+Eigen::ArrayXd TimeBenchmark(
   void (*benchmark)(const std::vector<AGraph>&, const Eigen::ArrayXXd&), 
   const BenchmarkTestData &test_data, int number, int repeat) {
   Eigen::ArrayXd times = Eigen::ArrayXd(repeat);
@@ -56,8 +56,8 @@ Eigen::ArrayXd time_benchmark(
   return times; 
 }
 
-void benchmark_evaluate(const std::vector<AGraph> &indv_list,
-                        const Eigen::ArrayXXd &x_vals) {
+void BenchmarkEvaluate(const std::vector<AGraph> &indv_list,
+                       const Eigen::ArrayXXd &x_vals) {
   std::vector<AGraph>::const_iterator indv;
   for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
     bingo::backend::SimplifyAndEvaluate(
@@ -65,8 +65,8 @@ void benchmark_evaluate(const std::vector<AGraph> &indv_list,
   } 
 }
 
-void benchmark_evaluate_w_x_derivative(const std::vector<AGraph> &indv_list,
-                                       const Eigen::ArrayXXd &x_vals) {
+void BenchmarkEvaluateAndXDerivative(const std::vector<AGraph> &indv_list,
+                                     const Eigen::ArrayXXd &x_vals) {
   std::vector<AGraph>::const_iterator indv;
   for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
     bingo::backend::SimplifyAndEvaluateWithDerivative(
@@ -74,8 +74,8 @@ void benchmark_evaluate_w_x_derivative(const std::vector<AGraph> &indv_list,
   }
 }
 
-void benchmark_evaluate_w_c_derivative(const std::vector<AGraph> &indv_list,
-                                       const Eigen::ArrayXXd &x_vals) {
+void BenchmarkEvaluateAndCDerivative(const std::vector<AGraph> &indv_list,
+                                     const Eigen::ArrayXXd &x_vals) {
   std::vector<AGraph>::const_iterator indv;
   for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
     bingo::backend::SimplifyAndEvaluateWithDerivative(

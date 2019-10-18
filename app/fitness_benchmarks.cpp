@@ -13,49 +13,50 @@
 
 using namespace bingo;
 
-void benchmark_regression(const std::vector<AGraph> &agraph_list,
-                          const VectorBasedFunction &fitness_function);
-Eigen::ArrayXd time_benchmark(
+void BenchmarkRegression(const std::vector<AGraph> &agraph_list,
+                         const VectorBasedFunction &fitness_function);
+Eigen::ArrayXd TimeBenchmark(
     void (*benchmark)(const std::vector<AGraph>&, const VectorBasedFunction &), 
     const BenchmarkTestData &test_data, 
     const VectorBasedFunction &fitness_function, int number=100, int repeat=10);
-void do_regression_benchmarking();
-void run_regression_benchmarks(const BenchmarkTestData &benchmark_test_data);
+void DoRegressionBenchmarking();
+void RunRegressionBenchmarks(const BenchmarkTestData &benchmark_test_data);
 
 int main() {
-  do_regression_benchmarking();
+  DoRegressionBenchmarking();
   return 0;
 }
 
-void do_regression_benchmarking() {
+void DoRegressionBenchmarking() {
   BenchmarkTestData benchmark_test_data;
-  load_benchmark_data(benchmark_test_data);
-  run_regression_benchmarks(benchmark_test_data);
+  LoadBenchmarkData(benchmark_test_data);
+  RunRegressionBenchmarks(benchmark_test_data);
 }
 
-void run_regression_benchmarks(const BenchmarkTestData &benchmark_test_data) {
+void RunRegressionBenchmarks(const BenchmarkTestData &benchmark_test_data) {
   auto input_and_derivative = CalculatePartials(benchmark_test_data.x_vals);
   auto x_vals = input_and_derivative.first;
   auto derivative = input_and_derivative.second;
   auto y = Eigen::ArrayXXd::Zero(x_vals.rows(), x_vals.cols());
+
   auto e_training_data = new ExplicitTrainingData(x_vals, y);
   ExplicitRegression e_regression(e_training_data);
-  Eigen::ArrayXd explicit_times = time_benchmark(benchmark_regression,
-                                                 benchmark_test_data,
-                                                 e_regression);
+  Eigen::ArrayXd explicit_times = TimeBenchmark(
+    BenchmarkRegression, benchmark_test_data, e_regression);
+
   auto i_training_data = new ImplicitTrainingData(x_vals, derivative);
   ImplicitRegression i_regression(i_training_data);
-  Eigen::ArrayXd implicit_times = time_benchmark(benchmark_regression,
-                                                 benchmark_test_data,
-                                                 e_regression);
-  print_header();
-  print_results(explicit_times, EXPLICIT);
-  print_results(implicit_times, IMPLICIT);
+  Eigen::ArrayXd implicit_times = TimeBenchmark(
+    BenchmarkRegression, benchmark_test_data, i_regression);
+
+  PrintHeader("REGRESSION BENCHMARKS");
+  PrintResults(explicit_times, EXPLICIT);
+  PrintResults(implicit_times, IMPLICIT);
   delete i_training_data;
   delete e_training_data;
 }
 
-Eigen::ArrayXd time_benchmark(
+Eigen::ArrayXd TimeBenchmark(
   void (*benchmark)(const std::vector<AGraph>&, const VectorBasedFunction &), 
   const BenchmarkTestData &test_data, 
   const VectorBasedFunction &fitness_function, int number, int repeat) {
@@ -72,8 +73,8 @@ Eigen::ArrayXd time_benchmark(
   return times; 
 }
 
-void benchmark_regression(const std::vector<AGraph> &agraph_list,
-                          const VectorBasedFunction &fitness_function) {
+void BenchmarkRegression(const std::vector<AGraph> &agraph_list,
+                         const VectorBasedFunction &fitness_function) {
   std::vector<AGraph>::const_iterator indv;
   for(indv = agraph_list.begin(); indv != agraph_list.end(); indv ++) {
     fitness_function.EvaluateIndividualFitness(*indv);

@@ -14,11 +14,11 @@ struct BenchmarkTestData {
     indv_list(il), x_vals(x) {}
 };
 
-void load_benchmark_data(BenchmarkTestData &benchmark_test_data);
-void load_agraph_indvidual_data(std::vector<AGraph> &indv_list);
-void set_indv_constants(AGraph &indv, std::string &const_string);
-void set_indv_stack(AGraph &indv, std::string &stack_string);
-Eigen::ArrayXXd load_agraph_x_vals();
-double standard_deviation(const Eigen::ArrayXd &vec);
+void LoadBenchmarkData(BenchmarkTestData &benchmark_test_data);
+void LoadAgraphIndvidualData(std::vector<AGraph> &indv_list);
+void SetIndvConstants(AGraph &indv, std::string &const_string);
+void SetIndvStack(AGraph &indv, std::string &stack_string);
+Eigen::ArrayXXd LoadAgraphXVals();
+double StandardDeviation(const Eigen::ArrayXd &vec);
 
 #endif // APP_BENCMARK_UTILS_BENCHMARK_DATA_H_

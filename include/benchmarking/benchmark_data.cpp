@@ -12,14 +12,14 @@
 #define STACK_SIZE 128
 #define STACK_COLS 3
 
-void load_benchmark_data(BenchmarkTestData &benchmark_test_data) {
+void LoadBenchmarkData(BenchmarkTestData &benchmark_test_data) {
   std::vector<AGraph> indv_list;
-  load_agraph_indvidual_data(indv_list);
-  Eigen::ArrayXXd x_vals = load_agraph_x_vals();
+  LoadAgraphIndvidualData(indv_list);
+  Eigen::ArrayXXd x_vals = LoadAgraphXVals();
   benchmark_test_data = BenchmarkTestData(indv_list, x_vals);
 }
 
-void load_agraph_indvidual_data(std::vector<AGraph> &indv_list) {
+void LoadAgraphIndvidualData(std::vector<AGraph> &indv_list) {
   std::ifstream stack_filestream;
   std::ifstream const_filestream;
   stack_filestream.open(STACK_FILE);
@@ -30,15 +30,15 @@ void load_agraph_indvidual_data(std::vector<AGraph> &indv_list) {
   while ((stack_filestream >> stack_file_line) &&
          (const_filestream >> const_file_line)) {
     AGraph curr_indv;
-    set_indv_stack(curr_indv, stack_file_line);
-    set_indv_constants(curr_indv, const_file_line);
+    SetIndvStack(curr_indv, stack_file_line);
+    SetIndvConstants(curr_indv, const_file_line);
     indv_list.push_back(curr_indv);
   }
   stack_filestream.close();
   const_filestream.close();
 }
 
-void set_indv_constants(AGraph &indv, std::string &const_string) {
+void SetIndvConstants(AGraph &indv, std::string &const_string) {
   std::stringstream string_stream(const_string);
   std::string num_constants;
   std::getline(string_stream, num_constants, ',');
@@ -51,7 +51,7 @@ void set_indv_constants(AGraph &indv, std::string &const_string) {
   indv.SetLocalOptimizationParams(curr_const);
 }
 
-void set_indv_stack(AGraph &indv, std::string &stack_string) {
+void SetIndvStack(AGraph &indv, std::string &stack_string) {
   std::stringstream string_stream(stack_string);
   Eigen::ArrayX3i curr_stack = Eigen::ArrayX3i(STACK_SIZE, STACK_COLS);
 
@@ -62,7 +62,7 @@ void set_indv_stack(AGraph &indv, std::string &stack_string) {
   indv.SetCommandArray(curr_stack);
 }
 
-Eigen::ArrayXXd load_agraph_x_vals() {
+Eigen::ArrayXXd LoadAgraphXVals() {
   std::ifstream filename;
   filename.open(X_FILE);
 
@@ -78,4 +78,3 @@ Eigen::ArrayXXd load_agraph_x_vals() {
   filename.close();
   return x_vals;
 }
-
