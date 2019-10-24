@@ -29,7 +29,7 @@ bool not_enough_parameters_used(int required_params,
                                 const Eigen::ArrayXXd &dot_product);
 
 Eigen::ArrayXXd ImplicitRegression::EvaluateFitnessVector(
-    const Equation &individual) {
+    const Equation &individual) const {
   EvalAndDerivative eval_and_grad 
       = individual.EvaluateEquationWithXGradientAt(
       ((ImplicitTrainingData*)training_data_)->x);

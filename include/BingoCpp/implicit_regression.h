@@ -58,7 +58,7 @@ class ImplicitRegression : public VectorBasedFunction {
     delete training_data_;
   }
 
-  Eigen::ArrayXXd EvaluateFitnessVector(const Equation &equation);
+  Eigen::ArrayXXd EvaluateFitnessVector(const Equation &equation) const;
 
  private:
   int required_params_;

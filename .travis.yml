@@ -39,6 +39,7 @@ script:
   - ./build.sh
   - cd build/
   - ./performanceBenchmark
+  - ./fitnessBenchmark
 
 after_success:
   - cd $PARENTDIR/build
