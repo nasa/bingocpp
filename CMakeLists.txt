@@ -26,11 +26,8 @@ include(Colors)
 set(CMAKE_CXX_STANDARD 11)
 
 # Things to always include as flags. Change as needed.
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")  
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra" CACHE STRING "" FORCE)  
 # Build-type specific flags. Change as needed.
-SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
-SET(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 
 message(STATUS "Building with the following extra flags: ${CMAKE_CXX_FLAGS}")
 
@@ -44,7 +41,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_SOURCE_DIR}/tests
     ${PROJECT_SOURCE_DIR}/external/googletest
-    ${PROJECT_SOURCE_DIR}/external/googletest/include)
+    ${PROJECT_SOURCE_DIR}/external/googletest/googletest/include)
 
 # Make variables referring to all the sources and test files.
 file(GLOB SOURCES "src/*.cpp")
@@ -159,11 +156,12 @@ add_custom_target( git_update
 # The following makes sure that an up-to-date version of googletest is available,
 # and built so that it may be used by your tests. 
 add_library( googletest
-    ${PROJECT_SOURCE_DIR}/external/googletest/src/gtest-all.cc
-    ${PROJECT_SOURCE_DIR}/external/googletest/src/gtest_main.cc )
+    ${PROJECT_SOURCE_DIR}/external/googletest/googletest/src/gtest-all.cc
+    ${PROJECT_SOURCE_DIR}/external/googletest/googletest/src/gtest_main.cc )
+    target_include_directories(googletest PRIVATE ${PROJECT_SOURCE_DIR}/external/googletest/googletest)
 # add_dependencies(googletest git_update)
-set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest-all.cc  PROPERTIES GENERATED 1)
-set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest_main.cc PROPERTIES GENERATED 1)
+# set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest-all.cc  PROPERTIES GENERATED 1)
+# set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest_main.cc PROPERTIES GENERATED 1)
 
 
 # ------------------------------------------------------------------------------
