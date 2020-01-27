@@ -45,7 +45,11 @@ class AGraph : public Equation {
   AGraph(bool manual_consants = false);
 
   AGraph(const AGraph &agraph);
-
+  AGraph(AGraph&&) = default;                
+  AGraph& operator=(const AGraph&) = default; 
+  AGraph& operator=(AGraph&&) = default;     
+  virtual ~AGraph() = default;
+  
   /**
    * @brief Creates a copy of this AGraph
    * 

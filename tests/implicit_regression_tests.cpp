@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include <Eigen/Dense>
 
 #include <BingoCpp/implicit_regression.h>

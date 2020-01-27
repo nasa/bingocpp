@@ -27,7 +27,9 @@ typedef std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvalAndDerivative;
 
 class Equation {
  public:
-    /**
+   virtual ~Equation() = default;
+   
+   /**
    * @brief Evaluate the Equation
    * 
    * Evaluation of the Equation at points x.
