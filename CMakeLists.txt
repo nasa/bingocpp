@@ -121,7 +121,10 @@ target_link_libraries(bingocpp PUBLIC bingo)
 # ------------------------------------------------------------------------------
 # If CMake aborts due to missing dependencies for code coverage 
 # (gcov, lcov, genhtml and supported compiler), comment this line.
-include(CodeCoverage)
+string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_tolower)
+if (cmake_build_type_tolower STREQUAL "coverage")
+    include(CodeCoverage)
+endif()
 
 
 # ------------------------------------------------------------------------------
