@@ -119,7 +119,7 @@ Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i &stack) {
         if (AGraph::HasArityTwo(new_stack(j, ArrayProps::kNodeIdx))) {
           new_stack(j, ArrayProps::kOp2) = reduced_param_map[stack(i, ArrayProps::kOp2)];
         } else {
-          new_stack(j, ArrayProps::kOp2) = new_stack(j, ArrayProps::kOp2);
+          new_stack(j, ArrayProps::kOp2) = new_stack(j, ArrayProps::kOp1);
         }
       }
       reduced_param_map[i] = j;
