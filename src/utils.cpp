@@ -11,7 +11,7 @@
 #include <vector>
 #include <numeric>
 
-#include "BingoCpp/utils.h"
+#include "bingocpp/utils.h"
 
 namespace bingo {
 

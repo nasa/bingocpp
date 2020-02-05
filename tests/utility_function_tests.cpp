@@ -10,7 +10,7 @@
 #include <Eigen/Dense>
 #include <gtest/gtest.h>
 
-#include <BingoCpp/utils.h>
+#include <bingocpp/utils.h>
 
 TEST(UtilsTest, SavitzkyGolay) {
   int window_size = 7;

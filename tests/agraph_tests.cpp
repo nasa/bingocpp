@@ -5,8 +5,8 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 
-#include <BingoCpp/agraph.h>
-#include <BingoCpp/backend.h>
+#include <bingocpp/agraph.h>
+#include <bingocpp/backend.h>
 
 #include "test_fixtures.h"
 #include "testing_utils.h"

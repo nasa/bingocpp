@@ -1,9 +1,9 @@
 #include <chrono>
 
-#include <BingoCpp/agraph.h>
-#include <BingoCpp/explicit_regression.h>
-#include <BingoCpp/implicit_regression.h>
-#include <BingoCpp/utils.h>
+#include <bingocpp/agraph.h>
+#include <bingocpp/explicit_regression.h>
+#include <bingocpp/implicit_regression.h>
+#include <bingocpp/utils.h>
 
 #include "benchmarking/benchmark_data.h"
 #include "benchmarking/benchmark_logging.h"

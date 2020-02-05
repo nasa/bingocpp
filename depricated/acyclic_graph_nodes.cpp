@@ -8,7 +8,7 @@
  * implementation of Operation.
  */
 
-#include "BingoCpp/acyclic_graph_nodes.h"
+#include "bingocpp/acyclic_graph_nodes.h"
 
 namespace agraphnodes{
   namespace { 

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "BingoCpp/explicit_regression.h"
+#include "bingocpp/explicit_regression.h"
 
 namespace bingo {
 

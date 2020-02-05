@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 
-#include <BingoCpp/explicit_regression.h>
+#include <bingocpp/explicit_regression.h>
 
 #include "test_fixtures.h"
 

@@ -4,9 +4,9 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 
-#include <BingoCpp/equation.h>
-#include <BingoCpp/fitness_function.h>
-#include <BingoCpp/training_data.h>
+#include <bingocpp/equation.h>
+#include <bingocpp/fitness_function.h>
+#include <bingocpp/training_data.h>
 
 #include "test_fixtures.h"
 #include "testing_utils.h"

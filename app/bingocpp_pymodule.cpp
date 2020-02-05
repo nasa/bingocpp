@@ -4,7 +4,7 @@
  * \author Geoffrey F. Bomarito
  * \date
  *
- * This file contains the python bindings of the BingoCpp library.
+ * This file contains the python bindings of the bingocpp library.
  * 
  * Notices
  * -------
@@ -45,11 +45,11 @@
 
 #include <Eigen/Dense> 
 
-#include "BingoCpp/agraph.h"
-#include "BingoCpp/backend.h"
-#include "BingoCpp/explicit_regression.h"
-#include "BingoCpp/implicit_regression.h"
-#include "BingoCpp/utils.h"
+#include "bingocpp/agraph.h"
+#include "bingocpp/backend.h"
+#include "bingocpp/explicit_regression.h"
+#include "bingocpp/implicit_regression.h"
+#include "bingocpp/utils.h"
 
 #include "python/py_equation.h"
 
