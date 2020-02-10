@@ -3,6 +3,7 @@ cd build
 PYEXECUTABLE=`which python`
 cmake -DCMAKE_BUILD_TYPE=Release -DPYTHON_EXECUTABLE:FILEPATH=$PYEXECUTABLE ..
 make VERBOSE=1 -j
-make bingocpp
+make symbolic_regression
+make utils
 #make gtest
 cd ..
