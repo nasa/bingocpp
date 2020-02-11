@@ -14,7 +14,7 @@ namespace bingo {
 class PyEquation : public Equation {
  public:
   Eigen::ArrayXXd 
-  EvaluateEquationAt(const Eigen::ArrayXXd &x) const override {
+  EvaluateEquationAt(const Eigen::ArrayXXd &x) {
     PYBIND11_OVERLOAD_PURE_NAME(
       Eigen::ArrayXXd,
       Equation,
@@ -25,7 +25,7 @@ class PyEquation : public Equation {
   }
 
   EvalAndDerivative
-  EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd &x) const override {
+  EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd &x) {
     PYBIND11_OVERLOAD_PURE_NAME(
       EvalAndDerivative,
       Equation,
@@ -36,7 +36,7 @@ class PyEquation : public Equation {
   }
 
   EvalAndDerivative
-  EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x) const override {
+  EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x) {
     PYBIND11_OVERLOAD_PURE_NAME(
       EvalAndDerivative,
       Equation,
@@ -46,7 +46,7 @@ class PyEquation : public Equation {
     );
   }
 
-  std::string GetLatexString() const override {
+  std::string GetLatexString() {
     PYBIND11_OVERLOAD_PURE_NAME(
       std::string,
       Equation,
@@ -55,7 +55,7 @@ class PyEquation : public Equation {
     );
   }
 
-  std::string GetConsoleString() const override {
+  std::string GetConsoleString() {
     PYBIND11_OVERLOAD_PURE_NAME(
       std::string,
       Equation,
@@ -64,7 +64,7 @@ class PyEquation : public Equation {
     );
   }
 
-  std::string GetStackString() const override {
+  std::string GetStackString() {
     PYBIND11_OVERLOAD_PURE_NAME(
       std::string,
       Equation,

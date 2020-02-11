@@ -87,9 +87,12 @@ PYBIND11_MODULE(bingocpp, m) {
     .def("get_complexity", &Equation::GetComplexity);
 
   py::class_<AGraph, Equation>(m, "AGraph")
-    .def(py::init<bool & >(), py::arg("manual_constants") = false)
+    .def(py::init<>())
     .def("is_cpp", &AGraph::IsCpp)
     .def_property("command_array",
+                  &AGraph::GetCommandArray,
+                  &AGraph::SetCommandArray)
+    .def_property("mutable_command_array",
                   &AGraph::GetCommandArrayModifiable,
                   &AGraph::SetCommandArray)
     .def_property("fitness",
@@ -104,8 +107,6 @@ PYBIND11_MODULE(bingocpp, m) {
     .def_property("constants",
                   &AGraph::GetLocalOptimizationParamsModifiable,
                   &AGraph::SetLocalOptimizationParams)
-    .def("notify_command_array_modification",
-         &AGraph::NotifyCommandArrayModificiation)
     .def("needs_local_optimization", &AGraph::NeedsLocalOptimization)
     .def("get_utilized_commands", &AGraph::GetUtilizedCommands)
     .def("get_number_local_optimization_params",

@@ -37,7 +37,6 @@ struct AGraphTestVals {
 
 class AGraphTest : public ::testing::TestWithParam<std::string> {
  public:
-  AGraph invalid_graph;
   AGraph sample_agraph_1;
   AGraph all_funcs_graph;
   StringMap map_to_graph_string;
@@ -46,24 +45,16 @@ class AGraphTest : public ::testing::TestWithParam<std::string> {
 
   void SetUp() {
     sample_agraph_1 = testutils::init_sample_agraph_1();
-    invalid_graph = init_invalid_graph(sample_agraph_1);
     all_funcs_graph = init_all_funcs_graph();
     map_to_graph_string = init_hash_map();
     map_to_graph = {
       {"all_funcs_graph", all_funcs_graph},
-      {"sample_agraph_1", sample_agraph_1},
-      {"invalid_graph", invalid_graph}
+      {"sample_agraph_1", sample_agraph_1}
     };
     sample_agraph_1_values = init_sample_agraph_1_values();
   }
 
   void TearDown() {}
-
-  AGraph init_invalid_graph(AGraph &agraph) {
-    AGraph return_val = AGraph();
-    return_val.SetCommandArray(agraph.GetCommandArray());
-    return return_val;
-  }
 
   AGraphTestVals init_sample_agraph_1_values() {
     int num_points = 11;
@@ -116,14 +107,8 @@ class AGraphTest : public ::testing::TestWithParam<std::string> {
       {"console string", "sin(X_0 + 1.000000) + 1.000000"},
       {"complexity", "5"}
     };
-    GraphString invalid_graph_map {
-      {"latex string", "sin{ X_0 + ? } + ?"},
-      {"console string", "sin(X_0 + ?) + ?"},
-      {"complexity", "5"}
-    };
     return_val.insert({"all_funcs_graph", all_funcs_graph_map});
     return_val.insert({"sample_agraph_1", sample_agraph_1_map});
-    return_val.insert({"invalid_graph", invalid_graph_map});
     return return_val;
   }
 };
@@ -167,7 +152,7 @@ TEST_P(AGraphTest, complexity_print) {
 }
 
 INSTANTIATE_TEST_CASE_P(,AGraphTest, ::testing::Values(
-    "all_funcs_graph", "sample_agraph_1", "invalid_graph"));
+    "all_funcs_graph", "sample_agraph_1"));
 
 TEST_F(AGraphTest, stack_print) {
   std::stringstream expected_str;
@@ -185,24 +170,6 @@ TEST_F(AGraphTest, stack_print) {
                    "(3) <= sin (2)\n"
                    "(4) <= (3) + (1)\n";
   ASSERT_STREQ(expected_str.str().c_str(), sample_agraph_1.GetStackString().c_str());
-}
-
-TEST_F(AGraphTest, invalid_stack_print) {
-  std::stringstream expected_str;
-  expected_str << "---full stack---\n"
-                   "(0) <= X_0\n"
-                   "(1) <= C\n"
-                   "(2) <= (0) + (1)\n"
-                   "(3) <= sin (2)\n" 
-                   "(4) <= (0) + (1)\n"
-                   "(5) <= (3) + (1)\n"
-                   "---small stack---\n"
-                   "(0) <= X_0\n"
-                   "(1) <= C\n"
-                   "(2) <= (0) + (1)\n"
-                   "(3) <= sin (2)\n"
-                   "(4) <= (3) + (1)\n";
-  ASSERT_STREQ(expected_str.str().c_str(), invalid_graph.GetStackString().c_str());
 }
 
 TEST_F(AGraphTest, evaluateAt) {
@@ -230,36 +197,11 @@ TEST_F(AGraphTest, evaluatWithCDerivative) {
   ASSERT_TRUE(testutils::almost_equal(sample_agraph_1_values.grad_c, df_dc));
 }
 
-TEST_F(AGraphTest, NeedsLocalOptimization) {
-  ASSERT_TRUE(invalid_graph.NeedsLocalOptimization());
-}
-
-TEST_F(AGraphTest, getNumberOfOptimizationParams) {
-  ASSERT_EQ(invalid_graph.GetNumberLocalOptimizationParams(), 1);
-}
-
-TEST_F(AGraphTest, setOptimizationParams) {
-  Eigen::VectorXd opt_params(1);
-  opt_params << 1.0;
-  invalid_graph.SetLocalOptimizationParams(opt_params);
-  ASSERT_FALSE(invalid_graph.NeedsLocalOptimization());
-  ASSERT_TRUE(testutils::almost_equal(
-    invalid_graph.EvaluateEquationAt(sample_agraph_1_values.x),
-    sample_agraph_1.EvaluateEquationAt(sample_agraph_1_values.x))
-  );
-}
-
 TEST_F(AGraphTest, setting_fitness_updates_fit_set) {
   AGraph new_graph = AGraph();
   ASSERT_FALSE(new_graph.IsFitnessSet());
   new_graph.SetFitness(2.0);
   ASSERT_TRUE(new_graph.IsFitnessSet());
-}
-
-TEST_F(AGraphTest, notify_command_array_mod) {
-  ASSERT_TRUE(sample_agraph_1.IsFitnessSet());
-  sample_agraph_1.NotifyCommandArrayModificiation();
-  ASSERT_FALSE(sample_agraph_1.IsFitnessSet());
 }
 
 TEST_F(AGraphTest, setting_command_array_unsets_fitness) {

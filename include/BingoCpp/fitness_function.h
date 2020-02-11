@@ -49,7 +49,7 @@ class FitnessFunction {
 
   virtual ~FitnessFunction() { }
 
-  virtual double EvaluateIndividualFitness(const Equation &individual) const = 0;
+  virtual double EvaluateIndividualFitness(Equation &individual) const = 0;
 
  protected:
   mutable int eval_count_;
@@ -72,13 +72,13 @@ class VectorBasedFunction : public FitnessFunction {
 
   virtual ~VectorBasedFunction() { }
 
-  double EvaluateIndividualFitness(const Equation &individual) const {
+  double EvaluateIndividualFitness(Equation &individual) const {
     Eigen::ArrayXXd fitness_vector = EvaluateFitnessVector(individual);
     return (const_cast<VectorBasedFunction*>(this)->*metric_function_)(fitness_vector);
   }
 
   virtual Eigen::ArrayXXd
-  EvaluateFitnessVector(const Equation &individual) const = 0;
+  EvaluateFitnessVector(Equation &individual) const = 0;
 
  protected:
   double mean_absolute_error(const Eigen::ArrayXXd &fitness_vector) {

@@ -10,23 +10,23 @@ namespace testutils {
 
 class SumEquation : public bingo::Equation {
  public:
-  Eigen::ArrayXXd EvaluateEquationAt(const Eigen::ArrayXXd &x) const {
+  Eigen::ArrayXXd EvaluateEquationAt(const Eigen::ArrayXXd &x) {
     return x.rowwise().sum();
   }
 
   EvalAndDerivative EvaluateEquationWithXGradientAt(
-      const Eigen::ArrayXXd &x) const {
+      const Eigen::ArrayXXd &x) {
     return std::make_pair(EvaluateEquationAt(x), x);
   }
 
   EvalAndDerivative EvaluateEquationWithLocalOptGradientAt(
-      const Eigen::ArrayXXd &x) const {
+      const Eigen::ArrayXXd &x) {
     return std::make_pair(EvaluateEquationAt(x), x);
   }
 
-  std::string GetLatexString() const { return ""; }
-  std::string GetConsoleString() const { return ""; }
-  std::string GetStackString() const { return ""; }
+  std::string GetLatexString() { return ""; }
+  std::string GetConsoleString() { return ""; }
+  std::string GetStackString() { return ""; }
   int GetComplexity() const  { return 0; }
 };
 

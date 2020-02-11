@@ -34,24 +34,24 @@ std::string print_string_with_args(const std::string &string,
                                    const std::string &arg1,
                                    const std::string &arg2);
 
-std::string get_stack_string(const AGraph &agraph,
-                             const Eigen::ArrayX3i &command_array);
+std::string get_stack_string(const Eigen::ArrayX3i &command_array,
+                             const Eigen::VectorXd &constants);
 
-std::string get_stack_element_string(const AGraph &individual,
+std::string get_stack_element_string(const Eigen::VectorXd &constants,
                                      int command_index,
                                      const Eigen::ArrayX3i &stack_element);
 } // namespace
 
-AGraph::AGraph(bool manual_constants) {
+AGraph::AGraph() {
   command_array_ = Eigen::ArrayX3i(0, 3);
   short_command_array_ = Eigen::ArrayX3i(0, 3);
   constants_ = Eigen::VectorXd(0);
   needs_opt_ = false;
   num_constants_ = 0;
-  manual_constants_ = manual_constants;
   fitness_ = kFitnessNotSet;
   fit_set_ = false;
   genetic_age_ = 0;
+  modified_ = false;
 }
   
 AGraph::AGraph(const AGraph &agraph) {
@@ -60,10 +60,10 @@ AGraph::AGraph(const AGraph &agraph) {
   constants_ = agraph.constants_;
   needs_opt_ = agraph.needs_opt_;
   num_constants_ = agraph.num_constants_;
-  manual_constants_ = agraph.manual_constants_;
   fitness_ = agraph.fitness_;
   fit_set_ = agraph.fit_set_;
   genetic_age_ = agraph.genetic_age_;
+  modified_ = agraph.modified_;
 }
 
 AGraph AGraph::Copy() {
@@ -75,18 +75,19 @@ const Eigen::ArrayX3i &AGraph::GetCommandArray() const {
 }
 
 Eigen::ArrayX3i &AGraph::GetCommandArrayModifiable() {
+  notify_agraph_modification();
   return command_array_;
 }
 
 void AGraph::SetCommandArray(const Eigen::ArrayX3i &command_array) {
   command_array_ = command_array;
-  NotifyCommandArrayModificiation();
+  notify_agraph_modification();
 }
 
-void AGraph::NotifyCommandArrayModificiation() {
+void AGraph::notify_agraph_modification() {
   fitness_ = kFitnessNotSet;
   fit_set_ = false;
-  process_modified_command_array();
+  modified_ = true;
 }
 
 double AGraph::GetFitness() const {
@@ -118,11 +119,17 @@ std::vector<bool> AGraph::GetUtilizedCommands() const {
   return backend::GetUtilizedCommands(command_array_);
 }
 
-bool AGraph::NeedsLocalOptimization() const {
+bool AGraph::NeedsLocalOptimization() {
+  if (modified_) {
+      process_modified_command_array();
+  }
   return needs_opt_;
 }
 
-int AGraph::GetNumberLocalOptimizationParams() const {
+int AGraph::GetNumberLocalOptimizationParams() {
+  if (modified_) {
+      process_modified_command_array();
+  }
   return num_constants_;
 }
 
@@ -140,7 +147,10 @@ Eigen::VectorXd &AGraph::GetLocalOptimizationParamsModifiable() {
 }
 
 Eigen::ArrayXXd 
-AGraph::EvaluateEquationAt(const Eigen::ArrayXXd &x) const {
+AGraph::EvaluateEquationAt(const Eigen::ArrayXXd &x) {
+  if (modified_) {
+      process_modified_command_array();
+  }
   Eigen::ArrayXXd f_of_x; 
   try {
     f_of_x = backend::Evaluate(this->short_command_array_,
@@ -155,7 +165,10 @@ AGraph::EvaluateEquationAt(const Eigen::ArrayXXd &x) const {
 }
 
 EvalAndDerivative
-AGraph::EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd &x) const {
+AGraph::EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd &x) {
+  if (modified_) {
+      process_modified_command_array();
+  }
   EvalAndDerivative df_dx;
   try {
     df_dx = backend::EvaluateWithDerivative(this->short_command_array_,
@@ -175,7 +188,10 @@ AGraph::EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd &x) const {
 }
 
 EvalAndDerivative
-AGraph::EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x) const {
+AGraph::EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x) {
+  if (modified_) {
+      process_modified_command_array();
+  }
   EvalAndDerivative df_dc;
   try {
     df_dc = backend::EvaluateWithDerivative(this->short_command_array_,
@@ -194,26 +210,36 @@ AGraph::EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x) const {
   }
 }
 
-std::ostream &operator<<(std::ostream &strm, const AGraph &graph) {
+std::ostream &operator<<(std::ostream &strm, AGraph &graph) {
   return strm << graph.GetConsoleString();
 }
 
-std::string AGraph::GetLatexString() const {
+std::string AGraph::GetLatexString() {
+  if (modified_) {
+      process_modified_command_array();
+  }
   return get_formatted_string_using(
       kLatexPrintMap,*this, short_command_array_);
 }
 
-std::string AGraph::GetConsoleString() const {
+std::string AGraph::GetConsoleString() {
+  if (modified_) {
+      process_modified_command_array();
+  }
   return get_formatted_string_using(
       kConsolePrintMap, *this, short_command_array_);
 }
 
-std::string AGraph::GetStackString() const {
-  std::stringstream print_str; 
+std::string AGraph::GetStackString() {
+  if (modified_) {
+      process_modified_command_array();
+  }
+  std::stringstream print_str;
+  Eigen::VectorXd empty_consts;
   print_str << "---full stack---\n"
-            << get_stack_string(*this, command_array_)
+            << get_stack_string(command_array_, empty_consts)
             << "---small stack---\n"
-            << get_stack_string(*this, short_command_array_); 
+            << get_stack_string(short_command_array_, constants_);
   return print_str.str();
 }
 
@@ -222,11 +248,6 @@ int AGraph::GetComplexity() const {
   return std::count_if (commands.begin(), commands.end(), [](bool i) {
     return i;
   });
-}
-
-void AGraph::ForceRenumberConstants() {
-  std::vector<bool> util_commands = GetUtilizedCommands();
-  renumber_constants(util_commands, command_array_);
 }
 
 int AGraph::Distance(const AGraph &agraph) {
@@ -242,50 +263,32 @@ bool AGraph::IsTerminal(int node) {
 }
 
 void AGraph::process_modified_command_array() {
+  short_command_array_ = backend::SimplifyStack(command_array_);
   int new_const_number = 0;
-  if (!manual_constants_) {
-    std::vector<bool> util = GetUtilizedCommands();
-    needs_opt_ = check_optimization_requirement(*this, util);
-    if (needs_opt_)  {
-      new_const_number = renumber_constants(util, command_array_);
+  for (int i = 0; i < short_command_array_.rows(); i++) {
+    if (short_command_array_(i, ArrayProps::kNodeIdx) == Op::LOAD_C) {
+      short_command_array_.row(i) << Op::LOAD_C, new_const_number, new_const_number;
+      new_const_number ++;
     }
   }
-  short_command_array_ = backend::SimplifyStack(command_array_);
+
+  int optimization_aggression = 0;
+  if (optimization_aggression == 0 && new_const_number <= num_constants_) {
+    constants_.resize(new_const_number);
+  } else if (optimization_aggression == 1 && new_const_number == num_constants_) {
+    // reuse old constants
+  } else {
+    constants_.resize(new_const_number);
+    constants_.setOnes(new_const_number);
+    if (new_const_number > 0) {
+      needs_opt_ = true;
+    }
+  }
+  modified_ = false;
   num_constants_ = new_const_number;
 }
 
 namespace {
-
-bool check_optimization_requirement(
-    AGraph &agraph,
-    const std::vector<bool> &utilized_commands) {
-  Eigen::ArrayX3i command_array = agraph.GetCommandArray();
-  for (int i = 0; i < command_array.rows(); i++) {
-    if (utilized_commands[i] &&
-        command_array(i, ArrayProps::kNodeIdx) == Op::LOAD_C) {
-      if (command_array(i, ArrayProps::kOp1) == Op::C_OPTIMIZE ||
-          command_array(i, ArrayProps::kOp1) >=
-          agraph.GetLocalOptimizationParams().size()) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-int renumber_constants (const std::vector<bool> &utilized_commands,
-                        Eigen::ArrayX3i &command_array) {
-  int const_num = 0;
-  int command_array_depth = command_array.rows();
-  for (int i = 0; i < command_array_depth; i++) {
-    if (utilized_commands[i] &&
-        command_array(i, ArrayProps::kNodeIdx) == Op::LOAD_C) {
-      command_array.row(i) << 1, const_num , const_num; 
-      const_num ++;
-    }
-  }
-  return const_num;
-}
 
 std::string get_formatted_string_using(
     const PrintMap &format_map,
@@ -346,16 +349,16 @@ std::string print_string_with_args(const std::string &string,
 }
 
 std::string get_stack_string(
-    const AGraph &agraph,
-    const Eigen::ArrayX3i &command_array) {
+    const Eigen::ArrayX3i &command_array,
+    const Eigen::VectorXd &constants) {
   std::string temp_string;
   for (int i = 0; i < command_array.rows(); i++) {
-    temp_string += get_stack_element_string(agraph, i, command_array.row(i));
+    temp_string += get_stack_element_string(constants, i, command_array.row(i));
   }
   return temp_string;
 }
 
-std::string get_stack_element_string(const AGraph &individual,
+std::string get_stack_element_string(const Eigen::VectorXd &constants,
                                      int command_index,
                                      const Eigen::ArrayX3i &stack_element) {
   int node = stack_element(0, ArrayProps::kNodeIdx);
@@ -367,12 +370,11 @@ std::string get_stack_element_string(const AGraph &individual,
     temp_string += "X_" + std::to_string(param1);
   } else if (node == Op::LOAD_C) {
     if (param1 == Op::C_OPTIMIZE ||
-        param1 >= individual.GetLocalOptimizationParams().size()) {
+        param1 >= constants.size()) {
       temp_string += "C";
     } else {
-      Eigen::VectorXd parameter = individual.GetLocalOptimizationParams();
       temp_string += "C_" + std::to_string(param1) + " = " + 
-                     std::to_string(parameter[param1]);
+                     std::to_string(constants[param1]);
     }
   } else {
     std::string param1_str = std::to_string(param1);

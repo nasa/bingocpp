@@ -42,7 +42,7 @@ namespace bingo {
  */
 class AGraph : public Equation {
  public:
-  AGraph(bool manual_consants = false);
+  AGraph();
 
   AGraph(const AGraph &agraph);
   AGraph(AGraph&&) = default;                
@@ -140,7 +140,7 @@ class AGraph : public Equation {
    * @return true Needs optimization.
    * @return false Has been optimized
    */
-  bool NeedsLocalOptimization() const;
+  bool NeedsLocalOptimization();
 
   /**
    * @brief Get the Number Local Optimization Params
@@ -150,7 +150,7 @@ class AGraph : public Equation {
    * 
    * @return int The number of parameters to optimize.
    */
-  int GetNumberLocalOptimizationParams() const;
+  int GetNumberLocalOptimizationParams();
 
   /**
    * @brief Set the Local Optimization Params
@@ -184,7 +184,7 @@ class AGraph : public Equation {
    * @return Eigen::ArrayXXd The evaluation of function at points x.
    */
   Eigen::ArrayXXd 
-  EvaluateEquationAt(const Eigen::ArrayXXd &x) const;
+  EvaluateEquationAt(const Eigen::ArrayXXd &x);
 
   /**
    * @brief Evaluate the AGraph and get its derivatives
@@ -199,7 +199,7 @@ class AGraph : public Equation {
    * along the points x and the derivative of the equation with respect to x.
    */
   EvalAndDerivative
-  EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd &x) const;
+  EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd &x);
 
   /**
    * @brief Evluate the AGraph and get its derivatives.
@@ -215,28 +215,28 @@ class AGraph : public Equation {
    * the constants of the equation.
    */
   EvalAndDerivative
-  EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x) const;
+  EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x);
 
   /**
    * @brief Get the Latex String of this AGraph equation.
    * 
    * @return std::string 
    */
-  std::string GetLatexString() const;
+  std::string GetLatexString();
 
   /**
    * @brief Get the Console String this AGraph equation.
    * 
    * @return std::string 
    */
-  std::string GetConsoleString() const;
+  std::string GetConsoleString();
 
   /**
    * @brief Get the Stack String this AGraph equation.
    * 
    * @return std::string 
    */
-  std::string GetStackString() const;
+  std::string GetStackString();
 
   /**
    * @brief Get the Complexity of this AGraph equation.
@@ -244,8 +244,6 @@ class AGraph : public Equation {
    * @return int 
    */
   int GetComplexity() const;
-
-  void ForceRenumberConstants();
 
   int Distance(const AGraph &agraph);
 
@@ -273,16 +271,17 @@ class AGraph : public Equation {
   Eigen::VectorXd constants_;
   bool needs_opt_;
   int num_constants_;
-  bool manual_constants_;
   double fitness_;
   bool fit_set_;
   int genetic_age_;
+  bool modified_;
 
   // To string operator when passed into stream
-  friend std::ostream &operator<<(std::ostream&, const AGraph&);
+  friend std::ostream &operator<<(std::ostream&, AGraph&);
 
   // Helper Functions
   void process_modified_command_array();
+  void notify_agraph_modification();
 };
 } // namespace bingo
 #endif //BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_H_

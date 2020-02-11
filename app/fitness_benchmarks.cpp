@@ -13,14 +13,14 @@
 
 using namespace bingo;
 
-void BenchmarkRegression(const std::vector<AGraph> &agraph_list,
+void BenchmarkRegression(std::vector<AGraph> &agraph_list,
                          const VectorBasedFunction &fitness_function);
 Eigen::ArrayXd TimeBenchmark(
-    void (*benchmark)(const std::vector<AGraph>&, const VectorBasedFunction &), 
-    const BenchmarkTestData &test_data, 
+    void (*benchmark)(std::vector<AGraph>&, const VectorBasedFunction &),
+    BenchmarkTestData &test_data,
     const VectorBasedFunction &fitness_function, int number=100, int repeat=10);
 void DoRegressionBenchmarking();
-void RunRegressionBenchmarks(const BenchmarkTestData &benchmark_test_data);
+void RunRegressionBenchmarks(BenchmarkTestData &benchmark_test_data);
 
 int main() {
   DoRegressionBenchmarking();
@@ -33,7 +33,7 @@ void DoRegressionBenchmarking() {
   RunRegressionBenchmarks(benchmark_test_data);
 }
 
-void RunRegressionBenchmarks(const BenchmarkTestData &benchmark_test_data) {
+void RunRegressionBenchmarks(BenchmarkTestData &benchmark_test_data) {
   auto input_and_derivative = CalculatePartials(benchmark_test_data.x_vals);
   auto x_vals = input_and_derivative.first;
   auto derivative = input_and_derivative.second;
@@ -57,8 +57,8 @@ void RunRegressionBenchmarks(const BenchmarkTestData &benchmark_test_data) {
 }
 
 Eigen::ArrayXd TimeBenchmark(
-  void (*benchmark)(const std::vector<AGraph>&, const VectorBasedFunction &), 
-  const BenchmarkTestData &test_data, 
+  void (*benchmark)(std::vector<AGraph>&, const VectorBasedFunction &),
+  BenchmarkTestData &test_data,
   const VectorBasedFunction &fitness_function, int number, int repeat) {
   Eigen::ArrayXd times = Eigen::ArrayXd(repeat);
   for (int run=0; run<repeat; run++) {
@@ -73,9 +73,9 @@ Eigen::ArrayXd TimeBenchmark(
   return times; 
 }
 
-void BenchmarkRegression(const std::vector<AGraph> &agraph_list,
+void BenchmarkRegression(std::vector<AGraph> &agraph_list,
                          const VectorBasedFunction &fitness_function) {
-  std::vector<AGraph>::const_iterator indv;
+  std::vector<AGraph>::iterator indv;
   for(indv = agraph_list.begin(); indv != agraph_list.end(); indv ++) {
     fitness_function.EvaluateIndividualFitness(*indv);
   }
