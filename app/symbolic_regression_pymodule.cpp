@@ -1,10 +1,10 @@
 /*!
- * \file bingocpp_pymodule.cc
+ * \file symbolic_regression_pymodule.cc
  *
  * \author Geoffrey F. Bomarito
  * \date
  *
- * This file contains the python bindings of the BingoCpp library.
+ * This file contains the python bindings of the symbolic_regression library.
  * 
  * Notices
  * -------
@@ -45,19 +45,21 @@
 
 #include <Eigen/Dense> 
 
-#include "BingoCpp/agraph.h"
-#include "BingoCpp/backend.h"
-#include "BingoCpp/explicit_regression.h"
-#include "BingoCpp/implicit_regression.h"
-#include "BingoCpp/utils.h"
+#include "bingocpp/agraph.h"
+#include "bingocpp/backend.h"
+#include "bingocpp/explicit_regression.h"
+#include "bingocpp/implicit_regression.h"
+#include "bingocpp/utils.h"
 
 #include "python/py_equation.h"
 
 namespace py = pybind11;
 using namespace bingo;
 
-PYBIND11_MODULE(bingocpp, m) {
-  m.doc() = "bingocpp module";  // optional module docstring
+// Todo: Rename symbolic_regression to _symbolic_regression to indicate private
+// module
+PYBIND11_MODULE(symbolic_regression, m) {
+  m.doc() = "The symbolic regression module";  // optional module docstring
   m.def("is_cpp", &backend::IsCpp, "is the backend c++");
   m.def("evaluate", &backend::Evaluate, "evaluate");
   m.def("simplify_and_evaluate", &backend::SimplifyAndEvaluate,
@@ -73,20 +75,20 @@ PYBIND11_MODULE(bingocpp, m) {
   m.def("simplify_stack", &backend::SimplifyStack,
         "simplify stack to only utilized commands");
 
-  py::class_<Equation, PyEquation /* <---trampoline */>(m, "Equation")
+  py::class_<Equation, bingo::PyEquation /* <---trampoline */>(m, "Equation")
     .def(py::init<>())
     .def("evaluate_equation_at",
-         &Equation::EvaluateEquationAt)
+         &bingo::Equation::EvaluateEquationAt)
     .def("evaluate_equation_with_x_gradient_at",
-         &Equation::EvaluateEquationWithXGradientAt)
+         &bingo::Equation::EvaluateEquationWithXGradientAt)
     .def("evaluate_equation_with_local_opt_gradient_at",
-          &Equation::EvaluateEquationWithLocalOptGradientAt)
-    .def("get_latex_string", &Equation::GetLatexString)
-    .def("get_stack_string", &Equation::GetStackString)
-    .def("get_console_string", &Equation::GetConsoleString)
-    .def("get_complexity", &Equation::GetComplexity);
+          &bingo::Equation::EvaluateEquationWithLocalOptGradientAt)
+    .def("get_latex_string", &bingo::Equation::GetLatexString)
+    .def("get_stack_string", &bingo::Equation::GetStackString)
+    .def("get_console_string", &bingo::Equation::GetConsoleString)
+    .def("get_complexity", &bingo::Equation::GetComplexity);
 
-  py::class_<AGraph, Equation>(m, "AGraph")
+  py::class_<AGraph, bingo::Equation>(m, "AGraph")
     .def(py::init<>())
     .def("is_cpp", &AGraph::IsCpp)
     .def_property("command_array",
@@ -167,10 +169,4 @@ PYBIND11_MODULE(bingocpp, m) {
          py::arg("metric") = "mae")
     .def("__call__", &ImplicitRegression::EvaluateIndividualFitness)
     .def("evaluate_fitness_vector", &ImplicitRegression::EvaluateFitnessVector);
-
-  m.def("calculate_partials", &CalculatePartials);
-  m.def("savitzky_golay", &SavitzkyGolay);
-  m.def("gen_fact", &GenFact);
-  m.def("gram_poly", &GramPoly);
-  m.def("gram_weight", &GramWeight);
 }

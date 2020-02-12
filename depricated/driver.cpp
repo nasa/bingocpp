@@ -4,7 +4,7 @@
  * \author Geoffrey F. Bomarito
  * \date
  *
- * This file contains the main function for BingoCpp.
+ * This file contains the main function for bingocpp.
  * 
  * Notices
  * -------
@@ -48,8 +48,8 @@
 
 #include <Eigen/Dense>
 
-#include "BingoCpp/version.h"
-#include "BingoCpp/backend.h"
+#include "bingocpp/version.h"
+#include "bingocpp/backend.h"
 
 
 int test_eig() {

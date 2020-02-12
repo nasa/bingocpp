@@ -109,8 +109,18 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/pybind/CMakeLists.txt")
 else()
     add_subdirectory( external/pybind EXCLUDE_FROM_ALL)
 endif()
-pybind11_add_module(bingocpp app/bingocpp_pymodule.cpp EXCLUDE_FROM_ALL)
-target_link_libraries(bingocpp PUBLIC bingo)
+
+set( MODULE_LIST 
+    symbolic_regression
+    utils
+)
+
+foreach(pymodule ${MODULE_LIST})
+    pybind11_add_module(${pymodule} "app/${pymodule}_pymodule.cpp" EXCLUDE_FROM_ALL)
+    target_link_libraries(${pymodule} PUBLIC bingo)
+endforeach(pymodule ${MODULE_LIST})
+
+
 
 
 # ------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-#include "BingoCpp/backend_nodes.h"
+#include "bingocpp/backend_nodes.h"
 
 namespace bingo {
 namespace backend {

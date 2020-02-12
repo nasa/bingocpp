@@ -24,7 +24,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
-#include "BingoCpp/agraph.h"
+#include "bingocpp/agraph.h"
 
 namespace bingo {
 /**

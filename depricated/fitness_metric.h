@@ -25,8 +25,8 @@
 #ifndef INCLUDE_BINGOCPP_FITNESS_METRIC_H_
 #define INCLUDE_BINGOCPP_FITNESS_METRIC_H_
 
-#include "BingoCpp/acyclic_graph.h"
-#include "BingoCpp/training_data.h"
+#include "bingocpp/acyclic_graph.h"
+#include "bingocpp/training_data.h"
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
