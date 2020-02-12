@@ -14,7 +14,7 @@
 
 #include "gtest/gtest.h"
 
-#include "BingoCpp/backend.h"
+#include "bingocpp/backend.h"
 #include "test_fixtures.h"
 
 using namespace bingo;

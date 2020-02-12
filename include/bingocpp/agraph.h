@@ -26,7 +26,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
-#include "BingoCpp/equation.h"
+#include "bingocpp/equation.h"
 
 typedef std::unordered_map<int, std::string> PrintMap;
 typedef std::vector<std::vector<std::string>> PrintVector;

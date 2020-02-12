@@ -3,10 +3,10 @@
 #include <stdexcept>
 #include <utility>
 
-#include "BingoCpp/agraph.h"
-#include "BingoCpp/agraph_maps.h"
-#include "BingoCpp/backend.h"
-#include "BingoCpp/constants.h"
+#include "bingocpp/agraph.h"
+#include "bingocpp/agraph_maps.h"
+#include "bingocpp/backend.h"
+#include "bingocpp/constants.h"
 
 namespace bingo {
 namespace {

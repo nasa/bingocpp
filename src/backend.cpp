@@ -3,9 +3,9 @@
 
 #include <Eigen/Dense>
 
-#include <BingoCpp/backend.h>
-#include <BingoCpp/backend_nodes.h>
-#include <BingoCpp/constants.h>
+#include <bingocpp/backend.h>
+#include <bingocpp/backend_nodes.h>
+#include <bingocpp/constants.h>
 
 namespace bingo {
 namespace backend {

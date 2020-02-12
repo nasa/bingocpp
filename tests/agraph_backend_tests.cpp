@@ -4,7 +4,7 @@
 #include <Eigen/Dense>
 #include <gtest/gtest.h>
 
-#include <BingoCpp/backend.h>
+#include <bingocpp/backend.h>
 
 #include "testing_utils.h"
 #include "test_fixtures.h"

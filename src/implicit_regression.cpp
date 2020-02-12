@@ -1,7 +1,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
-#include "BingoCpp/implicit_regression.h"
+#include "bingocpp/implicit_regression.h"
 
 namespace bingo {
 

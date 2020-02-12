@@ -14,8 +14,8 @@
 
 #include <unsupported/Eigen/NonLinearOptimization>
 
-#include "BingoCpp/explicit_regression.h"
-#include "BingoCpp/fitness_metric.h"
+#include "bingocpp/explicit_regression.h"
+#include "bingocpp/fitness_metric.h"
 
 namespace bingo {
   
