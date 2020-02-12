@@ -70,6 +70,10 @@ AGraph AGraph::Copy() {
   return AGraph(*this);
 }
 
+AGraph AGraph::DeepCopy(const std::unordered_map<int, int> &memodict) {
+  return AGraph(*this);
+}
+
 const Eigen::ArrayX3i &AGraph::GetCommandArray() const {
   return command_array_;
 }
@@ -274,7 +278,7 @@ void AGraph::process_modified_command_array() {
 
   int optimization_aggression = 0;
   if (optimization_aggression == 0 && new_const_number <= num_constants_) {
-    constants_.resize(new_const_number);
+    constants_.conservativeResize(new_const_number);
   } else if (optimization_aggression == 1 && new_const_number == num_constants_) {
     // reuse old constants
   } else {

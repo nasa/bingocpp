@@ -56,6 +56,7 @@ class AGraph : public Equation {
    * @return AGraph
    */
   AGraph Copy();
+  AGraph DeepCopy(const std::unordered_map<int, int>&);
 
   inline bool IsCpp() { return true; }
 

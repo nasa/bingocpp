@@ -28,7 +28,7 @@ Eigen::ArrayXXd dfdx_dot_dfdt(bool normalize_dot,
 bool not_enough_parameters_used(int required_params, 
                                 const Eigen::ArrayXXd &dot_product);
 
-Eigen::ArrayXXd ImplicitRegression::EvaluateFitnessVector(
+Eigen::VectorXd ImplicitRegression::EvaluateFitnessVector(
     Equation &individual) const {
   EvalAndDerivative eval_and_grad 
       = individual.EvaluateEquationWithXGradientAt(

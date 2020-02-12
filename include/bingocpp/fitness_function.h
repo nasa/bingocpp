@@ -51,6 +51,14 @@ class FitnessFunction {
 
   virtual double EvaluateIndividualFitness(Equation &individual) const = 0;
 
+  int GetEvalCount() const {
+    return eval_count_;
+  }
+
+  void SetEvalCount(int eval_count) {
+    eval_count_ = eval_count;
+  }
+
  protected:
   mutable int eval_count_;
   TrainingData* training_data_;
@@ -73,11 +81,11 @@ class VectorBasedFunction : public FitnessFunction {
   virtual ~VectorBasedFunction() { }
 
   double EvaluateIndividualFitness(Equation &individual) const {
-    Eigen::ArrayXXd fitness_vector = EvaluateFitnessVector(individual);
+    Eigen::VectorXd fitness_vector = EvaluateFitnessVector(individual);
     return (const_cast<VectorBasedFunction*>(this)->*metric_function_)(fitness_vector);
   }
 
-  virtual Eigen::ArrayXXd
+  virtual Eigen::VectorXd
   EvaluateFitnessVector(Equation &individual) const = 0;
 
  protected:

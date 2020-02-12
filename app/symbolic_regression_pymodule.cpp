@@ -127,7 +127,8 @@ PYBIND11_MODULE(symbolic_regression, m) {
     .def("get_stack_string", &AGraph::GetStackString)
     .def("get_complexity", &AGraph::GetComplexity)
     .def("distance", &AGraph::Distance)
-    .def("copy", &AGraph::Copy);
+    .def("copy", &AGraph::Copy)
+    .def("__deepcopy__", &AGraph::DeepCopy);
   
   py::class_<ImplicitTrainingData>(m, "ImplicitTrainingData")
     .def(py::init<Eigen::ArrayXXd &>())
@@ -158,6 +159,9 @@ PYBIND11_MODULE(symbolic_regression, m) {
     .def(py::init<ExplicitTrainingData *, std::string &>(),
         py::arg("training_data"),
         py::arg("metric")="mae")
+    .def_property("eval_count",
+                  &ExplicitRegression::GetEvalCount,
+                  &ExplicitRegression::SetEvalCount)
     .def("__call__", &ExplicitRegression::EvaluateIndividualFitness)
     .def("evaluate_fitness_vector", &ExplicitRegression::EvaluateFitnessVector);
   
@@ -167,6 +171,9 @@ PYBIND11_MODULE(symbolic_regression, m) {
          py::arg("required_params") = -1,
          py::arg("normalize_dot") = false,
          py::arg("metric") = "mae")
+    .def_property("eval_count",
+                  &ImplicitRegression::GetEvalCount,
+                  &ImplicitRegression::SetEvalCount)
     .def("__call__", &ImplicitRegression::EvaluateIndividualFitness)
     .def("evaluate_fitness_vector", &ImplicitRegression::EvaluateFitnessVector);
 }

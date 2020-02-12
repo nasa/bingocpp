@@ -21,7 +21,7 @@ ExplicitTrainingData *ExplicitTrainingData::GetItem(
   return new ExplicitTrainingData(temp_in, temp_out);
 }
 
-Eigen::ArrayXXd ExplicitRegression::EvaluateFitnessVector(
+Eigen::VectorXd ExplicitRegression::EvaluateFitnessVector(
     Equation &individual) const {
   ++ eval_count_;
   const Eigen::ArrayXXd x = ((ExplicitTrainingData*)training_data_)->x;
