@@ -158,7 +158,7 @@ TEST_F(AGraphTest, stack_print) {
   std::stringstream expected_str;
   expected_str << "---full stack---\n"
                    "(0) <= X_0\n"
-                   "(1) <= C_0 = 1.000000\n"
+                   "(1) <= C\n"
                    "(2) <= (0) + (1)\n"
                    "(3) <= sin (2)\n" 
                    "(4) <= (0) + (1)\n"
