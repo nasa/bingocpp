@@ -17,6 +17,9 @@
 #ifndef BINGOCPP_INCLUDE_BINGOCPP_IMPLICIT_REGRESSION_H_
 #define BINGOCPP_INCLUDE_BINGOCPP_IMPLICIT_REGRESSION_H_
 
+#include <string>
+#include <tuple>
+
 #include <Eigen/Dense>
 
 #include "bingocpp/equation.h"
@@ -24,6 +27,10 @@
 #include "bingocpp/training_data.h"
 
 #include "bingocpp/utils.h"
+
+typedef std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd> ImplicitTrainingDataState;
+typedef std::tuple<ImplicitTrainingDataState, std::string, int, bool, int> ImplicitRegressionState;
+
 
 namespace bingo {
 
@@ -48,11 +55,20 @@ struct ImplicitTrainingData : TrainingData {
   ImplicitTrainingData(ImplicitTrainingData &other) {
     x = other.x;
     dx_dt = other.dx_dt;
-  } 
+  }
+
+  ImplicitTrainingData(const ImplicitTrainingDataState &state) {
+    x = std::get<0>(state);
+    dx_dt = std::get<1>(state);
+  }
 
   ImplicitTrainingData* GetItem(int item);
 
   ImplicitTrainingData* GetItem(const std::vector<int> &items);
+
+  ImplicitTrainingDataState DumpState() {
+    return ImplicitTrainingDataState(x, dx_dt);
+  }
 
   int Size() { 
     return x.rows();
@@ -70,9 +86,19 @@ class ImplicitRegression : public VectorBasedFunction {
     normalize_dot_ = normalize_dot;
   }
 
+  ImplicitRegression(const ImplicitRegressionState &state):
+      VectorBasedFunction(new ImplicitTrainingData(std::get<0>(state)),
+                          std::get<1>(state)){
+    required_params_ = std::get<2>(state);
+    normalize_dot_ = std::get<3>(state);
+    eval_count_ = std::get<4>(state);
+  }
+
   ~ImplicitRegression() {
     delete training_data_;
   }
+
+  ImplicitRegressionState DumpState();
 
   Eigen::VectorXd EvaluateFitnessVector(Equation &equation) const;
 

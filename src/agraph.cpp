@@ -66,12 +66,26 @@ AGraph::AGraph(const AGraph &agraph) {
   modified_ = agraph.modified_;
 }
 
+AGraph::AGraph(const AGraphState &state) {
+  command_array_ = std::get<0>(state);
+  short_command_array_ = std::get<1>(state);
+  constants_ = std::get<2>(state);
+  needs_opt_ = std::get<3>(state);
+  num_constants_ = std::get<4>(state);
+  fitness_ = std::get<5>(state);
+  fit_set_ = std::get<6>(state);
+  genetic_age_ = std::get<7>(state);
+  modified_ = std::get<8>(state);
+}
+
 AGraph AGraph::Copy() {
   return AGraph(*this);
 }
 
-AGraph AGraph::DeepCopy(const std::unordered_map<int, int> &memodict) {
-  return AGraph(*this);
+AGraphState AGraph::DumpState() {
+  return AGraphState(command_array_, short_command_array_, constants_,
+                     needs_opt_, num_constants_, fitness_, fit_set_,
+                     genetic_age_, modified_);;
 }
 
 const Eigen::ArrayX3i &AGraph::GetCommandArray() const {

@@ -22,6 +22,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <tuple>
 
 #include <Eigen/Dense>
 #include <Eigen/Core>
@@ -31,6 +32,8 @@
 typedef std::unordered_map<int, std::string> PrintMap;
 typedef std::vector<std::vector<std::string>> PrintVector;
 typedef std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvalAndDerivative;
+typedef std::tuple<Eigen::ArrayX3i, Eigen::ArrayX3i, Eigen::VectorXd,
+                   bool, int, double, bool, int, bool> AGraphState;
 
 namespace bingo {
 
@@ -45,6 +48,7 @@ class AGraph : public Equation {
   AGraph();
 
   AGraph(const AGraph &agraph);
+  AGraph(const AGraphState &state);
   AGraph(AGraph&&) = default;                
   AGraph& operator=(const AGraph&) = default; 
   AGraph& operator=(AGraph&&) = default;     
@@ -56,7 +60,13 @@ class AGraph : public Equation {
    * @return AGraph
    */
   AGraph Copy();
-  AGraph DeepCopy(const std::unordered_map<int, int>&);
+
+  /**
+   * @brief Serializes the AGraph object
+   *
+   * @return AGraphState
+   */
+   AGraphState DumpState();
 
   inline bool IsCpp() { return true; }
 

@@ -74,7 +74,7 @@ class VectorBasedFunction : public FitnessFunction {
   typedef double (VectorBasedFunction::* MetricFunctionPointer)(const Eigen::ArrayXXd&);
   VectorBasedFunction(TrainingData *training_data = nullptr,
                       std::string metric = "mae") :
-      FitnessFunction(training_data) {
+      FitnessFunction(training_data), metric_(metric) {
     metric_function_ = GetMetric(metric);
   }
 
@@ -89,6 +89,8 @@ class VectorBasedFunction : public FitnessFunction {
   EvaluateFitnessVector(Equation &individual) const = 0;
 
  protected:
+  std::string metric_;
+
   double mean_absolute_error(const Eigen::ArrayXXd &fitness_vector) {
     return fitness_vector.abs().mean();
   }

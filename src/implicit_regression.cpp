@@ -21,6 +21,12 @@ ImplicitTrainingData *ImplicitTrainingData::GetItem(
   return new ImplicitTrainingData(temp_in, temp_out);
 }
 
+ImplicitRegressionState ImplicitRegression::DumpState() {
+  return ImplicitRegressionState(
+            ((ImplicitTrainingData*)training_data_)->DumpState(),
+                      metric_, required_params_, normalize_dot_, eval_count_);
+}
+
 void normalize_by_row(Eigen::ArrayXXd *data_array);
 Eigen::ArrayXXd dfdx_dot_dfdt(bool normalize_dot,
                               const Eigen::ArrayXXd &dx_dt,

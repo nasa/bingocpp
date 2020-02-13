@@ -128,7 +128,9 @@ PYBIND11_MODULE(symbolic_regression, m) {
     .def("get_complexity", &AGraph::GetComplexity)
     .def("distance", &AGraph::Distance)
     .def("copy", &AGraph::Copy)
-    .def("__deepcopy__", &AGraph::DeepCopy);
+    .def("__getstate__", &AGraph::DumpState)
+    .def("__setstate__", [](AGraph &ag, const AGraphState &state) {
+            new (&ag) AGraph(state); });
   
   py::class_<ImplicitTrainingData>(m, "ImplicitTrainingData")
     .def(py::init<Eigen::ArrayXXd &>())
@@ -141,7 +143,10 @@ PYBIND11_MODULE(symbolic_regression, m) {
     .def("__getitem__",
          (ImplicitTrainingData *(ImplicitTrainingData::*)(const std::vector<int>&))
          &ImplicitTrainingData::GetItem)
-    .def("__len__", &ImplicitTrainingData::Size);
+    .def("__len__", &ImplicitTrainingData::Size)
+    .def("__getstate__", &ImplicitTrainingData::DumpState)
+    .def("__setstate__", [](ImplicitTrainingData &td, const ImplicitTrainingDataState &state) {
+            new (&td) ImplicitTrainingData(state); });
   
   py::class_<ExplicitTrainingData>(m, "ExplicitTrainingData")
     .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd&>())
@@ -153,7 +158,10 @@ PYBIND11_MODULE(symbolic_regression, m) {
     .def("__getitem__",
          (ExplicitTrainingData *(ExplicitTrainingData::*)(const std::vector<int>&))
          &ExplicitTrainingData::GetItem)
-    .def("__len__", &ExplicitTrainingData::Size);
+    .def("__len__", &ExplicitTrainingData::Size)
+    .def("__getstate__", &ExplicitTrainingData::DumpState)
+    .def("__setstate__", [](ExplicitTrainingData &td, const ExplicitTrainingDataState &state) {
+            new (&td) ExplicitTrainingData(state); });
   
   py::class_<ExplicitRegression>(m, "ExplicitRegression")
     .def(py::init<ExplicitTrainingData *, std::string &>(),
@@ -163,7 +171,10 @@ PYBIND11_MODULE(symbolic_regression, m) {
                   &ExplicitRegression::GetEvalCount,
                   &ExplicitRegression::SetEvalCount)
     .def("__call__", &ExplicitRegression::EvaluateIndividualFitness)
-    .def("evaluate_fitness_vector", &ExplicitRegression::EvaluateFitnessVector);
+    .def("evaluate_fitness_vector", &ExplicitRegression::EvaluateFitnessVector)
+    .def("__getstate__", &ExplicitRegression::DumpState)
+    .def("__setstate__", [](ExplicitRegression &r, const ExplicitRegressionState &state) {
+            new (&r) ExplicitRegression(state); });
   
   py::class_<ImplicitRegression>(m, "ImplicitRegression")
     .def(py::init<ImplicitTrainingData *, int &, bool &, std::string &>(),
@@ -175,5 +186,8 @@ PYBIND11_MODULE(symbolic_regression, m) {
                   &ImplicitRegression::GetEvalCount,
                   &ImplicitRegression::SetEvalCount)
     .def("__call__", &ImplicitRegression::EvaluateIndividualFitness)
-    .def("evaluate_fitness_vector", &ImplicitRegression::EvaluateFitnessVector);
+    .def("evaluate_fitness_vector", &ImplicitRegression::EvaluateFitnessVector)
+    .def("__getstate__", &ImplicitRegression::DumpState)
+    .def("__setstate__", [](ImplicitRegression &r, const ImplicitRegressionState &state) {
+            new (&r) ImplicitRegression(state); });
 }

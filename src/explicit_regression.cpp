@@ -29,5 +29,11 @@ Eigen::VectorXd ExplicitRegression::EvaluateFitnessVector(
   return f_of_x - ((ExplicitTrainingData*)training_data_)->y;
 }
 
+ExplicitRegressionState ExplicitRegression::DumpState() {
+  return ExplicitRegressionState(
+          ((ExplicitTrainingData*)training_data_)->DumpState(),
+          metric_, eval_count_);
+}
+
 
 } // namespace bingo

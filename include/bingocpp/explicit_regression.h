@@ -19,12 +19,17 @@
 
 #include <string>
 #include <vector>
+#include <tuple>
 
 #include <Eigen/Core>
 
 #include "bingocpp/equation.h"
 #include "bingocpp/fitness_function.h"
 #include "bingocpp/training_data.h"
+
+typedef std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd> ExplicitTrainingDataState;
+typedef std::tuple<ExplicitTrainingDataState, std::string, int> ExplicitRegressionState;
+
 
 namespace bingo {
 
@@ -44,11 +49,20 @@ struct ExplicitTrainingData : TrainingData {
     y = other.y;
   }
 
+  ExplicitTrainingData(const ExplicitTrainingDataState &state) {
+    x = std::get<0>(state);
+    y = std::get<1>(state);
+  }
+
   ~ExplicitTrainingData() { }
 
   ExplicitTrainingData *GetItem(int item);
 
   ExplicitTrainingData *GetItem(const std::vector<int> &items);
+
+  ExplicitTrainingDataState DumpState() {
+    return ExplicitTrainingDataState(x, y);
+  }
 
   int Size() {
     return x.rows();
@@ -61,9 +75,17 @@ class ExplicitRegression : public VectorBasedFunction {
                      std::string metric="mae") : 
       VectorBasedFunction(new ExplicitTrainingData(*training_data), metric) {}
 
+  ExplicitRegression(const ExplicitRegressionState &state):
+      VectorBasedFunction(new ExplicitTrainingData(std::get<0>(state)),
+                          std::get<1>(state)){
+    eval_count_ = std::get<2>(state);
+  }
+
   ~ExplicitRegression() {
     delete training_data_;
   }
+
+  ExplicitRegressionState DumpState();
 
   Eigen::VectorXd EvaluateFitnessVector(Equation &individual) const;
 };
