@@ -6,6 +6,7 @@
 #include <bingocpp/explicit_regression.h>
 
 #include "test_fixtures.h"
+#include "testing_utils.h"
 
 using namespace bingo;
 
@@ -71,5 +72,24 @@ TEST_F(TestExplicitRegression, CorrectTrainingDataSize) {
     ASSERT_EQ(training_data->Size(), size);
     delete training_data;
   }
+}
+
+TEST_F(TestExplicitRegression, DumpLoadTrainingData) {
+  ExplicitTrainingData* training_data_copy = new ExplicitTrainingData(training_data_->DumpState());
+
+  ASSERT_TRUE(testutils::almost_equal(training_data_->x,
+                                      training_data_copy->x));
+  ASSERT_TRUE(testutils::almost_equal(training_data_->y,
+                                      training_data_copy->y));
+
+}
+
+TEST_F(TestExplicitRegression, DumpLoadRegression) {
+  ExplicitRegression regressor(training_data_);
+  regressor.SetEvalCount(123);
+  ExplicitRegression regressor_copy = ExplicitRegression(regressor.DumpState());
+
+  ASSERT_EQ(regressor_copy.GetEvalCount(), 123);
+
 }
 } // namespace 

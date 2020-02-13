@@ -128,6 +128,17 @@ TEST_F(AGraphTest, copy) {
   ASSERT_DOUBLE_EQ(agraph_copy.GetLocalOptimizationParams()[0], 1.0);
 }
 
+TEST_F(AGraphTest, dump_load) {
+  AGraph agraph_copy = AGraph(sample_agraph_1.DumpState());
+
+  ASSERT_EQ(agraph_copy.GetGeneticAge(), sample_agraph_1.GetGeneticAge());
+  ASSERT_DOUBLE_EQ(agraph_copy.GetLocalOptimizationParams()[0],
+                   sample_agraph_1.GetLocalOptimizationParams()[0]);
+  ASSERT_DOUBLE_EQ(agraph_copy.GetFitness(), sample_agraph_1.GetFitness());
+  ASSERT_TRUE( (agraph_copy.GetCommandArray() ==
+                sample_agraph_1.GetCommandArray()).all() );
+}
+
 TEST_P(AGraphTest, latex_print) {
   std::string agraph_name = GetParam();
   std::string string_rep = map_to_graph_string.at(agraph_name).at("latex string");

@@ -122,6 +122,25 @@ TEST_F(ImplicitRegressionTest, CorrectTrainingDataSize) {
   }
 }
 
+TEST_F(ImplicitRegressionTest, DumpLoadTrainingData) {
+  ImplicitTrainingData* training_data_copy = new ImplicitTrainingData(training_data_->DumpState());
+
+  ASSERT_TRUE(testutils::almost_equal(training_data_->x,
+                                      training_data_copy->x));
+  ASSERT_TRUE(testutils::almost_equal(training_data_->dx_dt,
+                                      training_data_copy->dx_dt));
+
+}
+
+TEST_F(ImplicitRegressionTest, DumpLoadRegression) {
+  ImplicitRegression regressor(training_data_);
+  regressor.SetEvalCount(123);
+  ImplicitRegression regressor_copy = ImplicitRegression(regressor.DumpState());
+
+  ASSERT_EQ(regressor_copy.GetEvalCount(), 123);
+
+}
+
 TEST(ImplicitRegressionPartials, PartialCalculationInTrainingData) {
   auto data_input = Eigen::ArrayXd::LinSpaced(20, 0., 19.);
   Eigen::ArrayXXd data_array(data_input.rows(), 3);
