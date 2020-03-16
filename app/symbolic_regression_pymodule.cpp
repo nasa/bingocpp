@@ -164,9 +164,10 @@ PYBIND11_MODULE(symbolic_regression, m) {
             new (&td) ExplicitTrainingData(state); });
   
   py::class_<ExplicitRegression>(m, "ExplicitRegression")
-    .def(py::init<ExplicitTrainingData *, std::string &>(),
+    .def(py::init<ExplicitTrainingData *, std::string &, bool &>(),
         py::arg("training_data"),
-        py::arg("metric")="mae")
+        py::arg("metric")="mae",
+        py::arg("relative")=false)
     .def_property("eval_count",
                   &ExplicitRegression::GetEvalCount,
                   &ExplicitRegression::SetEvalCount)
