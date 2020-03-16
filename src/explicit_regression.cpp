@@ -26,7 +26,10 @@ Eigen::VectorXd ExplicitRegression::EvaluateFitnessVector(
   ++ eval_count_;
   const Eigen::ArrayXXd x = ((ExplicitTrainingData*)training_data_)->x;
   Eigen::ArrayXXd f_of_x = individual.EvaluateEquationAt(x);
-  return f_of_x - ((ExplicitTrainingData*)training_data_)->y;
+  Eigen::ArrayXXd error = f_of_x - ((ExplicitTrainingData*)training_data_)->y;
+  if (relative_)
+    error /= ((ExplicitTrainingData*)training_data_)->y;
+  return error;
 }
 
 ExplicitRegressionState ExplicitRegression::DumpState() {

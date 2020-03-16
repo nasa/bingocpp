@@ -72,8 +72,11 @@ struct ExplicitTrainingData : TrainingData {
 class ExplicitRegression : public VectorBasedFunction {
  public:
   ExplicitRegression(ExplicitTrainingData *training_data,
-                     std::string metric="mae") : 
-      VectorBasedFunction(new ExplicitTrainingData(*training_data), metric) {}
+                     std::string metric="mae",
+                     bool relative=false) :
+      VectorBasedFunction(new ExplicitTrainingData(*training_data), metric) {
+      relative_ = relative;
+      }
 
   ExplicitRegression(const ExplicitRegressionState &state):
       VectorBasedFunction(new ExplicitTrainingData(std::get<0>(state)),
@@ -88,6 +91,9 @@ class ExplicitRegression : public VectorBasedFunction {
   ExplicitRegressionState DumpState();
 
   Eigen::VectorXd EvaluateFitnessVector(Equation &individual) const;
+
+  private:
+   bool relative_;
 };
 } // namespace bingo
 #endif // BINGOCPP_INCLUDE_BINGOCPP_EXPLICIT_REGRESSION_H_
