@@ -178,10 +178,9 @@ PYBIND11_MODULE(symbolic_regression, m) {
             new (&r) ExplicitRegression(state); });
   
   py::class_<ImplicitRegression>(m, "ImplicitRegression")
-    .def(py::init<ImplicitTrainingData *, int &, bool &, std::string &>(),
+    .def(py::init<ImplicitTrainingData *, int &, std::string &>(),
          py::arg("training_data"),
          py::arg("required_params") = -1,
-         py::arg("normalize_dot") = false,
          py::arg("metric") = "mae")
     .def_property("eval_count",
                   &ImplicitRegression::GetEvalCount,

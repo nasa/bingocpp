@@ -29,7 +29,7 @@
 #include "bingocpp/utils.h"
 
 typedef std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd> ImplicitTrainingDataState;
-typedef std::tuple<ImplicitTrainingDataState, std::string, int, bool, int> ImplicitRegressionState;
+typedef std::tuple<ImplicitTrainingDataState, std::string, int, int> ImplicitRegressionState;
 
 
 namespace bingo {
@@ -79,19 +79,16 @@ class ImplicitRegression : public VectorBasedFunction {
  public:
   ImplicitRegression(ImplicitTrainingData *training_data, 
                      int required_params = kNoneRequired,
-                     bool normalize_dot = false,
                      std::string metric="mae") :
       VectorBasedFunction(new ImplicitTrainingData(*training_data), metric) {
     required_params_ = required_params;
-    normalize_dot_ = normalize_dot;
   }
 
   ImplicitRegression(const ImplicitRegressionState &state):
       VectorBasedFunction(new ImplicitTrainingData(std::get<0>(state)),
                           std::get<1>(state)){
     required_params_ = std::get<2>(state);
-    normalize_dot_ = std::get<3>(state);
-    eval_count_ = std::get<4>(state);
+    eval_count_ = std::get<3>(state);
   }
 
   ~ImplicitRegression() {
@@ -104,7 +101,6 @@ class ImplicitRegression : public VectorBasedFunction {
 
  private:
   int required_params_;
-  bool normalize_dot_;
   static const int kNoneRequired = -1;
 };
 

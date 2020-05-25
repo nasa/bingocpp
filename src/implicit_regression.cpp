@@ -24,12 +24,10 @@ ImplicitTrainingData *ImplicitTrainingData::GetItem(
 ImplicitRegressionState ImplicitRegression::DumpState() {
   return ImplicitRegressionState(
             ((ImplicitTrainingData*)training_data_)->DumpState(),
-                      metric_, required_params_, normalize_dot_, eval_count_);
+                      metric_, required_params_, eval_count_);
 }
 
-void normalize_by_row(Eigen::ArrayXXd *data_array);
-Eigen::ArrayXXd dfdx_dot_dfdt(bool normalize_dot,
-                              const Eigen::ArrayXXd &dx_dt,
+Eigen::ArrayXXd dfdx_dot_dfdt(const Eigen::ArrayXXd &dx_dt,
                               const Eigen::ArrayXXd &grad);
 bool not_enough_parameters_used(int required_params, 
                                 const Eigen::ArrayXXd &dot_product);
@@ -40,7 +38,6 @@ Eigen::VectorXd ImplicitRegression::EvaluateFitnessVector(
       = individual.EvaluateEquationWithXGradientAt(
       ((ImplicitTrainingData*)training_data_)->x);
   Eigen::ArrayXXd dot_product = dfdx_dot_dfdt(
-      normalize_dot_,
       ((ImplicitTrainingData*)training_data_)->dx_dt,
       eval_and_grad.second);
 
@@ -59,23 +56,10 @@ Eigen::VectorXd ImplicitRegression::EvaluateFitnessVector(
   });
 }
 
-void normalize_by_row(Eigen::ArrayXXd *data_array) {
-  Eigen::ArrayXXd norm_array = data_array->rowwise().norm();
-  for (int i = 0; i < norm_array.rows(); i ++) {
-    data_array->row(i) /= norm_array.row(i)[0];
-  }
-}
-
-Eigen::ArrayXXd dfdx_dot_dfdt(bool normalize_dot,
-                              const Eigen::ArrayXXd &dx_dt,
+Eigen::ArrayXXd dfdx_dot_dfdt(const Eigen::ArrayXXd &dx_dt,
                               const Eigen::ArrayXXd &grad) {
   Eigen::ArrayXXd left_dot = grad;
   Eigen::ArrayXXd right_dot = dx_dt;
-  if (normalize_dot) {
-    normalize_by_row(&left_dot);
-    normalize_by_row(&right_dot);
-  }
-
   return left_dot * right_dot;
 }
 
