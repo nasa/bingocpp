@@ -32,14 +32,6 @@ namespace bingo {
  * 
  */
 namespace backend{
-
-/**
- * @brief Idenitfy whether the backed is C++
- * 
- * @return true 
- */
-inline bool IsCpp() { return true; }
-
 /**
  * @brief Evauluate the equation.
  * 

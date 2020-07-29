@@ -60,15 +60,6 @@ using namespace bingo;
 // module
 PYBIND11_MODULE(symbolic_regression, m) {
   m.doc() = "The symbolic regression module";  // optional module docstring
-  m.def("is_cpp", &backend::IsCpp, "is the backend c++");
-  m.def("evaluate", &backend::Evaluate, "evaluate");
-  m.def("simplify_and_evaluate", &backend::SimplifyAndEvaluate,
-        "evaluate after simplification");
-  m.def("evaluate_with_derivative", &backend::EvaluateWithDerivative,
-        "evaluate with derivative");
-  m.def("simplify_and_evaluate_with_derivative",
-        &backend::SimplifyAndEvaluateWithDerivative,
-        "evaluate with derivative after simplification");
   m.def("get_utilized_commands",
         &backend::GetUtilizedCommands,
         "get the commands that are utilized in a stack");
