@@ -6,7 +6,6 @@
 #include <Eigen/Dense>
 
 #include <bingocpp/agraph.h>
-#include <bingocpp/backend.h>
 
 #include "test_fixtures.h"
 #include "testing_utils.h"

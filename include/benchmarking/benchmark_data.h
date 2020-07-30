@@ -1,7 +1,7 @@
 #ifndef APP_BENCMARK_UTILS_BENCHMARK_DATA_H_
 #define APP_BENCMARK_UTILS_BENCHMARK_DATA_H_
 
-#include <bingocpp/backend.h>
+#include <bingocpp/evaluation_backend/evaluation_backend.h>
 #include <bingocpp/agraph.h>
 
 using namespace bingo;

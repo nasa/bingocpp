@@ -14,15 +14,15 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
 */
-#ifndef INCLUDE_BINGOCPP_BACKEND_NODES_H_
-#define INCLUDE_BINGOCPP_BACKEND_NODES_H_
+#ifndef INCLUDE_BINGOCPP_BACKEND_OPERATOR_EVAL_H_
+#define INCLUDE_BINGOCPP_BACKEND_OPERATOR_EVAL_H_
 
 #include <vector>
 
 #include <Eigen/Dense>
 
 namespace bingo {
-namespace backend {
+namespace evaluation_backend {
 
 typedef Eigen::ArrayXXd (
   *forward_operator_function)(

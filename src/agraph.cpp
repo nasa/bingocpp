@@ -5,7 +5,7 @@
 
 #include "bingocpp/agraph.h"
 #include "bingocpp/agraph_maps.h"
-#include "bingocpp/backend.h"
+#include "bingocpp/evaluation_backend/evaluation_backend.h"
 #include "bingocpp/constants.h"
 
 namespace bingo {
@@ -134,7 +134,7 @@ int AGraph::GetGeneticAge() const {
 }
 
 std::vector<bool> AGraph::GetUtilizedCommands() const {
-  return backend::GetUtilizedCommands(command_array_);
+  return evaluation_backend::GetUtilizedCommands(command_array_);
 }
 
 bool AGraph::NeedsLocalOptimization() {
@@ -171,7 +171,7 @@ AGraph::EvaluateEquationAt(const Eigen::ArrayXXd &x) {
   }
   Eigen::ArrayXXd f_of_x; 
   try {
-    f_of_x = backend::Evaluate(this->short_command_array_,
+    f_of_x = evaluation_backend::Evaluate(this->short_command_array_,
                                x,
                                this->constants_);
     return f_of_x;
@@ -189,7 +189,7 @@ AGraph::EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd &x) {
   }
   EvalAndDerivative df_dx;
   try {
-    df_dx = backend::EvaluateWithDerivative(this->short_command_array_,
+    df_dx = evaluation_backend::EvaluateWithDerivative(this->short_command_array_,
                                             x,
                                             this->constants_,
                                             true);
@@ -212,7 +212,7 @@ AGraph::EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x) {
   }
   EvalAndDerivative df_dc;
   try {
-    df_dc = backend::EvaluateWithDerivative(this->short_command_array_,
+    df_dc = evaluation_backend::EvaluateWithDerivative(this->short_command_array_,
                                             x,
                                             this->constants_,
                                             false);
@@ -281,7 +281,7 @@ bool AGraph::IsTerminal(int node) {
 }
 
 void AGraph::process_modified_command_array() {
-  short_command_array_ = backend::SimplifyStack(command_array_);
+  short_command_array_ = evaluation_backend::SimplifyStack(command_array_);
   int new_const_number = 0;
   for (int i = 0; i < short_command_array_.rows(); i++) {
     if (short_command_array_(i, ArrayProps::kNodeIdx) == Op::LOAD_C) {

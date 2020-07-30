@@ -3,12 +3,12 @@
 
 #include <Eigen/Dense>
 
-#include <bingocpp/backend.h>
-#include <bingocpp/backend_nodes.h>
+#include <bingocpp/evaluation_backend/evaluation_backend.h>
+#include <bingocpp/evaluation_backend/operator_eval.h>
 #include <bingocpp/constants.h>
 
 namespace bingo {
-namespace backend {
+namespace evaluation_backend {
 namespace {
 
 Eigen::ArrayXXd reverse_eval(const std::pair<int, int> &deriv_shape,

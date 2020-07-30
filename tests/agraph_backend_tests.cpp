@@ -4,13 +4,13 @@
 #include <Eigen/Dense>
 #include <gtest/gtest.h>
 
-#include <bingocpp/backend.h>
+#include <bingocpp/evaluation_backend/evaluation_backend.h>
 
 #include "testing_utils.h"
 #include "test_fixtures.h"
 
 using namespace bingo;
-using namespace backend;
+using namespace evaluation_backend;
 
 namespace {
 

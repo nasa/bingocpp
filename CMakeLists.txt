@@ -44,8 +44,8 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/external/googletest/googletest/include)
 
 # Make variables referring to all the sources and test files.
-file(GLOB SOURCES "src/*.cpp")
-file(GLOB TESTFILES "tests/*.cpp")
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE TESTFILES "tests/*.cpp")
 set(TEST_MAIN unit_tests.x)  # Default name for test executable.
 
 

@@ -14,8 +14,8 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
 */
-#ifndef INCLUDE_BINGOCPP_BACKEND_H_
-#define INCLUDE_BINGOCPP_BACKEND_H_
+#ifndef INCLUDE_BINGOCPP_EVALUATION_BACKEND_H_
+#define INCLUDE_BINGOCPP_EVALUATION_BACKEND_H_
 
 #include <set>
 #include <utility>
@@ -24,14 +24,14 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
-#include "bingocpp/agraph.h"
+#include <bingocpp/agraph.h>
 
 namespace bingo {
 /**
  * @brief This file contains the backend of the acyclic graph class.
  * 
  */
-namespace backend{
+namespace evaluation_backend {
 /**
  * @brief Evauluate the equation.
  * 

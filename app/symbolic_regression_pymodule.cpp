@@ -46,7 +46,6 @@
 #include <Eigen/Dense> 
 
 #include "bingocpp/agraph.h"
-#include "bingocpp/backend.h"
 #include "bingocpp/explicit_regression.h"
 #include "bingocpp/implicit_regression.h"
 #include "bingocpp/utils.h"
@@ -60,11 +59,6 @@ using namespace bingo;
 // module
 PYBIND11_MODULE(symbolic_regression, m) {
   m.doc() = "The symbolic regression module";  // optional module docstring
-  m.def("get_utilized_commands",
-        &backend::GetUtilizedCommands,
-        "get the commands that are utilized in a stack");
-  m.def("simplify_stack", &backend::SimplifyStack,
-        "simplify stack to only utilized commands");
 
   py::class_<Equation, bingo::PyEquation /* <---trampoline */>(m, "Equation")
     .def(py::init<>())

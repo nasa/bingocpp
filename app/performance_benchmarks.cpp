@@ -60,7 +60,7 @@ void BenchmarkEvaluate(const std::vector<AGraph> &indv_list,
                        const Eigen::ArrayXXd &x_vals) {
   std::vector<AGraph>::const_iterator indv;
   for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
-    bingo::backend::SimplifyAndEvaluate(
+    evaluation_backend::SimplifyAndEvaluate(
       indv->GetCommandArray(), x_vals, indv->GetLocalOptimizationParams());
   } 
 }
@@ -69,7 +69,7 @@ void BenchmarkEvaluateAndXDerivative(const std::vector<AGraph> &indv_list,
                                      const Eigen::ArrayXXd &x_vals) {
   std::vector<AGraph>::const_iterator indv;
   for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
-    bingo::backend::SimplifyAndEvaluateWithDerivative(
+    evaluation_backend::SimplifyAndEvaluateWithDerivative(
       indv->GetCommandArray(), x_vals, indv->GetLocalOptimizationParams(), true);
   }
 }
@@ -78,7 +78,7 @@ void BenchmarkEvaluateAndCDerivative(const std::vector<AGraph> &indv_list,
                                      const Eigen::ArrayXXd &x_vals) {
   std::vector<AGraph>::const_iterator indv;
   for(indv=indv_list.begin(); indv!=indv_list.end(); indv++) {
-    bingo::backend::SimplifyAndEvaluateWithDerivative(
+    evaluation_backend::SimplifyAndEvaluateWithDerivative(
       indv->GetCommandArray(), x_vals, indv->GetLocalOptimizationParams(), false);
   }
 }

@@ -45,13 +45,7 @@
 
 #include <Eigen/Dense>
 
-#include "bingocpp/agraph.h"
-#include "bingocpp/backend.h"
-#include "bingocpp/explicit_regression.h"
-#include "bingocpp/implicit_regression.h"
-#include "bingocpp/utils.h"
-
-#include "python/py_equation.h"
+#include "bingocpp/evaluation_backend/evaluation_backend.h"
 
 namespace py = pybind11;
 using namespace bingo;
@@ -60,7 +54,8 @@ using namespace bingo;
 PYBIND11_MODULE(evaluation_backend, m) {
   m.doc() = "The evaluation backend for Agraphs";  // optional module docstring
   m.attr("ENGINE") = "c++";
-  m.def("evaluate", &backend::Evaluate, "Evaluate an equation");
-  m.def("evaluate_with_derivative", &backend::EvaluateWithDerivative,
+  m.def("evaluate", &evaluation_backend::Evaluate, "Evaluate an equation");
+  m.def("evaluate_with_derivative",
+        &evaluation_backend::EvaluateWithDerivative,
         "Evaluate equation and take derivative");
 }
