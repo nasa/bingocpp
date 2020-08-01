@@ -37,7 +37,7 @@ enum Op : signed int {
   kPower=10,
   kAbs=11,
   kSqrt=12,
-  //kSafePow=13
+  kSafePower=13
 };
 
 typedef std::unordered_map<int, std::string> PrintMap;
