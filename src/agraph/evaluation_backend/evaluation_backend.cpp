@@ -89,10 +89,10 @@ std::vector<bool> GetUtilizedCommands(const Eigen::ArrayX3i &stack) {
   int stack_size = stack.rows();
   for (int i = 1; i < stack_size; i++) {
     int row = stack_size - i;
-    int node = stack(row, ArrayProps::kNodeIdx);
-    int param1 = stack(row, ArrayProps::kOp1);
-    int param2 = stack(row, ArrayProps::kOp2);
-    if (used_commands[row] && node > kConstant) {
+    int node = stack(row, kOpIdx);
+    int param1 = stack(row, kParam1Idx);
+    int param2 = stack(row, kParam2Idx);
+    if (used_commands[row] && node > Op::kConstant) {
       used_commands[param1] = true;
       if (AGraph::HasArityTwo(node)) {
         used_commands[param2] = true;
@@ -111,16 +111,16 @@ Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i &stack) {
 
   for (int i = 0, j = 0; i < stack.rows(); ++i) {
     if (used_command[i]) {
-      new_stack(j, ArrayProps::kNodeIdx) = stack(i, ArrayProps::kNodeIdx);
-      if (AGraph::IsTerminal(new_stack(j, ArrayProps::kNodeIdx))) {
-        new_stack(j, ArrayProps::kOp1) = stack(i, ArrayProps::kOp1);
-        new_stack(j, ArrayProps::kOp2) = stack(i, ArrayProps::kOp2);
+      new_stack(j, kOpIdx) = stack(i, kOpIdx);
+      if (AGraph::IsTerminal(new_stack(j, kOpIdx))) {
+        new_stack(j, kParam1Idx) = stack(i, kParam1Idx);
+        new_stack(j, kParam2Idx) = stack(i, kParam2Idx);
       } else {
-        new_stack(j, ArrayProps::kOp1) = reduced_param_map[stack(i, ArrayProps::kOp1)];
-        if (AGraph::HasArityTwo(new_stack(j, ArrayProps::kNodeIdx))) {
-          new_stack(j, ArrayProps::kOp2) = reduced_param_map[stack(i, ArrayProps::kOp2)];
+        new_stack(j, kParam1Idx) = reduced_param_map[stack(i, kParam1Idx)];
+        if (AGraph::HasArityTwo(new_stack(j, kOpIdx))) {
+          new_stack(j, kParam2Idx) = reduced_param_map[stack(i, kParam2Idx)];
         } else {
-          new_stack(j, ArrayProps::kOp2) = new_stack(j, ArrayProps::kOp1);
+          new_stack(j, kParam2Idx) = new_stack(j, kParam1Idx);
         }
       }
       reduced_param_map[i] = j;
@@ -148,9 +148,9 @@ Eigen::ArrayXXd reverse_eval(const std::pair<int, int> &deriv_shape,
 
   reverse_eval[stack_depth-1] = Eigen::ArrayXd::Ones(num_samples);
   for (int i = stack_depth - 1; i >= 0; i--) {
-    int node = stack(i, ArrayProps::kNodeIdx);
-    int param1 = stack(i, ArrayProps::kOp1);
-    int param2 = stack(i, ArrayProps::kOp2);
+    int node = stack(i, kOpIdx);
+    int param1 = stack(i, kParam1Idx);
+    int param2 = stack(i, kParam2Idx);
     if (node == deriv_wrt_node) {
       derivative.col(param1) += reverse_eval[i];
     } else {
@@ -180,9 +180,9 @@ Eigen::ArrayXXd reverse_eval_with_mask(const std::pair<int, int> &deriv_shape,
   reverse_eval[stack_depth-1] = Eigen::ArrayXd::Ones(num_samples);
   for (int i = stack_depth - 1; i >= 0; i--) {
     if (mask[i]) {
-      int node = stack(i, ArrayProps::kNodeIdx);
-      int param1 = stack(i, ArrayProps::kOp1);
-      int param2 = stack(i, ArrayProps::kOp2);
+      int node = stack(i, kOpIdx);
+      int param1 = stack(i, kParam1Idx);
+      int param2 = stack(i, kParam2Idx);
       if (node == deriv_wrt_node) {
         derivative.col(param1) += reverse_eval[i];
       } else {
@@ -200,9 +200,9 @@ std::vector<Eigen::ArrayXXd> forward_eval(
   std::vector<Eigen::ArrayXXd> _forward_eval(stack.rows());
 
   for (int i = 0; i < stack.rows(); ++i) {
-    int node = stack(i, ArrayProps::kNodeIdx);
-    int op1 = stack(i, ArrayProps::kOp1);
-    int op2 = stack(i, ArrayProps::kOp2);
+    int node = stack(i, kOpIdx);
+    int op1 = stack(i, kParam1Idx);
+    int op2 = stack(i, kParam2Idx);
     _forward_eval[i] = ForwardEvalFunction(
       node, op1, op2, x, constants, _forward_eval);
   }
@@ -218,9 +218,9 @@ std::vector<Eigen::ArrayXXd> forward_eval_with_mask(
 
   for (int i = 0; i < stack.rows(); ++i) {
     if (mask[i]) {
-      int node = stack(i, ArrayProps::kNodeIdx);
-      int op1 = stack(i, ArrayProps::kOp1);
-      int op2 = stack(i, ArrayProps::kOp2);
+      int node = stack(i, kOpIdx);
+      int op1 = stack(i, kParam1Idx);
+      int op2 = stack(i, kParam2Idx);
       _forward_eval[i] = ForwardEvalFunction(
         node, op1, op2, x, constants, _forward_eval);
     }
@@ -240,10 +240,10 @@ EvalAndDerivative evaluate_with_derivative(
   int deriv_wrt_node;
   if (param_x_or_c) {  // true = x
     deriv_shape = std::make_pair(x.rows(), x.cols());
-    deriv_wrt_node = kVariable;
+    deriv_wrt_node = Op::kVariable;
   } else {  // false = c
     deriv_shape = std::make_pair(x.rows(), constants.size());
-    deriv_wrt_node = kConstant;
+    deriv_wrt_node = Op::kConstant;
   }
 
   Eigen::ArrayXXd derivative = reverse_eval(
@@ -264,10 +264,10 @@ EvalAndDerivative evaluate_with_derivative_and_mask(
   int deriv_wrt_node;
   if (param_x_or_c) {  // true = x
     deriv_shape = std::make_pair(x.rows(), x.cols());
-    deriv_wrt_node = kVariable;
+    deriv_wrt_node = Op::kVariable;
   } else {  // false = c
     deriv_shape = std::make_pair(x.rows(), constants.size());
-    deriv_wrt_node = kConstant;
+    deriv_wrt_node = Op::kConstant;
   }
 
   Eigen::ArrayXXd derivative = reverse_eval_with_mask(

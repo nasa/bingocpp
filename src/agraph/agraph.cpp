@@ -273,19 +273,19 @@ int AGraph::Distance(const AGraph &agraph) {
 }
 
 bool AGraph::HasArityTwo(int node) {
-  return kIsArity2Map[node];
+  return kIsArity2Map.at(node);
 }
 
 bool AGraph::IsTerminal(int node) {
-  return kIsTerminalMap[node];
+  return kIsTerminalMap.at(node);
 }
 
 void AGraph::process_modified_command_array() {
   short_command_array_ = evaluation_backend::SimplifyStack(command_array_);
   int new_const_number = 0;
   for (int i = 0; i < short_command_array_.rows(); i++) {
-    if (short_command_array_(i, ArrayProps::kNodeIdx) == kConstant) {
-      short_command_array_.row(i) << kConstant, new_const_number, new_const_number;
+    if (short_command_array_(i, kOpIdx) == Op::kConstant) {
+      short_command_array_.row(i) << Op::kConstant, new_const_number, new_const_number;
       new_const_number ++;
     }
   }
@@ -325,15 +325,15 @@ std::string get_formatted_element_string(const AGraph &individual,
                                          const Eigen::ArrayX3i &stack_element,
                                          std::vector<std::string> string_list,
                                          const PrintMap &format_map) {
-  int node = stack_element(0, ArrayProps::kNodeIdx);
-  int param1 = stack_element(0, ArrayProps::kOp1);
-  int param2 = stack_element(0, ArrayProps::kOp2);
+  int node = stack_element(0, kOpIdx);
+  int param1 = stack_element(0, kParam1Idx);
+  int param2 = stack_element(0, kParam2Idx);
 
   std::string temp_string;
-  if (node == kVariable) {
+  if (node == Op::kVariable) {
     temp_string = "X_" + std::to_string(param1);
-  } else if (node == kConstant) {
-    if (param1 == -1 ||
+  } else if (node == Op::kConstant) {
+    if (param1 == kOptimizeConstant ||
         param1 >= individual.GetLocalOptimizationParams().size()) {
       temp_string = "?";
     } else {
@@ -379,15 +379,15 @@ std::string get_stack_string(
 std::string get_stack_element_string(const Eigen::VectorXd &constants,
                                      int command_index,
                                      const Eigen::ArrayX3i &stack_element) {
-  int node = stack_element(0, ArrayProps::kNodeIdx);
-  int param1 = stack_element(0, ArrayProps::kOp1);
-  int param2 = stack_element(0, ArrayProps::kOp2);
+  int node = stack_element(0, kOpIdx);
+  int param1 = stack_element(0, kParam1Idx);
+  int param2 = stack_element(0, kParam2Idx);
 
   std::string temp_string = "("+ std::to_string(command_index) +") <= ";
-  if (node == kVariable) {
+  if (node == Op::kVariable) {
     temp_string += "X_" + std::to_string(param1);
-  } else if (node == kConstant) {
-    if (param1 == -1 ||
+  } else if (node == Op::kConstant) {
+    if (param1 == kOptimizeConstant ||
         param1 >= constants.size()) {
       temp_string += "C";
     } else {

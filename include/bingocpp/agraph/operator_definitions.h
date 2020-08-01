@@ -22,7 +22,6 @@
 
 namespace bingo {
 
-// Operators for CommandArray
 enum Op : signed int {
   kInteger=-1,
   kVariable=0,
@@ -38,100 +37,103 @@ enum Op : signed int {
   kPower=10,
   kAbs=11,
   kSqrt=12,
-  kSafePow=13
+  //kSafePow=13
 };
 
 typedef std::unordered_map<int, std::string> PrintMap;
 typedef std::vector<std::vector<std::string>> PrintVector;
 
 const PrintMap kStackPrintMap {
-  {2, "({}) + ({})"},
-  {3, "({}) - ({})"},
-  {4, "({}) * ({})"},
-  {5, "({}) / ({}) "},
-  {6, "sin ({})"},
-  {7, "cos ({})"},
-  {8, "exp ({})"},
-  {9, "log ({})"},
-  {10, "({}) ^ ({})"},
-  {11, "abs ({})"},
-  {12, "sqrt ({})"},
+  {Op::kAddition, "({}) + ({})"},
+  {Op::kSubtraction, "({}) - ({})"},
+  {Op::kMultiplication, "({}) * ({})"},
+  {Op::kDivision, "({}) / ({}) "},
+  {Op::kSin, "sin ({})"},
+  {Op::kCos, "cos ({})"},
+  {Op::kExponential, "exp ({})"},
+  {Op::kLogarithm, "log ({})"},
+  {Op::kPower, "({}) ^ ({})"},
+  {Op::kAbs, "abs ({})"},
+  {Op::kSqrt, "sqrt ({})"},
 };
 
 const PrintMap kLatexPrintMap {
-  {2, "{} + {}"},
-  {3, "{} - ({})"},
-  {4, "({})({})"},
-  {5, "\\frac{ {} }{ {} }"},
-  {6, "sin{ {} }"},
-  {7, "cos{ {} }"},
-  {8, "exp{ {} }"},
-  {9, "log{ {} }"},
-  {10, "({})^{ ({}) }"},
-  {11, "|{}|"},
-  {12, "\\sqrt{ {} }"},
+  {Op::kAddition, "{} + {}"},
+  {Op::kSubtraction, "{} - ({})"},
+  {Op::kMultiplication, "({})({})"},
+  {Op::kDivision, "\\frac{ {} }{ {} }"},
+  {Op::kSin, "sin{ {} }"},
+  {Op::kCos, "cos{ {} }"},
+  {Op::kExponential, "exp{ {} }"},
+  {Op::kLogarithm, "log{ {} }"},
+  {Op::kPower, "({})^{ ({}) }"},
+  {Op::kAbs, "|{}|"},
+  {Op::kSqrt, "\\sqrt{ {} }"},
 };
 
 const PrintMap kConsolePrintMap {
-  {2, "{} + {}"},
-  {3, "{} - ({})"},
-  {4, "({})({})"},
-  {5, "({})/({})"},
-  {6, "sin({})"},
-  {7, "cos({})"},
-  {8, "exp({})"},
-  {9, "log({})"},
-  {10, "({})^({})"},
-  {11, "|{}|"},
-  {12, "sqrt({})"},
+  {Op::kAddition, "{} + {}"},
+  {Op::kSubtraction, "{} - ({})"},
+  {Op::kMultiplication, "({})({})"},
+  {Op::kDivision, "({})/({})"},
+  {Op::kSin, "sin({})"},
+  {Op::kCos, "cos({})"},
+  {Op::kExponential, "exp({})"},
+  {Op::kLogarithm, "log({})"},
+  {Op::kPower, "({})^({})"},
+  {Op::kAbs, "|{}|"},
+  {Op::kSqrt, "sqrt({})"},
 };
 
-const bool kIsArity2Map[13] = {
-  false,
-  false,
-  true,
-  true,
-  true,
-  true,
-  false,
-  false,
-  false,
-  false,
-  true,
-  false,
-  false
+const std::unordered_map<int, bool>  kIsArity2Map = {
+  {Op::kInteger, false},
+  {Op::kVariable, false},
+  {Op::kConstant, false},
+  {Op::kAddition, true},
+  {Op::kSubtraction, true},
+  {Op::kMultiplication, true},
+  {Op::kDivision, true},
+  {Op::kSin, false},
+  {Op::kCos, false},
+  {Op::kExponential, false},
+  {Op::kLogarithm, false},
+  {Op::kPower, true},
+  {Op::kAbs, false},
+  {Op::kSqrt, false},
 };
 
-const bool kIsTerminalMap[13] = {
-  true,
-  true,
-  false,
-  false,
-  false,
-  false,
-  false,
-  false,
-  false,
-  false,
-  false,
-  false,
-  false
+const std::unordered_map<int, bool> kIsTerminalMap = {
+  {Op::kInteger, true},
+  {Op::kVariable, true},
+  {Op::kConstant, true},
+  {Op::kAddition, false},
+  {Op::kSubtraction, false},
+  {Op::kMultiplication, false},
+  {Op::kDivision, false},
+  {Op::kSin, false},
+  {Op::kCos, false},
+  {Op::kExponential, false},
+  {Op::kLogarithm, false},
+  {Op::kPower, false},
+  {Op::kAbs, false},
+  {Op::kSqrt, false},
 };
 
-const PrintVector kOperatorNames {
-  std::vector<std::string> {"load", "x"},
-  std::vector<std::string> {"constant", "c"},
-  std::vector<std::string> {"add", "addition", "+"},
-  std::vector<std::string> {"subtract", "subtraction", "-"},
-  std::vector<std::string> {"multiply", "multiplication", "*"},
-  std::vector<std::string> {"divide", "division", "/"},
-  std::vector<std::string> {"sine", "sin"},
-  std::vector<std::string> {"cosine", "cos"},
-  std::vector<std::string> {"exponential", "exp", "e"},
-  std::vector<std::string> {"logarithm", "log"},
-  std::vector<std::string> {"power", "pow", "^"},
-  std::vector<std::string> {"absolute value", "||", "|"},
-  std::vector<std::string> {"square root", "sqrt"}
+const std::unordered_map<int, std::vector<std::string>> kOperatorNames {
+  {Op::kVariable, std::vector<std::string> {"integer"}},
+  {Op::kVariable, std::vector<std::string> {"load", "x"}},
+  {Op::kConstant, std::vector<std::string> {"constant", "c"}},
+  {Op::kAddition, std::vector<std::string> {"add", "addition", "+"}},
+  {Op::kSubtraction, std::vector<std::string> {"subtract", "subtraction", "-"}},
+  {Op::kMultiplication, std::vector<std::string> {"multiply", "multiplication", "*"}},
+  {Op::kDivision, std::vector<std::string> {"divide", "division", "/"}},
+  {Op::kSin, std::vector<std::string> {"sine", "sin"}},
+  {Op::kCos, std::vector<std::string> {"cosine", "cos"}},
+  {Op::kExponential, std::vector<std::string> {"exponential", "exp", "e"}},
+  {Op::kLogarithm, std::vector<std::string> {"logarithm", "log"}},
+  {Op::kPower, std::vector<std::string> {"power", "pow", "^"}},
+  {Op::kAbs, std::vector<std::string> {"absolute value", "||", "|"}},
+  {Op::kSqrt, std::vector<std::string> {"square root", "sqrt"}},
 };
 } // namespace bingo
 #endif // BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_OPERATOR_DEFINITIONS_H_
