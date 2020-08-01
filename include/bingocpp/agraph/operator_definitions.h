@@ -23,7 +23,7 @@
 namespace bingo {
 
 // Operators for CommandArray
-enum OperatorValue : signed int {
+enum Op : signed int {
   kInteger=-1,
   kVariable=0,
   kConstant=1,

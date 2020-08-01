@@ -4,7 +4,7 @@
 #include <utility>
 
 #include <bingocpp/agraph/agraph.h>
-#include <bingocpp/agraph/agraph_maps.h>
+#include <bingocpp/agraph/operator_definitions.h>
 #include <bingocpp/agraph/evaluation_backend/evaluation_backend.h>
 #include <bingocpp/agraph/constants.h>
 
@@ -284,8 +284,8 @@ void AGraph::process_modified_command_array() {
   short_command_array_ = evaluation_backend::SimplifyStack(command_array_);
   int new_const_number = 0;
   for (int i = 0; i < short_command_array_.rows(); i++) {
-    if (short_command_array_(i, ArrayProps::kNodeIdx) == Op::LOAD_C) {
-      short_command_array_.row(i) << Op::LOAD_C, new_const_number, new_const_number;
+    if (short_command_array_(i, ArrayProps::kNodeIdx) == kConstant) {
+      short_command_array_.row(i) << kConstant, new_const_number, new_const_number;
       new_const_number ++;
     }
   }
@@ -330,10 +330,10 @@ std::string get_formatted_element_string(const AGraph &individual,
   int param2 = stack_element(0, ArrayProps::kOp2);
 
   std::string temp_string;
-  if (node == Op::LOAD_X) {
+  if (node == kVariable) {
     temp_string = "X_" + std::to_string(param1);
-  } else if (node == Op::LOAD_C) {
-    if (param1 == Op::C_OPTIMIZE ||
+  } else if (node == kConstant) {
+    if (param1 == -1 ||
         param1 >= individual.GetLocalOptimizationParams().size()) {
       temp_string = "?";
     } else {
@@ -384,10 +384,10 @@ std::string get_stack_element_string(const Eigen::VectorXd &constants,
   int param2 = stack_element(0, ArrayProps::kOp2);
 
   std::string temp_string = "("+ std::to_string(command_index) +") <= ";
-  if (node == Op::LOAD_X) {
+  if (node == kVariable) {
     temp_string += "X_" + std::to_string(param1);
-  } else if (node == Op::LOAD_C) {
-    if (param1 == Op::C_OPTIMIZE ||
+  } else if (node == kConstant) {
+    if (param1 == -1 ||
         param1 >= constants.size()) {
       temp_string += "C";
     } else {

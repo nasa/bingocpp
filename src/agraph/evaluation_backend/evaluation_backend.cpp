@@ -6,6 +6,7 @@
 #include <bingocpp/agraph/evaluation_backend/evaluation_backend.h>
 #include <bingocpp/agraph/evaluation_backend/operator_eval.h>
 #include <bingocpp/agraph/constants.h>
+#include <bingocpp/agraph/operator_definitions.h>
 
 namespace bingo {
 namespace evaluation_backend {
@@ -91,7 +92,7 @@ std::vector<bool> GetUtilizedCommands(const Eigen::ArrayX3i &stack) {
     int node = stack(row, ArrayProps::kNodeIdx);
     int param1 = stack(row, ArrayProps::kOp1);
     int param2 = stack(row, ArrayProps::kOp2);
-    if (used_commands[row] && node > Op::LOAD_C) {
+    if (used_commands[row] && node > kConstant) {
       used_commands[param1] = true;
       if (AGraph::HasArityTwo(node)) {
         used_commands[param2] = true;
@@ -239,10 +240,10 @@ EvalAndDerivative evaluate_with_derivative(
   int deriv_wrt_node;
   if (param_x_or_c) {  // true = x
     deriv_shape = std::make_pair(x.rows(), x.cols());
-    deriv_wrt_node = Op::LOAD_X;
+    deriv_wrt_node = kVariable;
   } else {  // false = c
     deriv_shape = std::make_pair(x.rows(), constants.size());
-    deriv_wrt_node = Op::LOAD_C;
+    deriv_wrt_node = kConstant;
   }
 
   Eigen::ArrayXXd derivative = reverse_eval(
@@ -263,10 +264,10 @@ EvalAndDerivative evaluate_with_derivative_and_mask(
   int deriv_wrt_node;
   if (param_x_or_c) {  // true = x
     deriv_shape = std::make_pair(x.rows(), x.cols());
-    deriv_wrt_node = Op::LOAD_X;
+    deriv_wrt_node = kVariable;
   } else {  // false = c
     deriv_shape = std::make_pair(x.rows(), constants.size());
-    deriv_wrt_node = Op::LOAD_C;
+    deriv_wrt_node = kConstant;
   }
 
   Eigen::ArrayXXd derivative = reverse_eval_with_mask(
