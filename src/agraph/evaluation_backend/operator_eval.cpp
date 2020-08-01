@@ -1,4 +1,5 @@
 #include <bingocpp/agraph/evaluation_backend/operator_eval.h>
+#include <bingocpp/agraph/operator_definitons.h>
 
 namespace bingo {
 namespace evaluation_backend {
@@ -244,8 +245,38 @@ const std::vector<reverse_operator_function> reverse_eval_map {
 Eigen::ArrayXXd ForwardEvalFunction(int node, int param1, int param2,
                                     const Eigen::ArrayXXd &x, 
                                     const Eigen::VectorXd &constants,
-                                    std::vector<Eigen::ArrayXXd> &forward_eval) {
-  return forward_eval_map.at(node)(param1, param2, x, constants, forward_eval);
+                                    std::vector<Eigen::ArrayXXd> &forward_eval
+                                    ) {
+  switch (node) {
+    //case Op:kInteger :
+    //  return loadx_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op:kVariable :
+      return loadx_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op:kConstant :
+      return loadc_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op:kAddition :
+      return add_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op:kSubtraction :
+      return subtract_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op:kMultiplication :
+      return multiply_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op:kDivision :
+      return divide_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op:kSin :
+      return sin_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op:kCos :
+      return cos_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op:kExponential :
+      return exp_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op:kLogarithm :
+      return log_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op:kPower :
+      return pow_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op:kAbs :
+      return abs_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op:kSqrt :
+      return sqrt_forward_eval(param1, param2, x, constants, forward_eval);
+  }
 }
 
 void ReverseEvalFunction(int node, int reverse_index, int param1, int param2,
