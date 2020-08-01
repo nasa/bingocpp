@@ -37,7 +37,7 @@ enum Op : signed int {
   kPower=10,
   kAbs=11,
   kSqrt=12,
-  kSafePower=13
+  kSafePower=13,
 };
 
 typedef std::unordered_map<int, std::string> PrintMap;
@@ -53,6 +53,7 @@ const PrintMap kStackPrintMap {
   {Op::kExponential, "exp ({})"},
   {Op::kLogarithm, "log ({})"},
   {Op::kPower, "({}) ^ ({})"},
+  {Op::kSafePower, "(|{}|) ^ ({})"},
   {Op::kAbs, "abs ({})"},
   {Op::kSqrt, "sqrt ({})"},
 };
@@ -67,6 +68,7 @@ const PrintMap kLatexPrintMap {
   {Op::kExponential, "exp{ {} }"},
   {Op::kLogarithm, "log{ {} }"},
   {Op::kPower, "({})^{ ({}) }"},
+  {Op::kSafePower, "(|{}|)^{ ({}) }"},
   {Op::kAbs, "|{}|"},
   {Op::kSqrt, "\\sqrt{ {} }"},
 };
@@ -81,6 +83,7 @@ const PrintMap kConsolePrintMap {
   {Op::kExponential, "exp({})"},
   {Op::kLogarithm, "log({})"},
   {Op::kPower, "({})^({})"},
+  {Op::kSafePower, "(|{}|)^({})"},
   {Op::kAbs, "|{}|"},
   {Op::kSqrt, "sqrt({})"},
 };
@@ -98,6 +101,7 @@ const std::unordered_map<int, bool>  kIsArity2Map = {
   {Op::kExponential, false},
   {Op::kLogarithm, false},
   {Op::kPower, true},
+  {Op::kSafePower, true},
   {Op::kAbs, false},
   {Op::kSqrt, false},
 };
@@ -115,6 +119,7 @@ const std::unordered_map<int, bool> kIsTerminalMap = {
   {Op::kExponential, false},
   {Op::kLogarithm, false},
   {Op::kPower, false},
+  {Op::kSafePower, false},
   {Op::kAbs, false},
   {Op::kSqrt, false},
 };
@@ -132,6 +137,7 @@ const std::unordered_map<int, std::vector<std::string>> kOperatorNames {
   {Op::kExponential, std::vector<std::string> {"exponential", "exp", "e"}},
   {Op::kLogarithm, std::vector<std::string> {"logarithm", "log"}},
   {Op::kPower, std::vector<std::string> {"power", "pow", "^"}},
+  {Op::kSafePower, std::vector<std::string> {"safe power", "safe pow"}},
   {Op::kAbs, std::vector<std::string> {"absolute value", "||", "|"}},
   {Op::kSqrt, std::vector<std::string> {"square root", "sqrt"}},
 };
