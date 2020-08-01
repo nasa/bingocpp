@@ -19,8 +19,8 @@
 
 #include <random>
 
-#include "bingocpp/agraph.h"
-#include "bingocpp/constants.h"
+#include <bingocpp/agraph/agraph.h>
+#include <bingocpp/agraph/constants.h>
 
 namespace bingo {
 

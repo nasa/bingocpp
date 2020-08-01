@@ -21,9 +21,9 @@
 #include <string>
 #include <unordered_set>
 
-#include "bingocpp/agraph.h"
-#include "bingocpp/equation.h"
-#include "bingocpp/training_data.h"
+#include <bingocpp/agraph/agraph.h>
+#include <bingocpp/equation.h>
+#include <bingocpp/training_data.h>
 
 namespace bingo {
 

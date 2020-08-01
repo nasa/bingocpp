@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <bingocpp/agraph.h>
-#include <bingocpp/agraph_crossover.h>
+#include <bingocpp/agraph/agraph.h>
+#include <bingocpp/agraph/agraph_crossover.h>
 
 #include "test_fixtures.h"
 #include "testing_utils.h"

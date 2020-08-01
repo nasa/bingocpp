@@ -1,7 +1,7 @@
 #ifndef BINGO_TESTS_TEST_FIXTURES_H_
 #define BINGO_TESTS_TEST_FIXTURES_H_
 
-#include <bingocpp/agraph.h>
+#include <bingocpp/agraph/agraph.h>
 #include <bingocpp/equation.h>
 
 #include "testing_utils.h"

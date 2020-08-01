@@ -45,7 +45,7 @@
 
 #include <Eigen/Dense> 
 
-#include "bingocpp/agraph.h"
+#include "bingocpp/agraph/agraph.h"
 #include "bingocpp/explicit_regression.h"
 #include "bingocpp/implicit_regression.h"
 #include "bingocpp/utils.h"

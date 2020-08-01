@@ -1,12 +1,12 @@
 #include <chrono>
 
-#include <bingocpp/agraph.h>
+#include <bingocpp/agraph/agraph.h>
 #include <bingocpp/explicit_regression.h>
 #include <bingocpp/implicit_regression.h>
 #include <bingocpp/utils.h>
 
-#include "benchmarking/benchmark_data.h"
-#include "benchmarking/benchmark_logging.h"
+#include <benchmarking/benchmark_data.h>
+#include <benchmarking/benchmark_logging.h>
 
 #define EXPLICIT "explicit regression"
 #define IMPLICIT "implicit regression"

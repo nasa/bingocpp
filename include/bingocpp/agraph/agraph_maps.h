@@ -22,6 +22,22 @@
 
 namespace bingo {
 
+//enum OperatorValue {kIntegerOp=-1,
+//                    kVariableOp=0,
+//                    kConstantOp=1,
+//                    kAdditionOp=2,
+//                    kSubtractionOp=3,
+//                    kMultiplicationOp=4,
+//                    kDivisionOp=5,
+//                    kSinOp=6,
+//                    kCosOp=7,
+//                    kExponentialOp=8,
+//                    kLogarithmOp=9,
+//                    kPowerOp=10,
+//                    kAbsOp=11,
+//                    kSqrtOp=12,
+//                    kSafePowOp=13};
+
 typedef std::unordered_map<int, std::string> PrintMap;
 typedef std::vector<std::vector<std::string>> PrintVector;
 

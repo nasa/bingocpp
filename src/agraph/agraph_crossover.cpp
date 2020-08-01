@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "bingocpp/agraph_crossover.h"
+#include <bingocpp/agraph/agraph_crossover.h>
 
 namespace bingo {
 namespace {

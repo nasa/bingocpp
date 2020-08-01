@@ -45,7 +45,7 @@
 
 #include <Eigen/Dense>
 
-#include "bingocpp/evaluation_backend/evaluation_backend.h"
+#include "bingocpp/agraph/evaluation_backend/evaluation_backend.h"
 
 namespace py = pybind11;
 using namespace bingo;

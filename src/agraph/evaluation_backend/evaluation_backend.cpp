@@ -3,9 +3,9 @@
 
 #include <Eigen/Dense>
 
-#include <bingocpp/evaluation_backend/evaluation_backend.h>
-#include <bingocpp/evaluation_backend/operator_eval.h>
-#include <bingocpp/constants.h>
+#include <bingocpp/agraph/evaluation_backend/evaluation_backend.h>
+#include <bingocpp/agraph/evaluation_backend/operator_eval.h>
+#include <bingocpp/agraph/constants.h>
 
 namespace bingo {
 namespace evaluation_backend {

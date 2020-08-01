@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 
-#include <bingocpp/agraph.h>
+#include <bingocpp/agraph/agraph.h>
 
 #include "test_fixtures.h"
 #include "testing_utils.h"

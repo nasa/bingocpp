@@ -6,4 +6,5 @@ make VERBOSE=1 -j
 make symbolic_regression
 make utils
 make gtest
+make install
 cd ..
