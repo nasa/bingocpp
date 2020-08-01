@@ -14,29 +14,32 @@
  * License for the specific language governing permissions and limitations under
  * the License.
 */
-#ifndef BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_MAPS_H_
-#define BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_MAPS_H_
+#ifndef BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_OPERATOR_DEFINITIONS_H_
+#define BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_OPERATOR_DEFINITIONS_H_
 #include <string>
 #include <vector>
 #include <unordered_map>
 
 namespace bingo {
 
-//enum OperatorValue {kIntegerOp=-1,
-//                    kVariableOp=0,
-//                    kConstantOp=1,
-//                    kAdditionOp=2,
-//                    kSubtractionOp=3,
-//                    kMultiplicationOp=4,
-//                    kDivisionOp=5,
-//                    kSinOp=6,
-//                    kCosOp=7,
-//                    kExponentialOp=8,
-//                    kLogarithmOp=9,
-//                    kPowerOp=10,
-//                    kAbsOp=11,
-//                    kSqrtOp=12,
-//                    kSafePowOp=13};
+// Operators for CommandArray
+enum OperatorValue : signed int {
+  kInteger=-1,
+  kVariable=0,
+  kConstant=1,
+  kAddition=2,
+  kSubtraction=3,
+  kMultiplication=4,
+  kDivision=5,
+  kSin=6,
+  kCos=7,
+  kExponential=8,
+  kLogarithm=9,
+  kPower=10,
+  kAbs=11,
+  kSqrt=12,
+  kSafePow=13
+};
 
 typedef std::unordered_map<int, std::string> PrintMap;
 typedef std::vector<std::vector<std::string>> PrintVector;
@@ -131,4 +134,4 @@ const PrintVector kOperatorNames {
   std::vector<std::string> {"square root", "sqrt"}
 };
 } // namespace bingo
-#endif // BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_MAPS_H_
+#endif // BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_OPERATOR_DEFINITIONS_H_
