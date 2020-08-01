@@ -1,10 +1,10 @@
 /*!
- * \file evaluation_backend_pymodule.cc
+ * \file bingocpp_pymodule.cc
  *
  * \author Geoffrey F. Bomarito
  * \date
  *
- * This file contains the python bindings of the evaluation backend library.
+ * This file contains the python bindings for the c++ bingo library.
  *
  * Notices
  * -------
