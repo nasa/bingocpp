@@ -110,16 +110,13 @@ else()
     add_subdirectory( external/pybind EXCLUDE_FROM_ALL)
 endif()
 
-set( MODULE_LIST 
-    symbolic_regression
-    evaluation_backend
-    utils
+set( MODULE_LIST
+    bingocpp
 )
 
 foreach(pymodule ${MODULE_LIST})
     pybind11_add_module(${pymodule} "app/${pymodule}_pymodule.cpp") # EXCLUDE_FROM_ALL)
     target_link_libraries(${pymodule} PUBLIC bingo)
-    install(TARGETS ${pymodule} DESTINATION "${PROJECT_SOURCE_DIR}/pymodules")
 endforeach(pymodule ${MODULE_LIST})
 
 

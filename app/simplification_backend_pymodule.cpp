@@ -45,17 +45,19 @@
 
 #include <Eigen/Dense>
 
-#include "bingocpp/agraph/evaluation_backend/evaluation_backend.h"
+#include <bingocpp/agraph/evaluation_backend/evaluation_backend.h>
 
 namespace py = pybind11;
 using namespace bingo;
 
-void add_evaluation_backend_submodule(py::module &parent) {
-  py::module m = parent.def_submodule("evaluation_backend",
-                                      "The evaluation backend for Agraphs");
+void add_simplification_backend_submodule(py::module &parent) {
+  py::module m = parent.def_submodule("simplification_backend",
+                                      "The simplification backend for Agraphs");
   m.attr("ENGINE") = "c++";
-  m.def("evaluate", &evaluation_backend::Evaluate, "Evaluate an equation");
-  m.def("evaluate_with_derivative",
-        &evaluation_backend::EvaluateWithDerivative,
-        "Evaluate equation and take derivative");
+  m.def("get_utilized_commands", &evaluation_backend::GetUtilizedCommands,
+        "Find which commands are utilized");
+  m.def("simplify_stack", &evaluation_backend::SimplifyStack,
+        "Simplifies a stack based on computational algebra");
+  m.def("reduce_stack", &evaluation_backend::SimplifyStack, "Reduces a stack");
+
 }
