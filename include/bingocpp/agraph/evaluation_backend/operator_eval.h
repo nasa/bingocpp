@@ -24,18 +24,6 @@
 namespace bingo {
 namespace evaluation_backend {
 
-typedef Eigen::ArrayXXd (
-  *forward_operator_function)(
-    int, int, const Eigen::ArrayXXd &,
-    const Eigen::VectorXd &, std::vector<Eigen::ArrayXXd> &
-);
-
-typedef void (
-  *reverse_operator_function)(
-    int, int, int,
-    const std::vector<Eigen::ArrayXXd> &, std::vector<Eigen::ArrayXXd> &
-);
-
 /*
  * Maps param1, param2, x, constants, and forward eval to the correct
  * forward eval function corresponding to the operation node.
