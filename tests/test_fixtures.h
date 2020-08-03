@@ -27,7 +27,7 @@ class SumEquation : public bingo::Equation {
   std::string GetLatexString() { return ""; }
   std::string GetConsoleString() { return ""; }
   std::string GetStackString() { return ""; }
-  int GetComplexity() const  { return 0; }
+  int GetComplexity()  { return 0; }
 };
 
 inline Eigen::ArrayXXd one_to_nine_3_by_3() {
@@ -77,7 +77,7 @@ inline Eigen::VectorXd pi_ten_constants() {
 } 
 
 inline bingo::AGraph init_sample_agraph_1() {
-  bingo::AGraph test_graph = bingo::AGraph();
+  bingo::AGraph test_graph = bingo::AGraph(false);
   Eigen::ArrayX3i test_command_array(6, 3);
   test_command_array << 0, 0, 0,
                         1, 0, 0,
@@ -95,7 +95,7 @@ inline bingo::AGraph init_sample_agraph_1() {
 }
 
 inline bingo::AGraph init_sample_agraph_2() {
-  bingo::AGraph test_graph = bingo::AGraph();
+  bingo::AGraph test_graph = bingo::AGraph(false);
   Eigen::ArrayX3i test_command_array(6, 3);
   test_command_array << 0, 1, 3,
                         1, 1, 2,

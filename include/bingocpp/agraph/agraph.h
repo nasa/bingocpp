@@ -29,11 +29,9 @@
 
 #include <bingocpp/equation.h>
 
-typedef std::unordered_map<int, std::string> PrintMap;
-typedef std::vector<std::vector<std::string>> PrintVector;
 typedef std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvalAndDerivative;
 typedef std::tuple<Eigen::ArrayX3i, Eigen::ArrayX3i, Eigen::VectorXd,
-                   bool, int, double, bool, int, bool> AGraphState;
+                   bool, double, bool, int, bool, bool> AGraphState;
 
 namespace bingo {
 
@@ -45,7 +43,7 @@ namespace bingo {
  */
 class AGraph : public Equation {
  public:
-  AGraph();
+  AGraph(const bool use_simplification);
 
   AGraph(const AGraph &agraph);
   AGraph(const AGraphState &state);
@@ -68,8 +66,6 @@ class AGraph : public Equation {
    */
    AGraphState DumpState();
 
-  inline bool IsCpp() { return true; }
-
   /**
    * @brief Get the Command Array object
    * 
@@ -86,12 +82,6 @@ class AGraph : public Equation {
    * @param command_array A copy of the new Command Array
    */
   void SetCommandArray(const Eigen::ArrayX3i &command_array);
-
-  /**
-   * @brief Nofity individual of inplace modification of command array.
-   * 
-   */
-  void NotifyCommandArrayModificiation();
 
   /**
    * @brief Get the Fitness of this AGraph
@@ -114,8 +104,6 @@ class AGraph : public Equation {
    * @return false otherwise
    */
   bool IsFitnessSet() const;
-
-
   void SetFitnessStatus(bool val);
 
   /**
@@ -182,8 +170,6 @@ class AGraph : public Equation {
    */
   const Eigen::VectorXd &GetLocalOptimizationParams() const;
 
-  Eigen::VectorXd &GetLocalOptimizationParamsModifiable();
-
   /**
    * @brief Evaluate the AGraph equatoin
    * 
@@ -248,45 +234,28 @@ class AGraph : public Equation {
    * 
    * @return int 
    */
-  int GetComplexity() const;
+  int GetComplexity();
 
   int Distance(const AGraph &agraph);
 
-  /**
-   * @brief Determines if the equation operation has arity two.
-   * 
-   * @param node The operation of the equation.
-   * @return true If the operation requires to parameters.
-   * @return false Otherwise.
-   */
-  static bool HasArityTwo(int node);
-
-  /**
-   * @brief Determines if the equation operation is loading a value.
-   * 
-   * @param node The operation of the equation.
-   * @return true If the node loads a value.
-   * @return false It has arity greater than 0.
-   */
-  static bool IsTerminal(int node);
-
  private:
   Eigen::ArrayX3i command_array_;
-  Eigen::ArrayX3i short_command_array_;
-  Eigen::VectorXd constants_;
+  Eigen::ArrayX3i simplified_command_array_;
+  Eigen::VectorXd simplified_constants_;
   bool needs_opt_;
-  int num_constants_;
   double fitness_;
   bool fit_set_;
   int genetic_age_;
   bool modified_;
+  bool use_simplification_;
 
   // To string operator when passed into stream
   friend std::ostream &operator<<(std::ostream&, AGraph&);
 
-  // Helper Functions
-  void process_modified_command_array();
+  // helper functions
   void notify_agraph_modification();
+  void update();
+
 };
 } // namespace bingo
 #endif //BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_H_

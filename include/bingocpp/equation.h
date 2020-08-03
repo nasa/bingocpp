@@ -78,7 +78,7 @@ class Equation {
    * 
    * @return int 
    */
-  virtual int GetComplexity() const = 0;
+  virtual int GetComplexity() = 0;
 
 };
 } // namespace bingo

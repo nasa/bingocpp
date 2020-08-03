@@ -36,8 +36,8 @@ struct AGraphTestVals {
 
 class AGraphTest : public ::testing::TestWithParam<std::string> {
  public:
-  AGraph sample_agraph_1;
-  AGraph all_funcs_graph;
+  AGraph sample_agraph_1 = AGraph(false);
+  AGraph all_funcs_graph = AGraph(false);
   StringMap map_to_graph_string;
   std::unordered_map<std::string, AGraph> map_to_graph;
   AGraphTestVals sample_agraph_1_values;
@@ -68,7 +68,7 @@ class AGraphTest : public ::testing::TestWithParam<std::string> {
   }
 
   AGraph init_all_funcs_graph() {
-    AGraph test_graph = AGraph();
+    AGraph test_graph = AGraph(false);
     test_graph.SetGeneticAge(10);
     Eigen::ArrayX3i command_array(13, 3);
     command_array << 0, 0, 0,
@@ -208,7 +208,7 @@ TEST_F(AGraphTest, evaluatWithCDerivative) {
 }
 
 TEST_F(AGraphTest, setting_fitness_updates_fit_set) {
-  AGraph new_graph = AGraph();
+  AGraph new_graph = AGraph(false);
   ASSERT_FALSE(new_graph.IsFitnessSet());
   new_graph.SetFitness(2.0);
   ASSERT_TRUE(new_graph.IsFitnessSet());
