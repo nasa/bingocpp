@@ -6,6 +6,7 @@
 #include <bingocpp/agraph/agraph.h>
 #include <bingocpp/agraph/operator_definitions.h>
 #include <bingocpp/agraph/evaluation_backend/evaluation_backend.h>
+#include <bingocpp/agraph/simplification_backend/simplification_backend.h>
 #include <bingocpp/agraph/constants.h>
 
 namespace bingo {
@@ -134,7 +135,7 @@ int AGraph::GetGeneticAge() const {
 }
 
 std::vector<bool> AGraph::GetUtilizedCommands() const {
-  return evaluation_backend::GetUtilizedCommands(command_array_);
+  return simplification_backend::GetUtilizedCommands(command_array_);
 }
 
 bool AGraph::NeedsLocalOptimization() {
@@ -281,7 +282,7 @@ bool AGraph::IsTerminal(int node) {
 }
 
 void AGraph::process_modified_command_array() {
-  short_command_array_ = evaluation_backend::SimplifyStack(command_array_);
+  short_command_array_ = simplification_backend::SimplifyStack(command_array_);
   int new_const_number = 0;
   for (int i = 0; i < short_command_array_.rows(); i++) {
     if (short_command_array_(i, kOpIdx) == Op::kConstant) {
