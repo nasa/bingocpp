@@ -40,54 +40,6 @@ enum Op : signed int {
   kSafePower=13,
 };
 
-typedef std::unordered_map<int, std::string> PrintMap;
-typedef std::vector<std::vector<std::string>> PrintVector;
-
-const PrintMap kStackPrintMap {
-  {Op::kAddition, "({}) + ({})"},
-  {Op::kSubtraction, "({}) - ({})"},
-  {Op::kMultiplication, "({}) * ({})"},
-  {Op::kDivision, "({}) / ({}) "},
-  {Op::kSin, "sin ({})"},
-  {Op::kCos, "cos ({})"},
-  {Op::kExponential, "exp ({})"},
-  {Op::kLogarithm, "log ({})"},
-  {Op::kPower, "({}) ^ ({})"},
-  {Op::kSafePower, "(|{}|) ^ ({})"},
-  {Op::kAbs, "abs ({})"},
-  {Op::kSqrt, "sqrt ({})"},
-};
-
-const PrintMap kLatexPrintMap {
-  {Op::kAddition, "{} + {}"},
-  {Op::kSubtraction, "{} - ({})"},
-  {Op::kMultiplication, "({})({})"},
-  {Op::kDivision, "\\frac{ {} }{ {} }"},
-  {Op::kSin, "sin{ {} }"},
-  {Op::kCos, "cos{ {} }"},
-  {Op::kExponential, "exp{ {} }"},
-  {Op::kLogarithm, "log{ {} }"},
-  {Op::kPower, "({})^{ ({}) }"},
-  {Op::kSafePower, "(|{}|)^{ ({}) }"},
-  {Op::kAbs, "|{}|"},
-  {Op::kSqrt, "\\sqrt{ {} }"},
-};
-
-const PrintMap kConsolePrintMap {
-  {Op::kAddition, "{} + {}"},
-  {Op::kSubtraction, "{} - ({})"},
-  {Op::kMultiplication, "({})({})"},
-  {Op::kDivision, "({})/({})"},
-  {Op::kSin, "sin({})"},
-  {Op::kCos, "cos({})"},
-  {Op::kExponential, "exp({})"},
-  {Op::kLogarithm, "log({})"},
-  {Op::kPower, "({})^({})"},
-  {Op::kSafePower, "(|{}|)^({})"},
-  {Op::kAbs, "|{}|"},
-  {Op::kSqrt, "sqrt({})"},
-};
-
 const std::unordered_map<int, bool>  kIsArity2Map = {
   {Op::kInteger, false},
   {Op::kVariable, false},

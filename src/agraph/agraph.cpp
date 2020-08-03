@@ -5,42 +5,15 @@
 
 #include <bingocpp/agraph/agraph.h>
 #include <bingocpp/agraph/operator_definitions.h>
+#include <bingocpp/agraph/string_generation.h>
 #include <bingocpp/agraph/evaluation_backend/evaluation_backend.h>
 #include <bingocpp/agraph/simplification_backend/simplification_backend.h>
 #include <bingocpp/agraph/constants.h>
 
 namespace bingo {
+
 namespace {
-
 const double kFitnessNotSet = 1e9;
-
-bool check_optimization_requirement(
-    AGraph &agraph,
-    const std::vector<bool> &utilized_commands);
-
-int renumber_constants(const std::vector<bool> &utilized_commands,
-                       Eigen::ArrayX3i &command_array);
-
-std::string get_formatted_string_using(
-    const PrintMap &format_map,
-    const AGraph &agraph,
-    const Eigen::ArrayX3i &short_command_array);
-
-std::string get_formatted_element_string(const AGraph &individual,
-                                         const Eigen::ArrayX3i &stack_element,
-                                         std::vector<std::string> string_list,
-                                         const PrintMap &format_map);
-
-std::string print_string_with_args(const std::string &string,
-                                   const std::string &arg1,
-                                   const std::string &arg2);
-
-std::string get_stack_string(const Eigen::ArrayX3i &command_array,
-                             const Eigen::VectorXd &constants);
-
-std::string get_stack_element_string(const Eigen::VectorXd &constants,
-                                     int command_index,
-                                     const Eigen::ArrayX3i &stack_element);
 } // namespace
 
 AGraph::AGraph() {
@@ -230,36 +203,14 @@ AGraph::EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x) {
 }
 
 std::ostream &operator<<(std::ostream &strm, AGraph &graph) {
-  return strm << graph.GetConsoleString();
+  return strm << graph.GetFormattedString("console", false);
 }
 
-std::string AGraph::GetLatexString() {
-  if (modified_) {
-      process_modified_command_array();
-  }
-  return get_formatted_string_using(
-      kLatexPrintMap,*this, short_command_array_);
-}
-
-std::string AGraph::GetConsoleString() {
-  if (modified_) {
-      process_modified_command_array();
-  }
-  return get_formatted_string_using(
-      kConsolePrintMap, *this, short_command_array_);
-}
-
-std::string AGraph::GetStackString() {
-  if (modified_) {
-      process_modified_command_array();
-  }
-  std::stringstream print_str;
-  Eigen::VectorXd empty_consts;
-  print_str << "---full stack---\n"
-            << get_stack_string(command_array_, empty_consts)
-            << "---small stack---\n"
-            << get_stack_string(short_command_array_, constants_);
-  return print_str.str();
+std::string AGraph::GetFormattedString(std::string format, bool raw){
+ if (raw) {
+   return string_generation::GetFormattedString(format, this->command_array_, this->constants_);
+ }
+ return string_generation::GetFormattedString(format, this->command_array_, this->constants_);
 }
 
 int AGraph::GetComplexity() const {
@@ -307,103 +258,4 @@ void AGraph::process_modified_command_array() {
   num_constants_ = new_const_number;
 }
 
-namespace {
-
-std::string get_formatted_string_using(
-    const PrintMap &format_map,
-    const AGraph &agraph,
-    const Eigen::ArrayX3i &short_command_array){
-  std::vector<std::string> string_list;
-  for (auto stack_element : short_command_array.rowwise()) {
-    std::string temp_string = get_formatted_element_string(
-        agraph, stack_element, string_list, format_map);
-    string_list.push_back(temp_string);
-  }
-  return string_list.back();
-}
-
-std::string get_formatted_element_string(const AGraph &individual,
-                                         const Eigen::ArrayX3i &stack_element,
-                                         std::vector<std::string> string_list,
-                                         const PrintMap &format_map) {
-  int node = stack_element(0, kOpIdx);
-  int param1 = stack_element(0, kParam1Idx);
-  int param2 = stack_element(0, kParam2Idx);
-
-  std::string temp_string;
-  if (node == Op::kVariable) {
-    temp_string = "X_" + std::to_string(param1);
-  } else if (node == Op::kConstant) {
-    if (param1 == kOptimizeConstant ||
-        param1 >= individual.GetLocalOptimizationParams().size()) {
-      temp_string = "?";
-    } else {
-      Eigen::VectorXd parameter = individual.GetLocalOptimizationParams();
-      temp_string = std::to_string(parameter[param1]);
-    }
-  } else {
-    temp_string = print_string_with_args(format_map.at(node),
-                                         string_list[param1],
-                                         string_list[param2]);
-  }
-  return temp_string;
-}
-
-std::string print_string_with_args(const std::string &string,
-                                   const std::string &arg1,
-                                   const std::string &arg2) {
-  std::stringstream stream;
-  bool first_found = false;
-  for (std::string::const_iterator character = string.begin();
-       character != string.end(); character++) {
-    if (*character == '{' && *(character + 1) == '}') {
-      stream << ((!first_found) ? arg1 : arg2);
-      character++;
-      first_found = true;
-    } else {
-      stream << *character;
-    }
-  }
-  return stream.str();
-}
-
-std::string get_stack_string(
-    const Eigen::ArrayX3i &command_array,
-    const Eigen::VectorXd &constants) {
-  std::string temp_string;
-  for (int i = 0; i < command_array.rows(); i++) {
-    temp_string += get_stack_element_string(constants, i, command_array.row(i));
-  }
-  return temp_string;
-}
-
-std::string get_stack_element_string(const Eigen::VectorXd &constants,
-                                     int command_index,
-                                     const Eigen::ArrayX3i &stack_element) {
-  int node = stack_element(0, kOpIdx);
-  int param1 = stack_element(0, kParam1Idx);
-  int param2 = stack_element(0, kParam2Idx);
-
-  std::string temp_string = "("+ std::to_string(command_index) +") <= ";
-  if (node == Op::kVariable) {
-    temp_string += "X_" + std::to_string(param1);
-  } else if (node == Op::kConstant) {
-    if (param1 == kOptimizeConstant ||
-        param1 >= constants.size()) {
-      temp_string += "C";
-    } else {
-      temp_string += "C_" + std::to_string(param1) + " = " + 
-                     std::to_string(constants[param1]);
-    }
-  } else {
-    std::string param1_str = std::to_string(param1);
-    std::string param2_str = std::to_string(param2);
-    temp_string += print_string_with_args(kStackPrintMap.at(node),
-                                          param1_str,
-                                          param2_str);
-  }
-  temp_string += '\n';
-  return temp_string;
-}
-} // namespace (anonymous)
 } // namespace bingo

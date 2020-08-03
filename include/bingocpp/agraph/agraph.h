@@ -228,26 +228,20 @@ class AGraph : public Equation {
   EvalAndDerivative
   EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x);
 
-  /**
-   * @brief Get the Latex String of this AGraph equation.
-   * 
-   * @return std::string 
-   */
-  std::string GetLatexString();
 
   /**
-   * @brief Get the Console String this AGraph equation.
-   * 
-   * @return std::string 
+   * @brief Output a string description of the the AGraph in a given format.
+   *
+   * @param format The requested format of the equation. Options are "console",
+   * "latex", and "stack".
+   *
+   * @param node Output of the raw command array rather than the processed
+   * version. Default False.
+   *
+   * @return std::string Equation in specified form.
    */
-  std::string GetConsoleString();
+  std::string GetFormattedString(std::string format, bool raw);
 
-  /**
-   * @brief Get the Stack String this AGraph equation.
-   * 
-   * @return std::string 
-   */
-  std::string GetStackString();
 
   /**
    * @brief Get the Complexity of this AGraph equation.

@@ -74,27 +74,6 @@ class Equation {
   EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x) = 0;
 
   /**
-   * @brief Get the Latex String of this Equation.
-   * 
-   * @return std::string 
-   */
-  virtual std::string GetLatexString() = 0;
-
-  /**
-   * @brief Get the Console String this Equation.
-   * 
-   * @return std::string 
-   */
-  virtual std::string GetConsoleString() = 0;
-
-  /**
-   * @brief Get the Stack String this Equation.
-   * 
-   * @return std::string 
-   */
-  virtual std::string GetStackString() = 0;
-
-  /**
    * @brief Get the Complexity of this Equation.
    * 
    * @return int 

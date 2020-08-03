@@ -142,7 +142,7 @@ TEST_P(AGraphTest, latex_print) {
   std::string agraph_name = GetParam();
   std::string string_rep = map_to_graph_string.at(agraph_name).at("latex string");
   AGraph agraph = map_to_graph.at(agraph_name);
-  ASSERT_STREQ(string_rep.c_str(), agraph.GetLatexString().c_str());
+  ASSERT_STREQ(string_rep.c_str(), agraph.GetFormattedString("latex", false).c_str());
 }
 
 TEST_P(AGraphTest, console_print) {
@@ -179,7 +179,7 @@ TEST_F(AGraphTest, stack_print) {
                    "(2) <= (0) + (1)\n"
                    "(3) <= sin (2)\n"
                    "(4) <= (3) + (1)\n";
-  ASSERT_STREQ(expected_str.str().c_str(), sample_agraph_1.GetStackString().c_str());
+  ASSERT_STREQ(expected_str.str().c_str(), sample_agraph_1.GetFormattedString("stack", false).c_str());
 }
 
 TEST_F(AGraphTest, evaluateAt) {
