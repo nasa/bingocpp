@@ -200,7 +200,11 @@ AGraph::EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x) {
 }
 
 std::ostream &operator<<(std::ostream &strm, AGraph &graph) {
-  return strm << graph.GetFormattedString("console", false);
+  return strm << graph.GetConsoleString();
+}
+
+std::string AGraph::GetConsoleString(){
+  return AGraph::GetFormattedString("console", false);
 }
 
 std::string AGraph::GetFormattedString(std::string format, bool raw){

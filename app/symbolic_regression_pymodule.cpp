@@ -50,7 +50,6 @@
 #include "bingocpp/implicit_regression.h"
 #include "bingocpp/utils.h"
 
-#include "python/py_equation.h"
 
 namespace py = pybind11;
 using namespace bingo;
@@ -60,62 +59,7 @@ using namespace bingo;
 PYBIND11_MODULE(symbolic_regression, m) {
   m.doc() = "The symbolic regression module";  // optional module docstring
 
-  py::class_<Equation, bingo::PyEquation /* <---trampoline */>(m, "Equation")
-    .def(py::init<>())
-    .def("evaluate_equation_at",
-         &bingo::Equation::EvaluateEquationAt)
-    .def("evaluate_equation_with_x_gradient_at",
-         &bingo::Equation::EvaluateEquationWithXGradientAt)
-    .def("evaluate_equation_with_local_opt_gradient_at",
-          &bingo::Equation::EvaluateEquationWithLocalOptGradientAt)
-    .def("get_latex_string", &bingo::Equation::GetLatexString)
-    .def("get_stack_string", &bingo::Equation::GetStackString)
-    .def("get_console_string", &bingo::Equation::GetConsoleString)
-    .def("get_complexity", &bingo::Equation::GetComplexity);
 
-  py::class_<AGraph, bingo::Equation>(m, "AGraph")
-    .def(py::init<>())
-    .def("is_cpp", &AGraph::IsCpp)
-    .def_property("command_array",
-                  &AGraph::GetCommandArray,
-                  &AGraph::SetCommandArray)
-    .def_property("mutable_command_array",
-                  &AGraph::GetCommandArrayModifiable,
-                  &AGraph::SetCommandArray)
-    .def_property("fitness",
-                  &AGraph::GetFitness,
-                  &AGraph::SetFitness)
-    .def_property("fit_set",
-                  &AGraph::IsFitnessSet,
-                  &AGraph::SetFitness)
-    .def_property("genetic_age",
-                  &AGraph::GetGeneticAge,
-                  &AGraph::SetGeneticAge)
-    .def_property("constants",
-                  &AGraph::GetLocalOptimizationParamsModifiable,
-                  &AGraph::SetLocalOptimizationParams)
-    .def("needs_local_optimization", &AGraph::NeedsLocalOptimization)
-    .def("get_utilized_commands", &AGraph::GetUtilizedCommands)
-    .def("get_number_local_optimization_params",
-        &AGraph::GetNumberLocalOptimizationParams)
-    .def("get_local_optimization_params",
-        &AGraph::GetLocalOptimizationParamsModifiable)
-    .def("set_local_optimization_params", &AGraph::SetLocalOptimizationParams)
-    .def("evaluate_equation_at", &AGraph::EvaluateEquationAt)
-    .def("evaluate_equation_with_x_gradient_at",
-        &AGraph::EvaluateEquationWithXGradientAt)
-    .def("evaluate_equation_with_local_opt_gradient_at",
-        &AGraph::EvaluateEquationWithLocalOptGradientAt)
-    .def("__str__", &AGraph::GetConsoleString)
-    .def("get_latex_string", &AGraph::GetLatexString)
-    .def("get_console_string", &AGraph::GetConsoleString)
-    .def("get_stack_string", &AGraph::GetStackString)
-    .def("get_complexity", &AGraph::GetComplexity)
-    .def("distance", &AGraph::Distance)
-    .def("copy", &AGraph::Copy)
-    .def("__getstate__", &AGraph::DumpState)
-    .def("__setstate__", [](AGraph &ag, const AGraphState &state) {
-            new (&ag) AGraph(state); });
   
   py::class_<ImplicitTrainingData>(m, "ImplicitTrainingData")
     .def(py::init<Eigen::ArrayXXd &>())

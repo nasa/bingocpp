@@ -165,21 +165,23 @@ INSTANTIATE_TEST_CASE_P(,AGraphTest, ::testing::Values(
     "all_funcs_graph", "sample_agraph_1"));
 
 TEST_F(AGraphTest, stack_print) {
+  std::stringstream expected_str_raw;
   std::stringstream expected_str;
-  expected_str << "---full stack---\n"
-                   "(0) <= X_0\n"
-                   "(1) <= C\n"
-                   "(2) <= (0) + (1)\n"
-                   "(3) <= sin (2)\n" 
-                   "(4) <= (0) + (1)\n"
-                   "(5) <= (3) + (1)\n"
-                   "---small stack---\n"
-                   "(0) <= X_0\n"
-                   "(1) <= C_0 = 1.000000\n"
-                   "(2) <= (0) + (1)\n"
-                   "(3) <= sin (2)\n"
-                   "(4) <= (3) + (1)\n";
-  ASSERT_STREQ(expected_str.str().c_str(), sample_agraph_1.GetFormattedString("stack", false).c_str());
+  expected_str_raw << "(0) <= X_0\n"
+                      "(1) <= C\n"
+                      "(2) <= (0) + (1)\n"
+                      "(3) <= sin (2)\n"
+                      "(4) <= (0) + (1)\n"
+                      "(5) <= (3) + (1)\n";
+  ASSERT_STREQ(expected_str_raw.str().c_str(),
+               sample_agraph_1.GetFormattedString("stack", true).c_str());
+  expected_str << "(0) <= X_0\n"
+                  "(1) <= C_0 = 1.000000\n"
+                  "(2) <= (0) + (1)\n"
+                  "(3) <= sin (2)\n"
+                  "(4) <= (3) + (1)\n";
+  ASSERT_STREQ(expected_str.str().c_str(),
+               sample_agraph_1.GetFormattedString("stack", false).c_str());
 }
 
 TEST_F(AGraphTest, evaluateAt) {

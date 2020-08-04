@@ -227,6 +227,7 @@ class AGraph : public Equation {
    * @return std::string Equation in specified form.
    */
   std::string GetFormattedString(std::string format, bool raw);
+  std::string GetConsoleString();
 
 
   /**

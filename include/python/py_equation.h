@@ -46,34 +46,7 @@ class PyEquation : public Equation {
     );
   }
 
-  std::string GetLatexString() {
-    PYBIND11_OVERLOAD_PURE_NAME(
-      std::string,
-      Equation,
-      "get_latex_string",
-      GetLatexString,
-    );
-  }
-
-  std::string GetConsoleString() {
-    PYBIND11_OVERLOAD_PURE_NAME(
-      std::string,
-      Equation,
-      "get_console_string",
-      GetConsoleString,
-    );
-  }
-
-  std::string GetStackString() {
-    PYBIND11_OVERLOAD_PURE_NAME(
-      std::string,
-      Equation,
-      "get_Stack_string",
-      GetStackString,
-    );
-  }
-
-  int GetComplexity() const override {
+  int GetComplexity() override {
     PYBIND11_OVERLOAD_PURE_NAME(
       int,
       Equation,
