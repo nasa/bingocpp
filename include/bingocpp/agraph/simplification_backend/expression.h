@@ -19,6 +19,8 @@
 
 #include <vector>
 #include <iostream>
+#include <typeinfo>
+#include <memory>
 
 #include <bingocpp/agraph/operator_definitions.h>
 
@@ -27,10 +29,10 @@ namespace simplification_backend {
 
 class Expression {
   public:
-    Expression(int op) : op_(op) {}
     virtual ~Expression() = default;
 
-    int GetOperator() const { return op_; }
+    virtual Op GetOperator() const { return op_; }
+
     virtual bool IsZero() const = 0;
     virtual bool IsOne() const = 0;
     virtual bool IsConstantValued() const = 0;
@@ -40,15 +42,29 @@ class Expression {
     //virtual Expression GetTerm() const = 0;
     //virtual Expression GetCoefficient() const = 0;
 
+    bool operator==(const Expression& other) const
+    {
+      if (typeid(*this) != typeid(other) || op_ != other.op_) return false;
+      return equal(other);
+    }
+    inline bool operator!=(const Expression& other) const {
+      return !(*this == other);
+    }
 
- protected:
-   int op_;
+    friend std::ostream &operator<<(std::ostream &strm, const Expression& expr)
+      { return expr.print(strm); }
+
+  protected:
+    Op op_;
+
+    virtual bool equal(const Expression& other) const = 0;
+    virtual std::ostream &print(std::ostream &strm) const = 0;
 };
 
 
 class TermExpression : public Expression {
   public:
-    TermExpression(const int op, const int param);
+    TermExpression(const Op op, const int param);
     virtual ~TermExpression() = default;
 
     inline bool IsZero() const {
@@ -67,42 +83,45 @@ class TermExpression : public Expression {
     //Expression GetTerm() const;
     //Expression GetCoefficient() const;
 
-
-
-    inline bool operator==(const TermExpression& other) const {
-      return op_ == other.op_ && param_ == other.param_;
-    }
-    inline bool operator!=(const TermExpression& other) const {
-      return !(*this == other);
-    }
-
-    friend std::ostream &operator<<(std::ostream &strm,
-                                    const TermExpression& expr);
-
+  friend std::ostream &operator<<(std::ostream &strm, const TermExpression& expr)
+      { return expr.print(strm); }
 
   private:
     int param_;
 
+    bool equal(const Expression& other) const;
+    std::ostream &print(std::ostream &strm) const;
 };
 
-/*
+
 class OpExpression : public Expression {
   public:
-    OpExpression(const int op, const std::vector<Expression> params);
+    OpExpression(const Op op,
+                 const std::vector<std::shared_ptr<Expression>> params);
     virtual ~OpExpression() = default;
 
+    inline bool IsZero() const { return false; }
+    inline bool IsOne() const { return false; }
     bool IsConstantValued() const;
-    std::vector<std::string> DependsOn() const;
-    Expression GetBase() const;
-    Expression GetExponent() const;
-    Expression GetTerm() const;
-    Expression GetCoefficient() const;
+
+    //std::vector<std::string> DependsOn() const;
+    //Expression GetBase() const;
+    //Expression GetExponent() const;
+    //Expression GetTerm() const;
+    //Expression GetCoefficient() const;
+
+  friend std::ostream &operator<<(std::ostream &strm, const OpExpression& expr)
+      { return expr.print(strm); }
 
   private:
-    std::vector<Expression> params_;
+    std::vector<std::shared_ptr<Expression>> params_;
 
-}
-*/
+    bool equal(const Expression& other) const;
+    std::ostream &print(std::ostream &strm) const;
+};
+
+
+
 
 
 
