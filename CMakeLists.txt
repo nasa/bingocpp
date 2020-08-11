@@ -26,7 +26,9 @@ include(Colors)
 set(CMAKE_CXX_STANDARD 11)
 
 # Things to always include as flags. Change as needed.
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra" CACHE STRING "" FORCE)  
+IF (NOT CMAKE_CXX_FLAGS MATCHES "-Wall -Wextra$")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra" CACHE STRING "" FORCE)
+ENDIF (NOT CMAKE_CXX_FLAGS MATCHES "-Wall -Wextra$")
 # Build-type specific flags. Change as needed.
 
 message(STATUS "Building with the following extra flags: ${CMAKE_CXX_FLAGS}")
