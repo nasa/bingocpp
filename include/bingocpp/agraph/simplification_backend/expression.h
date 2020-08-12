@@ -40,6 +40,7 @@ class Expression: public std::enable_shared_from_this<Expression> {
     //virtual std::vector<std::string> DependsOn() const = 0;
     virtual std::shared_ptr<const Expression> GetBase() const = 0;
     virtual std::shared_ptr<const Expression> GetExponent() const = 0;
+    virtual std::shared_ptr<const Expression> GetTerm() const = 0;
     //virtual Expression GetTerm() const = 0;
     //virtual Expression GetCoefficient() const = 0;
 
@@ -81,6 +82,7 @@ class TermExpression : public Expression {
     //std::vector<std::string> DependsOn() const;
     inline std::shared_ptr<const Expression> GetBase() const { return shared_from_this(); }
     std::shared_ptr<const Expression> GetExponent() const;
+    std::shared_ptr<const Expression> GetTerm() const;
     //Expression GetTerm() const;
     //Expression GetCoefficient() const;
 
@@ -98,7 +100,7 @@ class TermExpression : public Expression {
 class OpExpression : public Expression {
   public:
     OpExpression(const Op operatr,
-                 const std::vector<std::shared_ptr<Expression>> operands);
+                 const std::vector<std::shared_ptr<const Expression>> operands);
     virtual ~OpExpression() = default;
 
     inline bool IsZero() const { return false; }
@@ -108,6 +110,7 @@ class OpExpression : public Expression {
     //std::vector<std::string> DependsOn() const;
     std::shared_ptr<const Expression> GetBase() const;
     std::shared_ptr<const Expression> GetExponent() const;
+    std::shared_ptr<const Expression> GetTerm() const;
     //Expression GetTerm() const;
     //Expression GetCoefficient() const;
 
@@ -115,7 +118,7 @@ class OpExpression : public Expression {
       { return expr.print(strm); }
 
   private:
-    std::vector<std::shared_ptr<Expression>> operands_;
+    std::vector<std::shared_ptr<const Expression>> operands_;
 
     bool equal(const Expression& other) const;
     std::ostream &print(std::ostream &strm) const;

@@ -21,26 +21,26 @@ class ExpressionTest : public testing::Test {
     std::shared_ptr<Expression> c0 =
         std::make_shared<TermExpression>(kConstant, 0);
 
-    std::vector<std::shared_ptr<Expression>> x0squared_params =
+    std::vector<std::shared_ptr<const Expression>> x0squared_params =
         {std::make_shared<TermExpression>(kVariable, 0),
          std::make_shared<TermExpression>(kVariable, 0)} ;
     std::shared_ptr<Expression> x0squared =
         std::make_shared<OpExpression>(kMultiplication, x0squared_params);
 
-    std::vector<std::shared_ptr<Expression>> threec0_params =
+    std::vector<std::shared_ptr<const Expression>> threec0_params =
         {std::make_shared<TermExpression>(kConstant, 0),
          std::make_shared<TermExpression>(kConstant, 0),
          std::make_shared<TermExpression>(kConstant, 0)} ;
     std::shared_ptr<Expression> threec0 =
         std::make_shared<OpExpression>(kAddition, threec0_params);
 
-    std::vector<std::shared_ptr<Expression>> c0x0_params =
+    std::vector<std::shared_ptr<const Expression>> c0x0_params =
         {std::make_shared<TermExpression>(kConstant, 0),
          std::make_shared<TermExpression>(kVariable, 0)} ;
     std::shared_ptr<Expression> c0x0 =
-        std::make_shared<OpExpression>(kAddition, c0x0_params);
+        std::make_shared<OpExpression>(kMultiplication, c0x0_params);
 
-    std::vector<std::shared_ptr<Expression>> x0cubed_params =
+    std::vector<std::shared_ptr<const Expression>> x0cubed_params =
         {std::make_shared<TermExpression>(kVariable, 0),
          std::make_shared<TermExpression>(kInteger, 3)} ;
     std::shared_ptr<Expression> x0cubed =
@@ -106,6 +106,26 @@ TEST_F(ExpressionTest, ExpressionExponent) {
     EXPECT_EQ (*three, *(x0cubed->GetExponent()) );
     EXPECT_EQ (*one, *(c0->GetExponent()) );
     EXPECT_EQ (*one, *(c0x0->GetExponent()) );
+}
+
+TEST_F(ExpressionTest, ExpressionTerm) {
+    std::vector<std::shared_ptr<const Expression>> mult_x0_params = {x0} ;
+    std::shared_ptr<Expression> mult_x0 =
+        std::make_shared<OpExpression>(kMultiplication, mult_x0_params);
+
+    std::vector<std::shared_ptr<const Expression>> mult_threec0_params = {threec0} ;
+    std::shared_ptr<Expression> mult_threec0 =
+        std::make_shared<OpExpression>(kMultiplication, mult_threec0_params);
+
+    std::vector<std::shared_ptr<const Expression>> mult_c0_params = {c0} ;
+    std::shared_ptr<Expression> mult_c0 =
+        std::make_shared<OpExpression>(kMultiplication, mult_c0_params);
+
+    EXPECT_EQ (*mult_c0, *(c0->GetTerm()) );
+    EXPECT_EQ (*mult_threec0, *(threec0->GetTerm()) );
+    EXPECT_EQ (*x0squared, *(x0squared->GetTerm()) );
+    EXPECT_EQ (*mult_x0, *(c0x0->GetTerm()) );
+    EXPECT_EQ (*mult_x0, *(x0->GetTerm()) );
 }
 
 } // namespace

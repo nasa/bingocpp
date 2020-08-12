@@ -1,8 +1,6 @@
 #include <bingocpp/agraph/simplification_backend/expression.h>
 #include <bingocpp/agraph/simplification_backend/constant_expressions.h>
 
-#include <iostream>
-
 
 namespace bingo {
 namespace simplification_backend {
@@ -31,10 +29,17 @@ inline std::shared_ptr<const Expression> TermExpression::GetExponent() const
   { return kOne; }
 
 
+std::shared_ptr<const Expression> TermExpression::GetTerm() const {
+  std::vector<std::shared_ptr<const Expression>> mult_params(1, shared_from_this());
+  return std::make_shared<OpExpression>(kMultiplication, mult_params);
+}
+
+
+
 
 
 OpExpression::OpExpression(const Op operatr,
-                           const std::vector<std::shared_ptr<Expression>> operands):
+                           const std::vector<std::shared_ptr<const Expression>> operands):
   operands_(operands){ operator_ = operatr; }
 
 bool OpExpression::IsConstantValued() const  {
@@ -73,6 +78,21 @@ std::shared_ptr<const Expression> OpExpression::GetBase() const {
 std::shared_ptr<const Expression> OpExpression::GetExponent() const {
   if (operator_ == kPower) { return operands_[1]; }
   return kOne;
+}
+
+
+std::shared_ptr<const Expression> OpExpression::GetTerm() const {
+  if (operator_ == kMultiplication) {
+    int first_op = operands_[0]->GetOperator();
+    if (first_op == kInteger || first_op == kConstant ) {
+      std::vector<std::shared_ptr<const Expression>> mult_params(operands_.begin() + 1,
+                                                           operands_.end());
+      return std::make_shared<OpExpression>(kMultiplication, mult_params);
+    }
+    return shared_from_this();
+  }
+  std::vector<std::shared_ptr<const Expression>> mult_params(1, shared_from_this());
+  return std::make_shared<OpExpression>(kMultiplication, mult_params);
 }
 
 
