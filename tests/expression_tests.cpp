@@ -128,4 +128,12 @@ TEST_F(ExpressionTest, ExpressionTerm) {
     EXPECT_EQ (*mult_x0, *(x0->GetTerm()) );
 }
 
+TEST_F(ExpressionTest, ExpressionCoefficient) {
+    EXPECT_EQ (*one, *(c0->GetCoefficient()) );
+    EXPECT_EQ (*one, *(threec0->GetCoefficient()) );
+    EXPECT_EQ (*one, *(x0squared->GetCoefficient()) );
+    EXPECT_EQ (*c0, *(c0x0->GetCoefficient()) );
+    EXPECT_EQ (*one, *(x0->GetCoefficient()) );
+}
+
 } // namespace
