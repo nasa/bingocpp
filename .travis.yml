@@ -3,6 +3,7 @@ compiler: gcc
 
 before_install:
    - which python
+   - python --version
 #   - pyenv install 3.6
 #   - pyenv global 3.4.0
 #  # C++17
@@ -33,7 +34,8 @@ before_script:
 
 script:
   - cd $PARENTDIR/build
-  - cmake -DCMAKE_BUILD_TYPE=Coverage $PARENTDIR
+  - PYEXECUTABLE=`which python`
+  - cmake -DCMAKE_BUILD_TYPE=Coverage -DPYTHON_EXECUTABLE:FILEPATH=$PYEXECUTABLE $PARENTDIR
   - make
   - make gtest
   - make coverage
