@@ -35,6 +35,10 @@ std::shared_ptr<const Expression> TermExpression::GetTerm() const {
 }
 
 
+inline std::shared_ptr<const Expression> TermExpression::GetCoefficient() const
+  { return kOne; }
+
+
 
 
 
@@ -93,6 +97,17 @@ std::shared_ptr<const Expression> OpExpression::GetTerm() const {
   }
   std::vector<std::shared_ptr<const Expression>> mult_params(1, shared_from_this());
   return std::make_shared<OpExpression>(kMultiplication, mult_params);
+}
+
+
+std::shared_ptr<const Expression> OpExpression::GetCoefficient() const {
+  if (operator_ == kMultiplication) {
+    int first_op = operands_[0]->GetOperator();
+    if (first_op == kInteger || first_op == kConstant ) {
+      return operands_[0];
+    }
+  }
+  return kOne;
 }
 
 

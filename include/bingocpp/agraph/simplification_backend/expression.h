@@ -41,8 +41,7 @@ class Expression: public std::enable_shared_from_this<Expression> {
     virtual std::shared_ptr<const Expression> GetBase() const = 0;
     virtual std::shared_ptr<const Expression> GetExponent() const = 0;
     virtual std::shared_ptr<const Expression> GetTerm() const = 0;
-    //virtual Expression GetTerm() const = 0;
-    //virtual Expression GetCoefficient() const = 0;
+    virtual std::shared_ptr<const Expression> GetCoefficient() const = 0;
 
     bool operator==(const Expression& other) const
     {
@@ -83,8 +82,7 @@ class TermExpression : public Expression {
     inline std::shared_ptr<const Expression> GetBase() const { return shared_from_this(); }
     std::shared_ptr<const Expression> GetExponent() const;
     std::shared_ptr<const Expression> GetTerm() const;
-    //Expression GetTerm() const;
-    //Expression GetCoefficient() const;
+    std::shared_ptr<const Expression> GetCoefficient() const;
 
   friend std::ostream &operator<<(std::ostream &strm, const TermExpression& expr)
       { return expr.print(strm); }
@@ -111,8 +109,7 @@ class OpExpression : public Expression {
     std::shared_ptr<const Expression> GetBase() const;
     std::shared_ptr<const Expression> GetExponent() const;
     std::shared_ptr<const Expression> GetTerm() const;
-    //Expression GetTerm() const;
-    //Expression GetCoefficient() const;
+    std::shared_ptr<const Expression> GetCoefficient() const;
 
   friend std::ostream &operator<<(std::ostream &strm, const OpExpression& expr)
       { return expr.print(strm); }
