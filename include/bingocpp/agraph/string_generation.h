@@ -41,9 +41,11 @@ const PrintMap kStackPrintMap {
   {Op::kExponential, "exp ({})"},
   {Op::kLogarithm, "log ({})"},
   {Op::kPower, "({}) ^ ({})"},
-  {Op::kSafePower, "(|{}|) ^ ({})"},
   {Op::kAbs, "abs ({})"},
   {Op::kSqrt, "sqrt ({})"},
+  {Op::kSafePower, "(|{}|) ^ ({})"},
+  {Op::kSinh, "sinh ({})"},
+  {Op::kCosh, "cosh ({})"},
 };
 
 const PrintMap kLatexPrintMap {
@@ -59,6 +61,8 @@ const PrintMap kLatexPrintMap {
   {Op::kSafePower, "(|{}|)^{ ({}) }"},
   {Op::kAbs, "|{}|"},
   {Op::kSqrt, "\\sqrt{ {} }"},
+  {Op::kSinh, "sinh{ {} }"},
+  {Op::kCosh, "cosh{ {} }"},
 };
 
 const PrintMap kConsolePrintMap {
@@ -74,6 +78,8 @@ const PrintMap kConsolePrintMap {
   {Op::kSafePower, "(|{}|)^({})"},
   {Op::kAbs, "|{}|"},
   {Op::kSqrt, "sqrt({})"},
+  {Op::kSinh, "sinh({})"},
+  {Op::kCosh, "cosh({})"},
 };
 
  /**

@@ -245,6 +245,37 @@ void sqrt_reverse_eval(int reverse_index, int param1, int,
                               /forward_eval[reverse_index]
                               *forward_eval[param1].sign();
 }
+
+// Sinh
+Eigen::ArrayXXd sinh_forward_eval(int param1, int,
+                                 const Eigen::ArrayXXd &,
+                                 const Eigen::VectorXd &,
+                                 std::vector<Eigen::ArrayXXd> &forward_eval) {
+  return forward_eval.at(param1).sinh();
+}
+
+void sinh_reverse_eval(int reverse_index, int param1, int,
+                      const std::vector<Eigen::ArrayXXd> &forward_eval,
+                      std::vector<Eigen::ArrayXXd> &reverse_eval) {
+  reverse_eval[param1] += reverse_eval[reverse_index]
+                         *forward_eval[param1].cosh();
+}
+
+// Cosh
+Eigen::ArrayXXd cosh_forward_eval(int param1, int,
+                                 const Eigen::ArrayXXd &,
+                                 const Eigen::VectorXd &,
+                                 std::vector<Eigen::ArrayXXd> &forward_eval) {
+  return forward_eval[param1].cosh();
+}
+
+void cosh_reverse_eval(int reverse_index, int param1, int,
+                      const std::vector<Eigen::ArrayXXd> &forward_eval,
+                      std::vector<Eigen::ArrayXXd> &reverse_eval) {
+  reverse_eval[param1] += reverse_eval[reverse_index]
+                         *forward_eval[param1].sinh();
+}
+
 } // namespace
 
 Eigen::ArrayXXd ForwardEvalFunction(int node, int param1, int param2,
@@ -277,12 +308,16 @@ Eigen::ArrayXXd ForwardEvalFunction(int node, int param1, int param2,
       return log_forward_eval(param1, param2, x, constants, forward_eval);
     case Op::kPower :
       return pow_forward_eval(param1, param2, x, constants, forward_eval);
-    case Op::kSafePower :
-      return safepow_forward_eval(param1, param2, x, constants, forward_eval);
     case Op::kAbs :
       return abs_forward_eval(param1, param2, x, constants, forward_eval);
     case Op::kSqrt :
       return sqrt_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kSafePower :
+      return safepow_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kSinh :
+      return sinh_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kCosh :
+      return cosh_forward_eval(param1, param2, x, constants, forward_eval);
   }
   throw std::runtime_error("Unknown Operator In Forward Evaluation");
 }
@@ -327,14 +362,20 @@ void ReverseEvalFunction(int node, int reverse_index, int param1, int param2,
     case Op::kPower :
       return pow_reverse_eval(reverse_index, param1, param2, forward_eval,
                                 reverse_eval);
-    case Op::kSafePower :
-      return safepow_reverse_eval(reverse_index, param1, param2, forward_eval,
-                                reverse_eval);
     case Op::kAbs :
       return abs_reverse_eval(reverse_index, param1, param2, forward_eval,
                                 reverse_eval);
     case Op::kSqrt :
       return sqrt_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kSafePower :
+      return safepow_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kSinh :
+      return sinh_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kCosh :
+      return cosh_reverse_eval(reverse_index, param1, param2, forward_eval,
                                 reverse_eval);
   }
   throw std::runtime_error("Unknown Operator In Reverse Evaluation");

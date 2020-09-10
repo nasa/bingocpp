@@ -38,6 +38,8 @@ enum Op : signed int {
   kAbs=11,
   kSqrt=12,
   kSafePower=13,
+  kSinh=14,
+  kCosh=15,
 };
 
 const std::unordered_map<int, bool>  kIsArity2Map = {
@@ -56,6 +58,8 @@ const std::unordered_map<int, bool>  kIsArity2Map = {
   {Op::kSafePower, true},
   {Op::kAbs, false},
   {Op::kSqrt, false},
+  {Op::kSinh, false},
+  {Op::kCosh, false},
 };
 
 const std::unordered_map<int, bool> kIsTerminalMap = {
@@ -74,6 +78,8 @@ const std::unordered_map<int, bool> kIsTerminalMap = {
   {Op::kSafePower, false},
   {Op::kAbs, false},
   {Op::kSqrt, false},
+  {Op::kSinh, false},
+  {Op::kCosh, false},
 };
 
 const std::unordered_map<int, std::vector<std::string>> kOperatorNames {
@@ -89,9 +95,11 @@ const std::unordered_map<int, std::vector<std::string>> kOperatorNames {
   {Op::kExponential, std::vector<std::string> {"exponential", "exp", "e"}},
   {Op::kLogarithm, std::vector<std::string> {"logarithm", "log"}},
   {Op::kPower, std::vector<std::string> {"power", "pow", "^"}},
-  {Op::kSafePower, std::vector<std::string> {"safe power", "safe pow"}},
   {Op::kAbs, std::vector<std::string> {"absolute value", "||", "|"}},
   {Op::kSqrt, std::vector<std::string> {"square root", "sqrt"}},
+  {Op::kSafePower, std::vector<std::string> {"safe power", "safe pow"}},
+  {Op::kSinh, std::vector<std::string> {"sineh", "sinh"}},
+  {Op::kCosh, std::vector<std::string> {"cosineh", "cosh"}},
 };
 } // namespace bingo
 #endif // BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_OPERATOR_DEFINITIONS_H_
