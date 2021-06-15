@@ -25,6 +25,7 @@
 #include "BingoCpp/equation.h"
 #include "BingoCpp/fitness_function.h"
 #include "BingoCpp/training_data.h"
+#include "BingoCpp/gradient_mixin.h"
 
 namespace bingo {
 
@@ -55,17 +56,19 @@ struct ExplicitTrainingData : TrainingData {
   }
 };
 
-class ExplicitRegression : public VectorBasedFunction {
+class ExplicitRegression : public VectorGradientMixin {
  public:
   ExplicitRegression(ExplicitTrainingData *training_data,
                      std::string metric="mae") : 
-      VectorBasedFunction(new ExplicitTrainingData(*training_data), metric) {}
+      VectorGradientMixin(new ExplicitTrainingData(*training_data), metric) {}
 
   ~ExplicitRegression() {
     delete training_data_;
   }
 
   Eigen::ArrayXXd EvaluateFitnessVector(const Equation &individual) const;
+
+  Eigen::ArrayXXd GetJacobian(const Equation &individual) const;
 };
 } // namespace bingo
 #endif // BINGOCPP_INCLUDE_BINGOCPP_EXPLICIT_REGRESSION_H_

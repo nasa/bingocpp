@@ -51,6 +51,12 @@ TEST_F(TestExplicitRegression, EvaluateIndividualFitnessWithNaN) {
   ASSERT_TRUE(std::isnan(fitness));
 }
 
+TEST_F(TestExplicitRegression, GetJacobian) {
+  ExplicitRegression regressor(training_data_);
+  Eigen::ArrayXXd expected_jacobian = training_data_->x;
+  ASSERT_TRUE(expected_jacobian.isApprox(regressor.GetJacobian(sum_equation_)));
+}
+
 TEST_F(TestExplicitRegression, GetSubsetOfTrainingData) {
   Eigen::ArrayXXd data_input = Eigen::ArrayXd::LinSpaced(5, 0, 4);
   ExplicitTrainingData* training_data = new ExplicitTrainingData(data_input, data_input);

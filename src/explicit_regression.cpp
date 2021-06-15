@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "BingoCpp/explicit_regression.h"
+#include <tuple>
 
 namespace bingo {
 
@@ -29,5 +30,12 @@ Eigen::ArrayXXd ExplicitRegression::EvaluateFitnessVector(
   return f_of_x - ((ExplicitTrainingData*)training_data_)->y;
 }
 
+Eigen::ArrayXXd ExplicitRegression::GetJacobian(
+    const Equation &individual) const {
+  Eigen::ArrayXXd f_of_x, df_dc;
+  const Eigen::ArrayXXd x = ((ExplicitTrainingData*)training_data_)->x;
+  std::tie(f_of_x, df_dc) = individual.EvaluateEquationWithLocalOptGradientAt(x);
+  return df_dc;
+}
 
 } // namespace bingo
