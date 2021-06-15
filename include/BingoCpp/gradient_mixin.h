@@ -39,10 +39,8 @@ class VectorGradientMixin : public GradientMixin, public VectorBasedFunction {
       metric_derivative_ = VectorGradientMixin::mean_absolute_error_derivative;
     } else if (metric_found(kMeanSquaredError, metric)) {
       metric_derivative_ = VectorGradientMixin::mean_squared_error_derivative;
-    } else if (metric_found(kRootMeanSquaredError, metric)) {
-      metric_derivative_ = VectorGradientMixin::root_mean_squared_error_derivative;
     } else {
-      throw std::invalid_argument("Invalid metric for vector gradient mixin");
+      metric_derivative_ = VectorGradientMixin::root_mean_squared_error_derivative;
     }
   }
 };
