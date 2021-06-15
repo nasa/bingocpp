@@ -30,19 +30,11 @@ class VectorGradientMixin : public GradientMixin, public VectorBasedFunction {
   std::function<Eigen::ArrayXXd(Eigen::ArrayXXd, Eigen::ArrayXXd)> metric_derivative_;
 
  public:
+  VectorGradientMixin(TrainingData *training_data = nullptr, std::string metric = "mae");
+
   Eigen::ArrayXXd GetGradient(const Equation &individual) const;
 
   virtual Eigen::ArrayXXd GetJacobian(const Equation &individual) const = 0;
-
-  VectorGradientMixin(TrainingData *training_data = nullptr, std::string metric = "mae") : VectorBasedFunction(training_data, metric) {
-    if (metric_found(kMeanAbsoluteError, metric)) {
-      metric_derivative_ = VectorGradientMixin::mean_absolute_error_derivative;
-    } else if (metric_found(kMeanSquaredError, metric)) {
-      metric_derivative_ = VectorGradientMixin::mean_squared_error_derivative;
-    } else {
-      metric_derivative_ = VectorGradientMixin::root_mean_squared_error_derivative;
-    }
-  }
 };
 
 } // namespace bingo
