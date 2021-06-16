@@ -1,4 +1,5 @@
 #include <cmath>
+#include <tuple>
 
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
@@ -51,6 +52,19 @@ TEST_F(TestExplicitRegression, EvaluateIndividualFitnessWithNaN) {
   ASSERT_TRUE(std::isnan(fitness));
 }
 
+TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradient) {
+  ExplicitRegression regressor(training_data_);
+  Eigen::ArrayXXd expected_gradient = Eigen::ArrayXXd::Zero(1, 5);
+
+  double fitness;
+  Eigen::ArrayXXd gradient;
+  std::tie(fitness, gradient) = regressor.GetIndividualFitnessAndGradient(sum_equation_);
+
+  ASSERT_TRUE(fitness < 1e-10);
+    // using isMuchSmallerThan instead of isApprox since we are doing a comparison to the zero matrix
+  ASSERT_TRUE(expected_gradient.isMuchSmallerThan(gradient));
+}
+
 TEST_F(TestExplicitRegression, GetFitnessVectorAndJacobian) {
   ExplicitRegression regressor(training_data_);
   Eigen::ArrayXXd expected_fitness_vector = Eigen::ArrayXXd::Zero(10, 1);
@@ -59,14 +73,10 @@ TEST_F(TestExplicitRegression, GetFitnessVectorAndJacobian) {
   Eigen::ArrayXXd fitness_vector, jacobian;
   std::tie(fitness_vector, jacobian) = regressor.GetFitnessVectorAndJacobian(sum_equation_);
 
-  ASSERT_TRUE(expected_fitness_vector.isApprox(fitness_vector));
+  // using isMuchSmallerThan instead of isApprox since we are doing a comparison to the zero matrix
+  ASSERT_TRUE(expected_fitness_vector.isMuchSmallerThan(fitness_vector));
   ASSERT_TRUE(expected_jacobian.isApprox(jacobian));
 }
-
-// TODO
-//TEST_F(TestExplicitRegression, GetGradient) {
-//
-//}
 
 TEST_F(TestExplicitRegression, GetSubsetOfTrainingData) {
   Eigen::ArrayXXd data_input = Eigen::ArrayXd::LinSpaced(5, 0, 4);
