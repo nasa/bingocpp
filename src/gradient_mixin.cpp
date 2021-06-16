@@ -14,10 +14,10 @@ VectorGradientMixin::VectorGradientMixin(TrainingData *training_data, std::strin
   }
 }
 
-Eigen::ArrayXXd VectorGradientMixin::GetGradient(const Equation &individual) const {
+std::tuple<double, Eigen::ArrayXXd> VectorGradientMixin::GetIndividualFitnessAndGradient(const Equation &individual) const {
   Eigen::ArrayXXd fitness_vector = this->EvaluateFitnessVector(individual);
   Eigen::ArrayXXd fitness_partials = this->GetJacobian(individual);
-  return metric_derivative_(fitness_vector, fitness_partials.transpose());
+  return std::tuple<double, Eigen::ArrayXXd>{0.0, metric_derivative_(fitness_vector, fitness_partials.transpose())};
 }
 
 } // namespace bingo

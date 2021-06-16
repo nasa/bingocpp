@@ -43,11 +43,11 @@ class VectorGradFitnessFunction : public VectorGradientMixin {
 class GradientMixinTest: public ::testing::TestWithParam<std::tuple<std::string, std::vector<double>>> {
  public:
   VectorGradFitnessFunction fitness_function_; 
-  std::string metric_;
   Eigen::ArrayXXd expected_gradient_;
+  double expected_fitness_;
 
   void SetUp() {
-    std::tie(fitness_function_metric_, expected_gradient_data_) = GetParam();
+    std::tie(fitness_function_metric_, expected_fitness_, expected_gradient_data_) = GetParam();
     expected_gradient_ = Eigen::ArrayXXd(1, 2);
     expected_gradient_ << expected_gradient_data_[0], expected_gradient_data_[1];
     fitness_function_ = VectorGradFitnessFunction(nullptr, fitness_function_metric_);
@@ -62,16 +62,20 @@ class GradientMixinTest: public ::testing::TestWithParam<std::tuple<std::string,
 
 
 TEST_P(GradientMixinTest, VectorGradient) {
-  ASSERT_TRUE(expected_gradient_.isApprox(fitness_function_.GetGradient(fitness_function_.empty_individual_)));
+  double fitness;
+  Eigen::ArrayXXd gradient;
+  std::tie(fitness, gradient) = fitness_function_.GetIndividualFitnessAndGradient(fitness_function_.empty_individual_);
+  ASSERT_EQ(fitness, expected_fitness_);
+  ASSERT_TRUE(expected_gradient_.isApprox(gradient));
 }
 
 
 INSTANTIATE_TEST_SUITE_P(VectorGradientWithMetrics,
                          GradientMixinTest,
                          ::testing::Values(
-                         std::make_tuple("mae", std::vector<double> {-1.0/3.0, 2.0/3.0}),
-                         std::make_tuple("mse", std::vector<double> {-4.0/3.0, 8.0/3.0}),
-                         std::make_tuple("rmse", std::vector<double> {sqrt(3.0/8.0) * -2.0/3.0, sqrt(3.0/8.0) * 4.0/3.0})));
+                         std::make_tuple("mae", 2.0, std::vector<double> {-1.0/3.0, 2.0/3.0}),
+                         std::make_tuple("mse", 14.0/3.0, std::vector<double> {-4.0/3.0, 8.0/3.0}),
+                         std::make_tuple("rmse", std::sqrt(14.0/3.0), std::vector<double> {sqrt(3.0/8.0) * -2.0/3.0, sqrt(3.0/8.0) * 4.0/3.0})));
 
 TEST(TestGradientMixin, InvalidGradientMetric) {
   try {
