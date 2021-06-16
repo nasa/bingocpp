@@ -30,12 +30,12 @@ Eigen::ArrayXXd ExplicitRegression::EvaluateFitnessVector(
   return f_of_x - ((ExplicitTrainingData*)training_data_)->y;
 }
 
-Eigen::ArrayXXd ExplicitRegression::GetJacobian(
+std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd> ExplicitRegression::GetFitnessVectorAndJacobian(
     const Equation &individual) const {
   Eigen::ArrayXXd f_of_x, df_dc;
   const Eigen::ArrayXXd x = ((ExplicitTrainingData*)training_data_)->x;
   std::tie(f_of_x, df_dc) = individual.EvaluateEquationWithLocalOptGradientAt(x);
-  return df_dc;
+  return std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd>{this->EvaluateFitnessVector(individual), df_dc};
 }
 
 } // namespace bingo

@@ -56,11 +56,12 @@ struct ExplicitTrainingData : TrainingData {
   }
 };
 
-class ExplicitRegression : public VectorGradientMixin {
+class ExplicitRegression : public VectorGradientMixin, public VectorBasedFunction {
  public:
   ExplicitRegression(ExplicitTrainingData *training_data,
                      std::string metric="mae") : 
-      VectorGradientMixin(new ExplicitTrainingData(*training_data), metric) {}
+      VectorGradientMixin(new ExplicitTrainingData(*training_data), metric),
+      VectorBasedFunction(new ExplicitTrainingData(*training_data), metric) {}
 
   ~ExplicitRegression() {
     delete training_data_;
@@ -68,7 +69,7 @@ class ExplicitRegression : public VectorGradientMixin {
 
   Eigen::ArrayXXd EvaluateFitnessVector(const Equation &individual) const;
 
-  Eigen::ArrayXXd GetJacobian(const Equation &individual) const;
+  std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(const Equation &individual) const;
 };
 } // namespace bingo
 #endif // BINGOCPP_INCLUDE_BINGOCPP_EXPLICIT_REGRESSION_H_

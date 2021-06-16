@@ -12,8 +12,20 @@ class GradientMixin {
   virtual std::tuple<double, Eigen::ArrayXXd> GetIndividualFitnessAndGradient(const Equation &individual) const = 0;
 };
 
-class VectorGradientMixin : public GradientMixin, public VectorBasedFunction {
+class VectorGradientMixin : public GradientMixin {
  protected:
+  static double mean_absolute_error(const Eigen::ArrayXXd &fitness_vector) {
+    return fitness_vector.abs().mean();
+  }
+
+  static double mean_squared_error(const Eigen::ArrayXXd &fitness_vector) {
+    return fitness_vector.square().mean();
+  }
+
+  static double root_mean_squared_error(const Eigen::ArrayXXd &fitness_vector) {
+    return sqrt(fitness_vector.square().mean());
+  }
+
   static Eigen::ArrayXXd mean_absolute_error_derivative(const Eigen::ArrayXXd &fitness_vector, const Eigen::ArrayXXd &fitness_partials) {
     return (fitness_partials.rowwise() * fitness_vector(0, Eigen::all).sign()).rowwise().mean().transpose();
   }
@@ -27,6 +39,7 @@ class VectorGradientMixin : public GradientMixin, public VectorBasedFunction {
   }
 
  private:
+  std::function<double(Eigen::ArrayXXd)> metric_function_;
   std::function<Eigen::ArrayXXd(Eigen::ArrayXXd, Eigen::ArrayXXd)> metric_derivative_;
 
  public:
@@ -34,7 +47,7 @@ class VectorGradientMixin : public GradientMixin, public VectorBasedFunction {
 
   std::tuple<double, Eigen::ArrayXXd> GetIndividualFitnessAndGradient(const Equation &individual) const;
 
-  virtual Eigen::ArrayXXd GetJacobian(const Equation &individual) const = 0;
+  virtual std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(const Equation &individual) const = 0;
 };
 
 } // namespace bingo

@@ -17,32 +17,42 @@ using namespace bingo;
 
 namespace {
 
-//class VectorGradFitnessFunction : public VectorGradientMixin, public VectorBasedFunction {
-class VectorGradFitnessFunction : public VectorGradientMixin {
+class VectorGradFitnessFunction : public VectorGradientMixin, public VectorBasedFunction {
  public:
-  // TODO figure out constructor
-  VectorGradFitnessFunction(TrainingData *training_data = nullptr, std::string metric = "mae") : VectorGradientMixin(training_data, metric) {
+  VectorGradFitnessFunction(TrainingData *training_data = nullptr, std::string metric = "mae") :
+      VectorGradientMixin(training_data, metric),
+      VectorBasedFunction(training_data, metric) {
   }
 
-  AGraph empty_individual_;
   Eigen::ArrayXXd EvaluateFitnessVector(const Equation &individual) const {
     Eigen::ArrayXXd fitnessVector(1, 3);
     fitnessVector << -2.0, 0.0, 2.0;
     return fitnessVector;
   }
 
-  Eigen::ArrayXXd GetJacobian(const Equation &individual) const {
+  std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(const Equation &individual) const {
     Eigen::ArrayXXd jacobian(3, 2);
     jacobian << 0.5, 1.0,
                 1.0, 2.0,
                -0.5, 3.0;
-    return jacobian;
+    return std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd>{this->EvaluateFitnessVector(individual), jacobian};
   }
 };
 
-class GradientMixinTest: public ::testing::TestWithParam<std::tuple<std::string, std::vector<double>>> {
+class ImplementedVectorMixin : public VectorGradientMixin {
  public:
-  VectorGradFitnessFunction fitness_function_; 
+  ImplementedVectorMixin(TrainingData *training_data = nullptr, std::string metric = "mae") :
+      VectorGradientMixin(training_data, metric) {}
+
+  std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(const Equation &individual) const {
+    Eigen::ArrayXXd empty;
+    return std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd>{empty, empty};
+  }
+};
+
+class GradientMixinTest : public ::testing::TestWithParam<std::tuple<std::string, double, std::vector<double>>> {
+ public:
+  VectorGradFitnessFunction fitness_function_;
   Eigen::ArrayXXd expected_gradient_;
   double expected_fitness_;
 
@@ -64,7 +74,8 @@ class GradientMixinTest: public ::testing::TestWithParam<std::tuple<std::string,
 TEST_P(GradientMixinTest, VectorGradient) {
   double fitness;
   Eigen::ArrayXXd gradient;
-  std::tie(fitness, gradient) = fitness_function_.GetIndividualFitnessAndGradient(fitness_function_.empty_individual_);
+  AGraph empty_individual;
+  std::tie(fitness, gradient) = fitness_function_.GetIndividualFitnessAndGradient(empty_individual);
   ASSERT_EQ(fitness, expected_fitness_);
   ASSERT_TRUE(expected_gradient_.isApprox(gradient));
 }
@@ -73,13 +84,13 @@ TEST_P(GradientMixinTest, VectorGradient) {
 INSTANTIATE_TEST_SUITE_P(VectorGradientWithMetrics,
                          GradientMixinTest,
                          ::testing::Values(
-                         std::make_tuple("mae", 2.0, std::vector<double> {-1.0/3.0, 2.0/3.0}),
-                         std::make_tuple("mse", 14.0/3.0, std::vector<double> {-4.0/3.0, 8.0/3.0}),
-                         std::make_tuple("rmse", std::sqrt(14.0/3.0), std::vector<double> {sqrt(3.0/8.0) * -2.0/3.0, sqrt(3.0/8.0) * 4.0/3.0})));
+                         std::make_tuple("mae", 4.0/3.0, std::vector<double> {-1.0/3.0, 2.0/3.0}),
+                         std::make_tuple("mse", 8.0/3.0, std::vector<double> {-4.0/3.0, 8.0/3.0}),
+                         std::make_tuple("rmse", std::sqrt(8.0/3.0), std::vector<double> {sqrt(3.0/8.0) * -2.0/3.0, sqrt(3.0/8.0) * 4.0/3.0})));
 
 TEST(TestGradientMixin, InvalidGradientMetric) {
   try {
-    VectorGradFitnessFunction test_function(nullptr, "invalid_metric");
+    ImplementedVectorMixin implemented_vector_gradient_mixin_(nullptr, "invalid_metric");
     FAIL() << "Expecting std::invalid_argument exception\n";
   } catch (std::invalid_argument &exception) {
     SUCCEED();
