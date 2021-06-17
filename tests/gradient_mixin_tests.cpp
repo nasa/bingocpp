@@ -25,7 +25,7 @@ class VectorGradFitnessFunction : public VectorGradientMixin, public VectorBased
   }
 
   Eigen::VectorXd EvaluateFitnessVector(Equation &individual) const {
-    Eigen::VectorXd fitnessVector(1, 3);
+    Eigen::VectorXd fitnessVector(3);
     fitnessVector << -2.0, 0.0, 2.0;
     return fitnessVector;
   }
@@ -59,7 +59,7 @@ class GradientMixinTest : public ::testing::TestWithParam<std::tuple<std::string
 
   void SetUp() {
     std::tie(fitness_function_metric_, expected_fitness_, expected_gradient_data_) = GetParam();
-    expected_gradient_ = Eigen::VectorXd(1, 2);
+    expected_gradient_ = Eigen::VectorXd(2);
     expected_gradient_ << expected_gradient_data_[0], expected_gradient_data_[1];
     fitness_function_ = VectorGradFitnessFunction(nullptr, fitness_function_metric_);
   }
@@ -72,7 +72,7 @@ class GradientMixinTest : public ::testing::TestWithParam<std::tuple<std::string
 };
 
 
-TEST_P(GradientMixinTest, VectorGradient) {
+TEST_P(GradientMixinTest, VectorIndividualFitnessAndGradient) {
   double fitness;
   Eigen::VectorXd gradient;
   AGraph empty_individual(false);
@@ -87,7 +87,8 @@ INSTANTIATE_TEST_SUITE_P(VectorGradientWithMetrics,
                          ::testing::Values(
                          std::make_tuple("mae", 4.0/3.0, std::vector<double> {-1.0/3.0, 2.0/3.0}),
                          std::make_tuple("mse", 8.0/3.0, std::vector<double> {-4.0/3.0, 8.0/3.0}),
-                         std::make_tuple("rmse", std::sqrt(8.0/3.0), std::vector<double> {sqrt(3.0/8.0) * -2.0/3.0, sqrt(3.0/8.0) * 4.0/3.0})));
+                         std::make_tuple("rmse", std::sqrt(8.0/3.0), std::vector<double> {sqrt(3.0/8.0) * -2.0/3.0, sqrt(3.0/8.0) * 4.0/3.0})
+                         ));
 
 TEST(TestGradientMixin, InvalidGradientMetric) {
   try {
