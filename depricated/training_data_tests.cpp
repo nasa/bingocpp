@@ -10,10 +10,10 @@
 #include <iostream>
 
 #include "gtest/gtest.h"
-#include "BingoCpp/explicit_regression.h"
-#include "BingoCpp/implicit_regression.h"
-#include "BingoCpp/training_data.h"
-#include "BingoCpp/utils.h"
+#include "bingocpp/explicit_regression.h"
+#include "bingocpp/implicit_regression.h"
+#include "bingocpp/training_data.h"
+#include "bingocpp/utils.h"
 #include <Eigen/Dense>
 #include <Eigen/Core>
 

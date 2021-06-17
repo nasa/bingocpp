@@ -4,9 +4,10 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 
-#include <BingoCpp/explicit_regression.h>
+#include <bingocpp/explicit_regression.h>
 
 #include "test_fixtures.h"
+#include "testing_utils.h"
 
 using namespace bingo;
 
@@ -28,13 +29,8 @@ class TestExplicitRegression : public testing::Test {
 
  private:
   ExplicitTrainingData* init_sample_training_data() {
-    const int num_points = 50;
-    const int num_data_per_feature = 10;
-    const int num_feature = 50 / num_data_per_feature;
-    Eigen::ArrayXXd x = Eigen::ArrayXd::LinSpaced(num_points, 0, 0.98);
-    x = x.reshaped(num_feature, num_data_per_feature);
-    x.transposeInPlace();
-    Eigen::Array<double, 10, 1> y = Eigen::ArrayXd::LinSpaced(10, 0.2, 4.7);
+    Eigen::ArrayXXd x = Eigen::ArrayXXd::Constant(10, 5, 1.0);
+    Eigen::Array<double, 10, 1> y = Eigen::ArrayXd::Constant(10, 1, 2.5);
     return new ExplicitTrainingData(x, y);
   }
 };
@@ -42,7 +38,13 @@ class TestExplicitRegression : public testing::Test {
 TEST_F(TestExplicitRegression, EvaluateIndividualFitness) {
   ExplicitRegression regressor(training_data_);
   double fitness = regressor.EvaluateIndividualFitness(sum_equation_);
-  ASSERT_TRUE(fitness < 1e-10);
+  ASSERT_NEAR(fitness, 2.5, 1e-10);
+}
+
+TEST_F(TestExplicitRegression, EvaluateIndividualFitnessRelative) {
+  ExplicitRegression regressor(training_data_, "mae", true);
+  double fitness = regressor.EvaluateIndividualFitness(sum_equation_);
+  ASSERT_NEAR(fitness, 1.0, 1e-10);
 }
 
 TEST_F(TestExplicitRegression, EvaluateIndividualFitnessWithNaN) {
@@ -98,5 +100,24 @@ TEST_F(TestExplicitRegression, CorrectTrainingDataSize) {
     ASSERT_EQ(training_data->Size(), size);
     delete training_data;
   }
+}
+
+TEST_F(TestExplicitRegression, DumpLoadTrainingData) {
+  ExplicitTrainingData* training_data_copy = new ExplicitTrainingData(training_data_->DumpState());
+
+  ASSERT_TRUE(testutils::almost_equal(training_data_->x,
+                                      training_data_copy->x));
+  ASSERT_TRUE(testutils::almost_equal(training_data_->y,
+                                      training_data_copy->y));
+
+}
+
+TEST_F(TestExplicitRegression, DumpLoadRegression) {
+  ExplicitRegression regressor(training_data_);
+  regressor.SetEvalCount(123);
+  ExplicitRegression regressor_copy = ExplicitRegression(regressor.DumpState());
+
+  ASSERT_EQ(regressor_copy.GetEvalCount(), 123);
+
 }
 } // namespace 

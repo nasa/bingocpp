@@ -1,7 +1,7 @@
 #include <iostream>
-
-#include "BingoCpp/explicit_regression.h"
 #include <tuple>
+
+#include "bingocpp/explicit_regression.h"
 
 namespace bingo {
 
@@ -22,12 +22,21 @@ ExplicitTrainingData *ExplicitTrainingData::GetItem(
   return new ExplicitTrainingData(temp_in, temp_out);
 }
 
-Eigen::ArrayXXd ExplicitRegression::EvaluateFitnessVector(
-    const Equation &individual) const {
+Eigen::VectorXd ExplicitRegression::EvaluateFitnessVector(
+    Equation &individual) const {
   ++ eval_count_;
   const Eigen::ArrayXXd x = ((ExplicitTrainingData*)training_data_)->x;
   Eigen::ArrayXXd f_of_x = individual.EvaluateEquationAt(x);
-  return f_of_x - ((ExplicitTrainingData*)training_data_)->y;
+  Eigen::ArrayXXd error = f_of_x - ((ExplicitTrainingData*)training_data_)->y;
+  if (relative_)
+    error /= ((ExplicitTrainingData*)training_data_)->y;
+  return error;
+}
+
+ExplicitRegressionState ExplicitRegression::DumpState() {
+  return ExplicitRegressionState(
+          ((ExplicitTrainingData*)training_data_)->DumpState(),
+          metric_, eval_count_);
 }
 
 std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd> ExplicitRegression::GetFitnessVectorAndJacobian(

@@ -21,9 +21,9 @@
 #include <string>
 #include <unordered_set>
 
-#include "BingoCpp/agraph.h"
-#include "BingoCpp/equation.h"
-#include "BingoCpp/training_data.h"
+#include <bingocpp/agraph/agraph.h>
+#include <bingocpp/equation.h>
+#include <bingocpp/training_data.h>
 
 namespace bingo {
 
@@ -49,7 +49,15 @@ class FitnessFunction {
 
   virtual ~FitnessFunction() { }
 
-  virtual double EvaluateIndividualFitness(const Equation &individual) const = 0;
+  virtual double EvaluateIndividualFitness(Equation &individual) const = 0;
+
+  int GetEvalCount() const {
+    return eval_count_;
+  }
+
+  void SetEvalCount(int eval_count) {
+    eval_count_ = eval_count;
+  }
 
  protected:
   mutable int eval_count_;
@@ -66,21 +74,23 @@ class VectorBasedFunction : public FitnessFunction {
   typedef double (VectorBasedFunction::* MetricFunctionPointer)(const Eigen::ArrayXXd&);
   VectorBasedFunction(TrainingData *training_data = nullptr,
                       std::string metric = "mae") :
-      FitnessFunction(training_data) {
+      FitnessFunction(training_data), metric_(metric) {
     metric_function_ = GetMetric(metric);
   }
 
   virtual ~VectorBasedFunction() { }
 
-  double EvaluateIndividualFitness(const Equation &individual) const {
-    Eigen::ArrayXXd fitness_vector = EvaluateFitnessVector(individual);
+  double EvaluateIndividualFitness(Equation &individual) const {
+    Eigen::VectorXd fitness_vector = EvaluateFitnessVector(individual);
     return (const_cast<VectorBasedFunction*>(this)->*metric_function_)(fitness_vector);
   }
 
-  virtual Eigen::ArrayXXd
-  EvaluateFitnessVector(const Equation &individual) const = 0;
+  virtual Eigen::VectorXd
+  EvaluateFitnessVector(Equation &individual) const = 0;
 
  protected:
+  std::string metric_;
+
   double mean_absolute_error(const Eigen::ArrayXXd &fitness_vector) {
     return fitness_vector.abs().mean();
   }

@@ -1,8 +1,8 @@
 #ifndef BINGO_TESTS_TEST_FIXTURES_H_
 #define BINGO_TESTS_TEST_FIXTURES_H_
 
-#include <BingoCpp/agraph.h>
-#include <BingoCpp/equation.h>
+#include <bingocpp/agraph/agraph.h>
+#include <bingocpp/equation.h>
 
 #include "testing_utils.h"
 
@@ -10,24 +10,24 @@ namespace testutils {
 
 class SumEquation : public bingo::Equation {
  public:
-  Eigen::ArrayXXd EvaluateEquationAt(const Eigen::ArrayXXd &x) const {
+  Eigen::ArrayXXd EvaluateEquationAt(const Eigen::ArrayXXd &x) {
     return x.rowwise().sum();
   }
 
   EvalAndDerivative EvaluateEquationWithXGradientAt(
-      const Eigen::ArrayXXd &x) const {
+      const Eigen::ArrayXXd &x) {
     return std::make_pair(EvaluateEquationAt(x), x);
   }
 
   EvalAndDerivative EvaluateEquationWithLocalOptGradientAt(
-      const Eigen::ArrayXXd &x) const {
+      const Eigen::ArrayXXd &x) {
     return std::make_pair(EvaluateEquationAt(x), x);
   }
 
-  std::string GetLatexString() const { return ""; }
-  std::string GetConsoleString() const { return ""; }
-  std::string GetStackString() const { return ""; }
-  int GetComplexity() const  { return 0; }
+  std::string GetLatexString() { return ""; }
+  std::string GetConsoleString() { return ""; }
+  std::string GetStackString() { return ""; }
+  int GetComplexity()  { return 0; }
 };
 
 inline Eigen::ArrayXXd one_to_nine_3_by_3() {
@@ -77,7 +77,7 @@ inline Eigen::VectorXd pi_ten_constants() {
 } 
 
 inline bingo::AGraph init_sample_agraph_1() {
-  bingo::AGraph test_graph = bingo::AGraph();
+  bingo::AGraph test_graph = bingo::AGraph(false);
   Eigen::ArrayX3i test_command_array(6, 3);
   test_command_array << 0, 0, 0,
                         1, 0, 0,
@@ -95,7 +95,7 @@ inline bingo::AGraph init_sample_agraph_1() {
 }
 
 inline bingo::AGraph init_sample_agraph_2() {
-  bingo::AGraph test_graph = bingo::AGraph();
+  bingo::AGraph test_graph = bingo::AGraph(false);
   Eigen::ArrayX3i test_command_array(6, 3);
   test_command_array << 0, 1, 3,
                         1, 1, 2,

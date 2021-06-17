@@ -22,15 +22,16 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <tuple>
 
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
-#include "BingoCpp/equation.h"
+#include <bingocpp/equation.h>
 
-typedef std::unordered_map<int, std::string> PrintMap;
-typedef std::vector<std::vector<std::string>> PrintVector;
 typedef std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvalAndDerivative;
+typedef std::tuple<Eigen::ArrayX3i, Eigen::ArrayX3i, Eigen::VectorXd,
+                   bool, double, bool, int, bool, bool> AGraphState;
 
 namespace bingo {
 
@@ -42,9 +43,10 @@ namespace bingo {
  */
 class AGraph : public Equation {
  public:
-  AGraph(bool manual_consants = false);
+  AGraph(const bool use_simplification);
 
   AGraph(const AGraph &agraph);
+  AGraph(const AGraphState &state);
   AGraph(AGraph&&) = default;                
   AGraph& operator=(const AGraph&) = default; 
   AGraph& operator=(AGraph&&) = default;     
@@ -57,7 +59,12 @@ class AGraph : public Equation {
    */
   AGraph Copy();
 
-  inline bool IsCpp() { return true; }
+  /**
+   * @brief Serializes the AGraph object
+   *
+   * @return AGraphState
+   */
+   AGraphState DumpState();
 
   /**
    * @brief Get the Command Array object
@@ -75,12 +82,6 @@ class AGraph : public Equation {
    * @param command_array A copy of the new Command Array
    */
   void SetCommandArray(const Eigen::ArrayX3i &command_array);
-
-  /**
-   * @brief Nofity individual of inplace modification of command array.
-   * 
-   */
-  void NotifyCommandArrayModificiation();
 
   /**
    * @brief Get the Fitness of this AGraph
@@ -103,8 +104,6 @@ class AGraph : public Equation {
    * @return false otherwise
    */
   bool IsFitnessSet() const;
-
-
   void SetFitnessStatus(bool val);
 
   /**
@@ -140,7 +139,7 @@ class AGraph : public Equation {
    * @return true Needs optimization.
    * @return false Has been optimized
    */
-  bool NeedsLocalOptimization() const;
+  bool NeedsLocalOptimization();
 
   /**
    * @brief Get the Number Local Optimization Params
@@ -150,7 +149,7 @@ class AGraph : public Equation {
    * 
    * @return int The number of parameters to optimize.
    */
-  int GetNumberLocalOptimizationParams() const;
+  int GetNumberLocalOptimizationParams();
 
   /**
    * @brief Set the Local Optimization Params
@@ -171,8 +170,6 @@ class AGraph : public Equation {
    */
   const Eigen::VectorXd &GetLocalOptimizationParams() const;
 
-  Eigen::VectorXd &GetLocalOptimizationParamsModifiable();
-
   /**
    * @brief Evaluate the AGraph equatoin
    * 
@@ -184,7 +181,7 @@ class AGraph : public Equation {
    * @return Eigen::ArrayXXd The evaluation of function at points x.
    */
   Eigen::ArrayXXd 
-  EvaluateEquationAt(const Eigen::ArrayXXd &x) const;
+  EvaluateEquationAt(const Eigen::ArrayXXd &x);
 
   /**
    * @brief Evaluate the AGraph and get its derivatives
@@ -199,7 +196,7 @@ class AGraph : public Equation {
    * along the points x and the derivative of the equation with respect to x.
    */
   EvalAndDerivative
-  EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd &x) const;
+  EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd &x);
 
   /**
    * @brief Evluate the AGraph and get its derivatives.
@@ -215,74 +212,51 @@ class AGraph : public Equation {
    * the constants of the equation.
    */
   EvalAndDerivative
-  EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x) const;
+  EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x);
+
 
   /**
-   * @brief Get the Latex String of this AGraph equation.
-   * 
-   * @return std::string 
+   * @brief Output a string description of the the AGraph in a given format.
+   *
+   * @param format The requested format of the equation. Options are "console",
+   * "latex", and "stack".
+   *
+   * @param node Output of the raw command array rather than the processed
+   * version. Default False.
+   *
+   * @return std::string Equation in specified form.
    */
-  std::string GetLatexString() const;
+  std::string GetFormattedString(std::string format, bool raw);
+  std::string GetConsoleString();
 
-  /**
-   * @brief Get the Console String this AGraph equation.
-   * 
-   * @return std::string 
-   */
-  std::string GetConsoleString() const;
-
-  /**
-   * @brief Get the Stack String this AGraph equation.
-   * 
-   * @return std::string 
-   */
-  std::string GetStackString() const;
 
   /**
    * @brief Get the Complexity of this AGraph equation.
    * 
    * @return int 
    */
-  int GetComplexity() const;
-
-  void ForceRenumberConstants();
+  int GetComplexity();
 
   int Distance(const AGraph &agraph);
 
-  /**
-   * @brief Determines if the equation operation has arity two.
-   * 
-   * @param node The operation of the equation.
-   * @return true If the operation requires to parameters.
-   * @return false Otherwise.
-   */
-  static bool HasArityTwo(int node);
-
-  /**
-   * @brief Determines if the equation operation is loading a value.
-   * 
-   * @param node The operation of the equation.
-   * @return true If the node loads a value.
-   * @return false It has arity greater than 0.
-   */
-  static bool IsTerminal(int node);
-
  private:
   Eigen::ArrayX3i command_array_;
-  Eigen::ArrayX3i short_command_array_;
-  Eigen::VectorXd constants_;
+  Eigen::ArrayX3i simplified_command_array_;
+  Eigen::VectorXd simplified_constants_;
   bool needs_opt_;
-  int num_constants_;
-  bool manual_constants_;
   double fitness_;
   bool fit_set_;
   int genetic_age_;
+  bool modified_;
+  bool use_simplification_;
 
   // To string operator when passed into stream
-  friend std::ostream &operator<<(std::ostream&, const AGraph&);
+  friend std::ostream &operator<<(std::ostream&, AGraph&);
 
-  // Helper Functions
-  void process_modified_command_array();
+  // helper functions
+  void notify_agraph_modification();
+  void update();
+
 };
 } // namespace bingo
 #endif //BINGOCPP_INCLUDE_BINGOCPP_AGRAPH_H_

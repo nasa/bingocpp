@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.1.3)
 # Set project name, version and laguages here.
 # Version numbers are available by including "BingoCpp/version.h" in 
 # the source. See version.h.in for some more details.
-project(BingoCpp VERSION 0.3.2.0 LANGUAGES C CXX)
+project(bingocpp VERSION 0.3.2.0 LANGUAGES C CXX)
 
 
 # ---------- version ----------
@@ -26,7 +26,9 @@ include(Colors)
 set(CMAKE_CXX_STANDARD 11)
 
 # Things to always include as flags. Change as needed.
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra" CACHE STRING "" FORCE)  
+IF (NOT CMAKE_CXX_FLAGS MATCHES "-Wall -Wextra$")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra" CACHE STRING "" FORCE)
+ENDIF (NOT CMAKE_CXX_FLAGS MATCHES "-Wall -Wextra$")
 # Build-type specific flags. Change as needed.
 
 message(STATUS "Building with the following extra flags: ${CMAKE_CXX_FLAGS}")
@@ -44,8 +46,8 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/external/googletest/googletest/include)
 
 # Make variables referring to all the sources and test files.
-file(GLOB SOURCES "src/*.cpp")
-file(GLOB TESTFILES "tests/*.cpp")
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE TESTFILES "tests/*.cpp")
 set(TEST_MAIN unit_tests.x)  # Default name for test executable.
 
 
@@ -109,8 +111,17 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/pybind/CMakeLists.txt")
 else()
     add_subdirectory( external/pybind EXCLUDE_FROM_ALL)
 endif()
-pybind11_add_module(bingocpp app/bingocpp_pymodule.cpp EXCLUDE_FROM_ALL)
-target_link_libraries(bingocpp PUBLIC bingo)
+
+set( MODULE_LIST
+    bingocpp
+)
+
+foreach(pymodule ${MODULE_LIST})
+    pybind11_add_module(${pymodule} "app/${pymodule}_pymodule.cpp") # EXCLUDE_FROM_ALL)
+    target_link_libraries(${pymodule} PUBLIC bingo)
+endforeach(pymodule ${MODULE_LIST})
+
+
 
 
 # ------------------------------------------------------------------------------

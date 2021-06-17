@@ -14,27 +14,15 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
 */
-#ifndef INCLUDE_BINGOCPP_BACKEND_NODES_H_
-#define INCLUDE_BINGOCPP_BACKEND_NODES_H_
+#ifndef INCLUDE_BINGOCPP_BACKEND_OPERATOR_EVAL_H_
+#define INCLUDE_BINGOCPP_BACKEND_OPERATOR_EVAL_H_
 
 #include <vector>
 
 #include <Eigen/Dense>
 
 namespace bingo {
-namespace backend {
-
-typedef Eigen::ArrayXXd (
-  *forward_operator_function)(
-    int, int, const Eigen::ArrayXXd &,
-    const Eigen::VectorXd &, std::vector<Eigen::ArrayXXd> &
-);
-
-typedef void (
-  *reverse_operator_function)(
-    int, int, int,
-    const std::vector<Eigen::ArrayXXd> &, std::vector<Eigen::ArrayXXd> &
-);
+namespace evaluation_backend {
 
 /*
  * Maps param1, param2, x, constants, and forward eval to the correct

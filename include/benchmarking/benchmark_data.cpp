@@ -29,7 +29,7 @@ void LoadAgraphIndvidualData(std::vector<AGraph> &indv_list) {
   std::string const_file_line;
   while ((stack_filestream >> stack_file_line) &&
          (const_filestream >> const_file_line)) {
-    AGraph curr_indv;
+    AGraph curr_indv = AGraph(false);
     SetIndvStack(curr_indv, stack_file_line);
     SetIndvConstants(curr_indv, const_file_line);
     indv_list.push_back(curr_indv);

@@ -4,9 +4,9 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 
-#include <BingoCpp/equation.h>
-#include <BingoCpp/fitness_function.h>
-#include <BingoCpp/training_data.h>
+#include <bingocpp/equation.h>
+#include <bingocpp/fitness_function.h>
+#include <bingocpp/training_data.h>
 
 #include "test_fixtures.h"
 #include "testing_utils.h"
@@ -37,7 +37,7 @@ class SampleFitnessFunction : public bingo::VectorBasedFunction {
       std::string metric = "mae") :
       bingo::VectorBasedFunction(training_data, metric) {}
   ~SampleFitnessFunction() {} 
-  Eigen::ArrayXXd EvaluateFitnessVector(const bingo::Equation &individual) const {
+  Eigen::VectorXd EvaluateFitnessVector(bingo::Equation &individual) const {
     Eigen::ArrayXXd f_of_x =
         individual.EvaluateEquationAt(((SampleTrainingData*)training_data_)->x);
     return f_of_x - ((SampleTrainingData*)training_data_)->y;

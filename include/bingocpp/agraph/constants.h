@@ -21,30 +21,12 @@ namespace bingo {
 
 const double kNaN = std::numeric_limits<double>::quiet_NaN();
 
-// Properties for CommandArray
-enum ArrayProps : unsigned int {
-  kNodeIdx = 0,
-  kOp1 = 1,
-  kOp2 = 2,
-  kArrayCols = 3
-};
+const unsigned int kOpIdx = 0;
+const unsigned int kParam1Idx = 1;
+const unsigned int kParam2Idx = 2;
+const unsigned int kArrayCols = 3;
 
-// Operators for CommandArray
-enum Op : signed int {
-  LOAD_X = 0,
-  LOAD_C = 1,
-  C_OPTIMIZE = -1,
-  ADD = 2,
-  SUB = 3,
-  MULT = 4,
-  DIV = 5,
-  SIN = 6,
-  COS = 7,
-  EXP = 8,
-  LOG = 9,
-  POW = 10,
-  ABS = 11,
-  SQRT = 12
-};
+const int kOptimizeConstant = -1;
+
 } // namespace bingo
 #endif // BINGOCPP_INCLUDE_BINGOCPP_CONSTANTS_H_

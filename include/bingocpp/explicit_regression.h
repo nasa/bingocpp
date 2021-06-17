@@ -19,13 +19,18 @@
 
 #include <string>
 #include <vector>
+#include <tuple>
 
 #include <Eigen/Core>
 
-#include "BingoCpp/equation.h"
-#include "BingoCpp/fitness_function.h"
-#include "BingoCpp/training_data.h"
-#include "BingoCpp/gradient_mixin.h"
+#include "bingocpp/equation.h"
+#include "bingocpp/fitness_function.h"
+#include "bingocpp/training_data.h"
+#include "bingocpp/gradient_mixin.h"
+
+typedef std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd> ExplicitTrainingDataState;
+typedef std::tuple<ExplicitTrainingDataState, std::string, int> ExplicitRegressionState;
+
 
 namespace bingo {
 
@@ -45,11 +50,20 @@ struct ExplicitTrainingData : TrainingData {
     y = other.y;
   }
 
+  ExplicitTrainingData(const ExplicitTrainingDataState &state) {
+    x = std::get<0>(state);
+    y = std::get<1>(state);
+  }
+
   ~ExplicitTrainingData() { }
 
   ExplicitTrainingData *GetItem(int item);
 
   ExplicitTrainingData *GetItem(const std::vector<int> &items);
+
+  ExplicitTrainingDataState DumpState() {
+    return ExplicitTrainingDataState(x, y);
+  }
 
   int Size() {
     return x.rows();
@@ -59,17 +73,31 @@ struct ExplicitTrainingData : TrainingData {
 class ExplicitRegression : public VectorGradientMixin, public VectorBasedFunction {
  public:
   ExplicitRegression(ExplicitTrainingData *training_data,
-                     std::string metric="mae") : 
+                     std::string metric="mae",
+                     bool relative=false) :
       VectorGradientMixin(new ExplicitTrainingData(*training_data), metric),
-      VectorBasedFunction(new ExplicitTrainingData(*training_data), metric) {}
+      VectorBasedFunction(new ExplicitTrainingData(*training_data), metric) {
+      relative_ = relative;
+      }
+
+  ExplicitRegression(const ExplicitRegressionState &state):
+      VectorBasedFunction(new ExplicitTrainingData(std::get<0>(state)),
+                          std::get<1>(state)){
+    eval_count_ = std::get<2>(state);
+  }
 
   ~ExplicitRegression() {
     delete training_data_;
   }
 
-  Eigen::ArrayXXd EvaluateFitnessVector(const Equation &individual) const;
+  ExplicitRegressionState DumpState();
+
+  Eigen::VectorXd EvaluateFitnessVector(Equation &individual) const;
 
   std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(const Equation &individual) const;
+
+  private:
+   bool relative_;
 };
 } // namespace bingo
 #endif // BINGOCPP_INCLUDE_BINGOCPP_EXPLICIT_REGRESSION_H_

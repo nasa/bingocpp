@@ -17,13 +17,20 @@
 #ifndef BINGOCPP_INCLUDE_BINGOCPP_IMPLICIT_REGRESSION_H_
 #define BINGOCPP_INCLUDE_BINGOCPP_IMPLICIT_REGRESSION_H_
 
+#include <string>
+#include <tuple>
+
 #include <Eigen/Dense>
 
-#include "BingoCpp/equation.h"
-#include "BingoCpp/fitness_function.h"
-#include "BingoCpp/training_data.h"
+#include "bingocpp/equation.h"
+#include "bingocpp/fitness_function.h"
+#include "bingocpp/training_data.h"
 
-#include "BingoCpp/utils.h"
+#include "bingocpp/utils.h"
+
+typedef std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd> ImplicitTrainingDataState;
+typedef std::tuple<ImplicitTrainingDataState, std::string, int, int> ImplicitRegressionState;
+
 
 namespace bingo {
 
@@ -48,11 +55,20 @@ struct ImplicitTrainingData : TrainingData {
   ImplicitTrainingData(ImplicitTrainingData &other) {
     x = other.x;
     dx_dt = other.dx_dt;
-  } 
+  }
+
+  ImplicitTrainingData(const ImplicitTrainingDataState &state) {
+    x = std::get<0>(state);
+    dx_dt = std::get<1>(state);
+  }
 
   ImplicitTrainingData* GetItem(int item);
 
   ImplicitTrainingData* GetItem(const std::vector<int> &items);
+
+  ImplicitTrainingDataState DumpState() {
+    return ImplicitTrainingDataState(x, dx_dt);
+  }
 
   int Size() { 
     return x.rows();
@@ -63,22 +79,28 @@ class ImplicitRegression : public VectorBasedFunction {
  public:
   ImplicitRegression(ImplicitTrainingData *training_data, 
                      int required_params = kNoneRequired,
-                     bool normalize_dot = false,
                      std::string metric="mae") :
       VectorBasedFunction(new ImplicitTrainingData(*training_data), metric) {
     required_params_ = required_params;
-    normalize_dot_ = normalize_dot;
+  }
+
+  ImplicitRegression(const ImplicitRegressionState &state):
+      VectorBasedFunction(new ImplicitTrainingData(std::get<0>(state)),
+                          std::get<1>(state)){
+    required_params_ = std::get<2>(state);
+    eval_count_ = std::get<3>(state);
   }
 
   ~ImplicitRegression() {
     delete training_data_;
   }
 
-  Eigen::ArrayXXd EvaluateFitnessVector(const Equation &equation) const;
+  ImplicitRegressionState DumpState();
+
+  Eigen::VectorXd EvaluateFitnessVector(Equation &equation) const;
 
  private:
   int required_params_;
-  bool normalize_dot_;
   static const int kNoneRequired = -1;
 };
 

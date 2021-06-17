@@ -1,13 +1,30 @@
-#include "BingoCpp/backend_nodes.h"
+#include <stdexcept>
+
+#include <bingocpp/agraph/evaluation_backend/operator_eval.h>
+#include <bingocpp/agraph/operator_definitions.h>
 
 namespace bingo {
-namespace backend {
+namespace evaluation_backend {
 namespace { 
 
+// Integer
+Eigen::ArrayXXd integer_forward_eval(int param1, int,
+                                     const Eigen::ArrayXXd &x,
+                                     const Eigen::VectorXd &,
+                                     std::vector<Eigen::ArrayXXd> &) {
+  return Eigen::ArrayXd::Constant(x.rows(), param1);
+}
+
+void integer_reverse_eval(int, int, int,
+                          const std::vector<Eigen::ArrayXXd> &,
+                          std::vector<Eigen::ArrayXXd> &) {
+  return;
+}
+
 // Load x
-Eigen::ArrayXXd loadx_forward_eval(int param1, int, 
-                                   const Eigen::ArrayXXd &x, 
-                                   const Eigen::VectorXd &, 
+Eigen::ArrayXXd loadx_forward_eval(int param1, int,
+                                   const Eigen::ArrayXXd &x,
+                                   const Eigen::VectorXd &,
                                    std::vector<Eigen::ArrayXXd> &) {
   return x.col(param1);
 }
@@ -162,12 +179,33 @@ Eigen::ArrayXXd pow_forward_eval(int param1, int param2,
                                  const Eigen::ArrayXXd &,
                                  const Eigen::VectorXd &,
                                  std::vector<Eigen::ArrayXXd> &forward_eval) {
-  return forward_eval[param1].abs().pow(forward_eval[param2]);
+  return forward_eval[param1].pow(forward_eval[param2]);
 }
 
 void pow_reverse_eval(int reverse_index, int param1, int param2, 
                       const std::vector<Eigen::ArrayXXd> &forward_eval, 
                       std::vector<Eigen::ArrayXXd> &reverse_eval) {
+  reverse_eval[param1] += reverse_eval[reverse_index]
+                         *forward_eval[reverse_index]
+                         *forward_eval[param2]
+                         /forward_eval[param1];
+  reverse_eval[param2] += reverse_eval[reverse_index]
+                         *forward_eval[reverse_index]
+                         *(forward_eval[param1].log());
+}
+
+// Safe Power
+Eigen::ArrayXXd safepow_forward_eval(int param1, int param2,
+                                     const Eigen::ArrayXXd &,
+                                     const Eigen::VectorXd &,
+                                     std::vector<Eigen::ArrayXXd> &forward_eval
+                                     ) {
+  return forward_eval[param1].abs().pow(forward_eval[param2]);
+}
+
+void safepow_reverse_eval(int reverse_index, int param1, int param2,
+                          const std::vector<Eigen::ArrayXXd> &forward_eval,
+                          std::vector<Eigen::ArrayXXd> &reverse_eval) {
   reverse_eval[param1] += reverse_eval[reverse_index]
                          *forward_eval[reverse_index]
                          *forward_eval[param2]
@@ -208,50 +246,139 @@ void sqrt_reverse_eval(int reverse_index, int param1, int,
                               *forward_eval[param1].sign();
 }
 
-const std::vector<forward_operator_function> forward_eval_map {
-  loadx_forward_eval,
-  loadc_forward_eval,
-  add_forward_eval,
-  subtract_forward_eval,
-  multiply_forward_eval,
-  divide_forward_eval,
-  sin_forward_eval,
-  cos_forward_eval,
-  exp_forward_eval,
-  log_forward_eval,
-  pow_forward_eval,
-  abs_forward_eval,
-  sqrt_forward_eval
-};
+// Sinh
+Eigen::ArrayXXd sinh_forward_eval(int param1, int,
+                                 const Eigen::ArrayXXd &,
+                                 const Eigen::VectorXd &,
+                                 std::vector<Eigen::ArrayXXd> &forward_eval) {
+  return forward_eval.at(param1).sinh();
+}
 
-const std::vector<reverse_operator_function> reverse_eval_map {
-  loadx_reverse_eval,
-  loadc_reverse_eval,
-  add_reverse_eval,
-  subtract_reverse_eval,
-  multiply_reverse_eval,
-  divide_reverse_eval,
-  sin_reverse_eval,
-  cos_reverse_eval,
-  exp_reverse_eval,
-  log_reverse_eval,
-  pow_reverse_eval,
-  abs_reverse_eval,
-  sqrt_reverse_eval
-};
+void sinh_reverse_eval(int reverse_index, int param1, int,
+                      const std::vector<Eigen::ArrayXXd> &forward_eval,
+                      std::vector<Eigen::ArrayXXd> &reverse_eval) {
+  reverse_eval[param1] += reverse_eval[reverse_index]
+                         *forward_eval[param1].cosh();
+}
+
+// Cosh
+Eigen::ArrayXXd cosh_forward_eval(int param1, int,
+                                 const Eigen::ArrayXXd &,
+                                 const Eigen::VectorXd &,
+                                 std::vector<Eigen::ArrayXXd> &forward_eval) {
+  return forward_eval[param1].cosh();
+}
+
+void cosh_reverse_eval(int reverse_index, int param1, int,
+                      const std::vector<Eigen::ArrayXXd> &forward_eval,
+                      std::vector<Eigen::ArrayXXd> &reverse_eval) {
+  reverse_eval[param1] += reverse_eval[reverse_index]
+                         *forward_eval[param1].sinh();
+}
+
 } // namespace
 
 Eigen::ArrayXXd ForwardEvalFunction(int node, int param1, int param2,
                                     const Eigen::ArrayXXd &x, 
                                     const Eigen::VectorXd &constants,
-                                    std::vector<Eigen::ArrayXXd> &forward_eval) {
-  return forward_eval_map.at(node)(param1, param2, x, constants, forward_eval);
+                                    std::vector<Eigen::ArrayXXd> &forward_eval
+                                    ) {
+  switch (node) {
+    case Op::kInteger :
+      return integer_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kVariable :
+      return loadx_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kConstant :
+      return loadc_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kAddition :
+      return add_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kSubtraction :
+      return subtract_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kMultiplication :
+      return multiply_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kDivision :
+      return divide_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kSin :
+      return sin_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kCos :
+      return cos_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kExponential :
+      return exp_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kLogarithm :
+      return log_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kPower :
+      return pow_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kAbs :
+      return abs_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kSqrt :
+      return sqrt_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kSafePower :
+      return safepow_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kSinh :
+      return sinh_forward_eval(param1, param2, x, constants, forward_eval);
+    case Op::kCosh :
+      return cosh_forward_eval(param1, param2, x, constants, forward_eval);
+  }
+  throw std::runtime_error("Unknown Operator In Forward Evaluation");
 }
 
 void ReverseEvalFunction(int node, int reverse_index, int param1, int param2,
                          const std::vector<Eigen::ArrayXXd> &forward_eval,
                          std::vector<Eigen::ArrayXXd> &reverse_eval) {
-  reverse_eval_map.at(node)(reverse_index, param1, param2, forward_eval, reverse_eval);
+  switch (node) {
+    case Op::kInteger :
+      return integer_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                  reverse_eval);
+    case Op::kVariable :
+      return loadx_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kConstant :
+      return loadc_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kAddition :
+      return add_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kSubtraction :
+      return subtract_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kMultiplication :
+      return multiply_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kDivision :
+      return divide_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kSin :
+      return sin_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kCos :
+      return cos_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kExponential :
+      return exp_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kLogarithm :
+      return log_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kPower :
+      return pow_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kAbs :
+      return abs_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kSqrt :
+      return sqrt_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kSafePower :
+      return safepow_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kSinh :
+      return sinh_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+    case Op::kCosh :
+      return cosh_reverse_eval(reverse_index, param1, param2, forward_eval,
+                                reverse_eval);
+  }
+  throw std::runtime_error("Unknown Operator In Reverse Evaluation");
 }
 } // namespace backend
 } // namespace bingo

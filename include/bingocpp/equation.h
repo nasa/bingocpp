@@ -40,7 +40,7 @@ class Equation {
    * @return Eigen::ArrayXXd The evaluation of function at points x.
    */
   virtual Eigen::ArrayXXd 
-  EvaluateEquationAt(const Eigen::ArrayXXd &x) const = 0;
+  EvaluateEquationAt(const Eigen::ArrayXXd &x) = 0;
 
   /**
    * @brief Evaluate the Equation and get its derivatives
@@ -55,7 +55,7 @@ class Equation {
    * along the points x and the derivative of the equation with respect to x.
    */
   virtual EvalAndDerivative
-  EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd &x) const = 0;
+  EvaluateEquationWithXGradientAt(const Eigen::ArrayXXd &x) = 0;
 
   /**
    * @brief Evaluate the Equation and get its derivatives.
@@ -71,35 +71,14 @@ class Equation {
    * the constants of the equation.
    */
   virtual EvalAndDerivative
-  EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x) const = 0;
-
-  /**
-   * @brief Get the Latex String of this Equation.
-   * 
-   * @return std::string 
-   */
-  virtual std::string GetLatexString() const = 0;
-
-  /**
-   * @brief Get the Console String this Equation.
-   * 
-   * @return std::string 
-   */
-  virtual std::string GetConsoleString() const = 0;
-
-  /**
-   * @brief Get the Stack String this Equation.
-   * 
-   * @return std::string 
-   */
-  virtual std::string GetStackString() const = 0;
+  EvaluateEquationWithLocalOptGradientAt(const Eigen::ArrayXXd &x) = 0;
 
   /**
    * @brief Get the Complexity of this Equation.
    * 
    * @return int 
    */
-  virtual int GetComplexity() const = 0;
+  virtual int GetComplexity() = 0;
 
 };
 } // namespace bingo

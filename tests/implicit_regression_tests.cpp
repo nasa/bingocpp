@@ -3,7 +3,7 @@
 #include "gtest/gtest.h"
 #include <Eigen/Dense>
 
-#include <BingoCpp/implicit_regression.h>
+#include <bingocpp/implicit_regression.h>
 
 #include "test_fixtures.h"
 
@@ -50,9 +50,7 @@ class ImplicitRegressionTestNormalize : public ImplicitRegressionFixture,
 };
 
 TEST_P(ImplicitRegressionTestNormalize, EvaluateIndividualFitness) {
-  bool normalize_dot_product = GetParam();
-  auto regressor
-      = new ImplicitRegression(training_data_, -1, normalize_dot_product);
+  auto regressor = new ImplicitRegression(training_data_, -1);
   double fitness = regressor->EvaluateIndividualFitness(sum_equation_);
   ASSERT_TRUE(0.14563031020 - fitness < 1e-10);
   delete regressor;
@@ -77,9 +75,7 @@ TEST_P(ImplicitRegressionTestNonNormalized, EvaluateIndividualFitness) {
   auto const &param = GetParam();
   auto required_params = std::get<0>(param);
   auto infinite_fitness = std::get<1>(param);
-  auto regressor = new ImplicitRegression(training_data_,
-                                          required_params,
-                                          infinite_fitness);
+  auto regressor = new ImplicitRegression(training_data_, required_params);
   double fitness = regressor->EvaluateIndividualFitness(sum_equation_);
   ASSERT_TRUE(!std::isfinite(fitness) == infinite_fitness);
   delete regressor;
@@ -120,6 +116,25 @@ TEST_F(ImplicitRegressionTest, CorrectTrainingDataSize) {
     ASSERT_EQ(training_data->Size(), size);
     delete training_data;
   }
+}
+
+TEST_F(ImplicitRegressionTest, DumpLoadTrainingData) {
+  ImplicitTrainingData* training_data_copy = new ImplicitTrainingData(training_data_->DumpState());
+
+  ASSERT_TRUE(testutils::almost_equal(training_data_->x,
+                                      training_data_copy->x));
+  ASSERT_TRUE(testutils::almost_equal(training_data_->dx_dt,
+                                      training_data_copy->dx_dt));
+
+}
+
+TEST_F(ImplicitRegressionTest, DumpLoadRegression) {
+  ImplicitRegression regressor(training_data_);
+  regressor.SetEvalCount(123);
+  ImplicitRegression regressor_copy = ImplicitRegression(regressor.DumpState());
+
+  ASSERT_EQ(regressor_copy.GetEvalCount(), 123);
+
 }
 
 TEST(ImplicitRegressionPartials, PartialCalculationInTrainingData) {

@@ -4,13 +4,15 @@
 #include <Eigen/Dense>
 #include <gtest/gtest.h>
 
-#include <BingoCpp/backend.h>
+#include <bingocpp/agraph/evaluation_backend/evaluation_backend.h>
+#include <bingocpp/agraph/simplification_backend/simplification_backend.h>
 
 #include "testing_utils.h"
 #include "test_fixtures.h"
 
 using namespace bingo;
-using namespace backend;
+using namespace evaluation_backend;
+using namespace simplification_backend;
 
 namespace {
 
@@ -147,68 +149,6 @@ std::vector<Eigen::ArrayXXd> init_op_c_derivs(
 }
 };
 
-TEST_P(AGraphBackend, simplify_and_evaluate) {
-  int operator_i = GetParam();
-  Eigen::ArrayXXd expected_outcome = operator_evals_x0[operator_i];
-
-  Eigen::ArrayX3i stack(3, 3);
-  stack << 0, 0, 0,
-           0, 1, 0,
-           operator_i, 0, 0;
-  Eigen::ArrayXXd f_of_x = SimplifyAndEvaluate(stack,
-                                               sample_agraph_1_values.x_vals,
-                                               sample_agraph_1_values.constants);
-  ASSERT_TRUE(testutils::almost_equal(expected_outcome, f_of_x));
-}
-
-TEST_P(AGraphBackend, simplify_and_evaluate_x_deriv) {
-  int operator_i = GetParam();
-  Eigen::ArrayXXd expected_derivative = 
-    Eigen::ArrayXXd::Zero(sample_agraph_1_values.x_vals.rows(), 2);
-  expected_derivative.col(0) = operator_x_derivs[operator_i];
-
-  Eigen::ArrayX3i stack(4, 3);
-  stack << 0, 0, 0,
-           0, 0, 0,
-           0, 1, 1,
-           operator_i, 0, 1;
-
-  Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals;
-  Eigen::ArrayXXd constants = sample_agraph_1_values.constants;
-  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> res_and_gradient = 
-    SimplifyAndEvaluateWithDerivative(stack,
-                                      x_0,
-                                      constants,
-                                      true);
-  Eigen::ArrayXXd df_dx = res_and_gradient.second;
-  ASSERT_TRUE(testutils::almost_equal(expected_derivative, df_dx));
-}
-
-TEST_P(AGraphBackend, simplify_and_evaluate_c_deriv) {
-  int operator_i = GetParam();
-  int num_x_points = sample_agraph_1_values.x_vals.rows();
-  int num_consts = sample_agraph_1_values.constants.size();
-  int last_col = num_consts - 1;
-  Eigen::ArrayXXd expected_derivative = 
-    Eigen::MatrixXd::Zero(num_x_points, num_consts).array();
-  expected_derivative.col(last_col) = operator_c_derivs[operator_i];
-  
-  Eigen::ArrayX3i stack(4, 3);
-  stack << 1, 1, 1,
-           1, 1, 1,
-           0, 1, 1,
-           operator_i, 1, 0;
-  
-  Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals;
-  Eigen::ArrayXXd constants = sample_agraph_1_values.constants;
-  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> res_and_gradient = 
-    SimplifyAndEvaluateWithDerivative(stack,
-                                      x_0,
-                                      constants,
-                                      false);
-  Eigen::ArrayXXd df_dc = res_and_gradient.second;
-  ASSERT_TRUE(testutils::almost_equal(expected_derivative, df_dc));
-}
 INSTANTIATE_TEST_CASE_P(,AGraphBackend, ::testing::Range(0, N_OPS, 1));
 
 TEST_F(AGraphBackend, evaluate) {
@@ -229,21 +169,6 @@ TEST_F(AGraphBackend, evaluate_and_derivative) {
 
   ASSERT_TRUE(testutils::almost_equal(y_and_dy.first, y_true));
   ASSERT_TRUE(testutils::almost_equal(y_and_dy.second, dy_true));
-}
-
-TEST_F(AGraphBackend, mask_evaluate) {
-  Eigen::ArrayXXd y = Evaluate(simple_stack, x, constants);
-  Eigen::ArrayXXd y_simple = SimplifyAndEvaluate(simple_stack, x, constants);
-  ASSERT_TRUE(testutils::almost_equal(y, y_simple));
-}
-
-TEST_F(AGraphBackend, mask_evaluate_and_derivative) {
-  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy =
-    EvaluateWithDerivative(simple_stack, x, constants);
-  std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy_simple =
-    SimplifyAndEvaluateWithDerivative(simple_stack, x, constants);
-  ASSERT_TRUE(testutils::almost_equal(y_and_dy.first, y_and_dy_simple.first));
-  ASSERT_TRUE(testutils::almost_equal(y_and_dy.first, y_and_dy_simple.first));
 }
 
 TEST_F(AGraphBackend, get_utilized_commands) {
