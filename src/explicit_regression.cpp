@@ -39,12 +39,12 @@ ExplicitRegressionState ExplicitRegression::DumpState() {
           metric_, eval_count_);
 }
 
-std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd> ExplicitRegression::GetFitnessVectorAndJacobian(
-    const Equation &individual) const {
+std::tuple<Eigen::VectorXd, Eigen::ArrayXXd> ExplicitRegression::GetFitnessVectorAndJacobian(
+    Equation &individual) const {
   Eigen::ArrayXXd f_of_x, df_dc;
   const Eigen::ArrayXXd x = ((ExplicitTrainingData*)training_data_)->x;
   std::tie(f_of_x, df_dc) = individual.EvaluateEquationWithLocalOptGradientAt(x);
-  return std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd>{this->EvaluateFitnessVector(individual), df_dc};
+  return std::tuple<Eigen::VectorXd, Eigen::ArrayXXd>{this->EvaluateFitnessVector(individual), df_dc};
 }
 
 } // namespace bingo

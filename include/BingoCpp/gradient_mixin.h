@@ -9,7 +9,7 @@ namespace bingo {
 
 class GradientMixin {
  public:
-  virtual std::tuple<double, Eigen::ArrayXXd> GetIndividualFitnessAndGradient(const Equation &individual) const = 0;
+  virtual std::tuple<double, Eigen::ArrayXXd> GetIndividualFitnessAndGradient(Equation &individual) const = 0;
 };
 
 class VectorGradientMixin : public GradientMixin {
@@ -45,9 +45,9 @@ class VectorGradientMixin : public GradientMixin {
  public:
   VectorGradientMixin(TrainingData *training_data = nullptr, std::string metric = "mae");
 
-  std::tuple<double, Eigen::ArrayXXd> GetIndividualFitnessAndGradient(const Equation &individual) const;
+  std::tuple<double, Eigen::ArrayXXd> GetIndividualFitnessAndGradient(Equation &individual) const;
 
-  virtual std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(const Equation &individual) const = 0;
+  virtual std::tuple<Eigen::VectorXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const = 0;
 };
 
 } // namespace bingo

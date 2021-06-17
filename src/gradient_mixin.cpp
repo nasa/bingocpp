@@ -20,7 +20,7 @@ VectorGradientMixin::VectorGradientMixin(TrainingData *training_data, std::strin
   }
 }
 
-std::tuple<double, Eigen::ArrayXXd> VectorGradientMixin::GetIndividualFitnessAndGradient(const Equation &individual) const {
+std::tuple<double, Eigen::ArrayXXd> VectorGradientMixin::GetIndividualFitnessAndGradient(Equation &individual) const {
   Eigen::ArrayXXd fitness_vector, jacobian;
   std::tie(fitness_vector, jacobian) = this->GetFitnessVectorAndJacobian(individual);
   double fitness = this->metric_function_(fitness_vector);
