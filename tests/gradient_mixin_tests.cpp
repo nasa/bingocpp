@@ -54,12 +54,12 @@ class ImplementedVectorMixin : public VectorGradientMixin {
 class GradientMixinTest : public ::testing::TestWithParam<std::tuple<std::string, double, std::vector<double>>> {
  public:
   VectorGradFitnessFunction fitness_function_;
-  Eigen::ArrayXXd expected_gradient_;
+  Eigen::VectorXd expected_gradient_;
   double expected_fitness_;
 
   void SetUp() {
     std::tie(fitness_function_metric_, expected_fitness_, expected_gradient_data_) = GetParam();
-    expected_gradient_ = Eigen::ArrayXXd(1, 2);
+    expected_gradient_ = Eigen::VectorXd(1, 2);
     expected_gradient_ << expected_gradient_data_[0], expected_gradient_data_[1];
     fitness_function_ = VectorGradFitnessFunction(nullptr, fitness_function_metric_);
   }
@@ -74,7 +74,7 @@ class GradientMixinTest : public ::testing::TestWithParam<std::tuple<std::string
 
 TEST_P(GradientMixinTest, VectorGradient) {
   double fitness;
-  Eigen::ArrayXXd gradient;
+  Eigen::VectorXd gradient;
   AGraph empty_individual(false);
   std::tie(fitness, gradient) = fitness_function_.GetIndividualFitnessAndGradient(empty_individual);
   ASSERT_EQ(fitness, expected_fitness_);

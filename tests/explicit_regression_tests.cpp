@@ -56,10 +56,10 @@ TEST_F(TestExplicitRegression, EvaluateIndividualFitnessWithNaN) {
 
 TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradient) {
   ExplicitRegression regressor(training_data_);
-  Eigen::ArrayXXd expected_gradient = Eigen::ArrayXXd::Zero(1, 5);
+  Eigen::VectorXd expected_gradient = Eigen::ArrayXXd::Zero(1, 5);
 
   double fitness;
-  Eigen::ArrayXXd gradient;
+  Eigen::VectorXd gradient;
   std::tie(fitness, gradient) = regressor.GetIndividualFitnessAndGradient(sum_equation_);
 
   ASSERT_TRUE(fitness < 1e-10);
