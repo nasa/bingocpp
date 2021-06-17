@@ -26,16 +26,17 @@ class VectorGradientMixin : public GradientMixin {
     return sqrt(fitness_vector.square().mean());
   }
 
-  static Eigen::ArrayXXd mean_absolute_error_derivative(const Eigen::ArrayXXd &fitness_vector, const Eigen::ArrayXXd &fitness_partials) {
-    return (fitness_partials.rowwise() * fitness_vector.transpose()(0, Eigen::all).sign()).rowwise().mean();
+  static Eigen::VectorXd mean_absolute_error_derivative(const Eigen::VectorXd &fitness_vector, const Eigen::ArrayXXd &fitness_partials) {
+    return (fitness_partials.rowwise() * fitness_vector.transpose()(0, Eigen::all).array().sign()).rowwise().mean();
   }
 
-  static Eigen::ArrayXXd mean_squared_error_derivative(const Eigen::ArrayXXd &fitness_vector, const Eigen::ArrayXXd &fitness_partials) {
-    return 2.0 * (fitness_partials.rowwise() * fitness_vector.transpose()(0, Eigen::all)).rowwise().mean();
+  static Eigen::VectorXd mean_squared_error_derivative(const Eigen::VectorXd &fitness_vector, const Eigen::ArrayXXd &fitness_partials) {
+    return 2.0 * (fitness_partials.rowwise() * fitness_vector.transpose()(0, Eigen::all).array()).rowwise().mean();
   }
 
-  static Eigen::ArrayXXd root_mean_squared_error_derivative(const Eigen::ArrayXXd &fitness_vector, const Eigen::ArrayXXd &fitness_partials) {
-    return 1.0/sqrt(fitness_vector.transpose()(0, Eigen::all).square().mean()) * (fitness_partials.rowwise() * fitness_vector.transpose()(0, Eigen::all)).rowwise().mean();
+  static Eigen::VectorXd root_mean_squared_error_derivative(const Eigen::VectorXd &fitness_vector, const Eigen::ArrayXXd &fitness_partials) {
+    return 1.0/sqrt(fitness_vector.transpose()(0, Eigen::all).array().square().mean()) *
+    (fitness_partials.rowwise() * fitness_vector.transpose()(0, Eigen::all).array()).rowwise().mean();
   }
 
  private:
