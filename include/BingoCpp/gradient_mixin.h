@@ -14,16 +14,16 @@ class GradientMixin {
 
 class VectorGradientMixin : public GradientMixin {
  protected:
-  static double mean_absolute_error(const Eigen::ArrayXXd &fitness_vector) {
-    return fitness_vector.abs().mean();
+  static double mean_absolute_error(const Eigen::VectorXd &fitness_vector) {
+    return fitness_vector.array().abs().mean();
   }
 
-  static double mean_squared_error(const Eigen::ArrayXXd &fitness_vector) {
-    return fitness_vector.square().mean();
+  static double mean_squared_error(const Eigen::VectorXd &fitness_vector) {
+    return fitness_vector.array().square().mean();
   }
 
-  static double root_mean_squared_error(const Eigen::ArrayXXd &fitness_vector) {
-    return sqrt(fitness_vector.square().mean());
+  static double root_mean_squared_error(const Eigen::VectorXd &fitness_vector) {
+    return sqrt(fitness_vector.array().square().mean());
   }
 
   static Eigen::VectorXd mean_absolute_error_derivative(const Eigen::VectorXd &fitness_vector, const Eigen::ArrayXXd &fitness_partials) {
