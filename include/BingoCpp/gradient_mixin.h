@@ -1,6 +1,6 @@
 #include <Eigen/Dense>
-#include <BingoCpp/equation.h>
-#include <BingoCpp/fitness_function.h>
+#include <bingocpp/equation.h>
+#include <bingocpp/fitness_function.h>
 
 #include <functional>
 #include <cmath>

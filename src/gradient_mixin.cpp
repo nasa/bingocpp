@@ -1,5 +1,5 @@
 #include <Eigen/Dense>
-#include <BingoCpp/gradient_mixin.h>
+#include <bingocpp/gradient_mixin.h>
 
 #include <tuple>
 
