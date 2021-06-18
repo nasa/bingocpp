@@ -16,6 +16,13 @@ class GradientMixin {
 };
 
 class VectorGradientMixin : public GradientMixin {
+ public:
+  VectorGradientMixin(TrainingData *training_data = nullptr, std::string metric = "mae");
+
+  std::tuple<double, Eigen::VectorXd> GetIndividualFitnessAndGradient(Equation &individual) const;
+
+  virtual std::tuple<Eigen::VectorXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const = 0;
+
  protected:
   static double mean_absolute_error(const Eigen::VectorXd &fitness_vector) {
     return fitness_vector.array().abs().mean();
@@ -48,13 +55,6 @@ class VectorGradientMixin : public GradientMixin {
  private:
   std::function<double(Eigen::ArrayXXd)> metric_function_;
   std::function<Eigen::ArrayXXd(Eigen::ArrayXXd, Eigen::ArrayXXd)> metric_derivative_;
-
- public:
-  VectorGradientMixin(TrainingData *training_data = nullptr, std::string metric = "mae");
-
-  std::tuple<double, Eigen::VectorXd> GetIndividualFitnessAndGradient(Equation &individual) const;
-
-  virtual std::tuple<Eigen::VectorXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const = 0;
 };
 
 } // namespace bingo
