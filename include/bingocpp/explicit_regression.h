@@ -78,7 +78,7 @@ class ExplicitRegression : public VectorGradientMixin, public VectorBasedFunctio
       VectorGradientMixin(new ExplicitTrainingData(*training_data), metric),
       VectorBasedFunction(new ExplicitTrainingData(*training_data), metric) {
       relative_ = relative;
-      }
+  }
 
   ExplicitRegression(const ExplicitRegressionState &state):
       VectorBasedFunction(new ExplicitTrainingData(std::get<0>(state)),
