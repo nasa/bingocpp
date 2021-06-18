@@ -1,12 +1,7 @@
 #include <gtest/gtest.h>
-#include <iostream>
-
 #include <Eigen/Dense>
 
 #include <bingocpp/gradient_mixin.h>
-#include <bingocpp/equation.h>
-#include <bingocpp/fitness_function.h>
-#include <bingocpp/agraph/agraph.h>
 
 #include <tuple>
 #include <string>
