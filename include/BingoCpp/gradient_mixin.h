@@ -1,3 +1,6 @@
+#ifndef BINGOCPP_INCLUDE_BINGOCPP_GRADIENT_MIXIN_H_
+#define BINGOCPP_INCLUDE_BINGOCPP_GRADIENT_MIXIN_H_
+
 #include <Eigen/Dense>
 #include <bingocpp/equation.h>
 #include <bingocpp/fitness_function.h>
@@ -55,3 +58,4 @@ class VectorGradientMixin : public GradientMixin {
 };
 
 } // namespace bingo
+#endif // BINGOCPP_INCLUDE_BINGOCPP_GRADIENT_MIXIN_H_
