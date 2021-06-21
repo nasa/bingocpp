@@ -20,6 +20,7 @@
 #include <stdexcept>
 #include <string>
 #include <unordered_set>
+#include <functional>
 
 #include <bingocpp/agraph/agraph.h>
 #include <bingocpp/equation.h>
@@ -82,7 +83,7 @@ class VectorBasedFunction : public FitnessFunction {
 
   double EvaluateIndividualFitness(Equation &individual) const {
     Eigen::VectorXd fitness_vector = EvaluateFitnessVector(individual);
-    return (const_cast<VectorBasedFunction*>(this)->*metric_function_)(fitness_vector);
+    return this->metric_function_(fitness_vector);
   }
 
   virtual Eigen::VectorXd
@@ -91,32 +92,32 @@ class VectorBasedFunction : public FitnessFunction {
  protected:
   std::string metric_;
 
-  double mean_absolute_error(const Eigen::ArrayXXd &fitness_vector) {
+  static double mean_absolute_error(const Eigen::ArrayXXd &fitness_vector) {
     return fitness_vector.abs().mean();
   }
 
-  double root_mean_square_error(const Eigen::ArrayXXd &fitness_vector) {
+  static double root_mean_squared_error(const Eigen::ArrayXXd &fitness_vector) {
     return sqrt(fitness_vector.square().mean());
   }
 
-  double mean_squared_error(const Eigen::ArrayXXd &fitness_vector) {
+  static double mean_squared_error(const Eigen::ArrayXXd &fitness_vector) {
     return fitness_vector.square().mean();
   }
 
-  MetricFunctionPointer GetMetric(std::string metric) {
+  std::function<double(Eigen::ArrayXXd)> GetMetric(std::string metric) {
     if (metric_found(kMeanAbsoluteError, metric)) {
-      return &VectorBasedFunction::mean_absolute_error;
+      return VectorBasedFunction::mean_absolute_error;
     } else if (metric_found(kMeanSquaredError, metric)) {
-      return &VectorBasedFunction::mean_squared_error;
+      return VectorBasedFunction::mean_squared_error;
     } else if (metric_found(kRootMeanSquaredError, metric)) {
-      return &VectorBasedFunction::root_mean_square_error;
+      return VectorBasedFunction::root_mean_squared_error;
     } else {
       throw std::invalid_argument("Invalid metric for Fitness Function");
     }
   }
 
  private:
-  mutable MetricFunctionPointer metric_function_;
+  std::function<double(Eigen::ArrayXXd)> metric_function_;
 };
 } // namespace bingo
 
