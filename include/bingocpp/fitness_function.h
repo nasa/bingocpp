@@ -92,19 +92,19 @@ class VectorBasedFunction : public FitnessFunction {
  protected:
   std::string metric_;
 
-  static double mean_absolute_error(const Eigen::ArrayXXd &fitness_vector) {
+  static double mean_absolute_error(const Eigen::ArrayXd &fitness_vector) {
     return fitness_vector.abs().mean();
   }
 
-  static double root_mean_squared_error(const Eigen::ArrayXXd &fitness_vector) {
+  static double root_mean_squared_error(const Eigen::ArrayXd &fitness_vector) {
     return sqrt(fitness_vector.square().mean());
   }
 
-  static double mean_squared_error(const Eigen::ArrayXXd &fitness_vector) {
+  static double mean_squared_error(const Eigen::ArrayXd &fitness_vector) {
     return fitness_vector.square().mean();
   }
 
-  std::function<double(Eigen::ArrayXXd)> GetMetric(std::string metric) {
+  std::function<double(Eigen::ArrayXd)> GetMetric(std::string metric) {
     if (metric_found(kMeanAbsoluteError, metric)) {
       return VectorBasedFunction::mean_absolute_error;
     } else if (metric_found(kMeanSquaredError, metric)) {
@@ -117,7 +117,7 @@ class VectorBasedFunction : public FitnessFunction {
   }
 
  private:
-  std::function<double(Eigen::ArrayXXd)> metric_function_;
+  std::function<double(Eigen::ArrayXd)> metric_function_;
 };
 } // namespace bingo
 
