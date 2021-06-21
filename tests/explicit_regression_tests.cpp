@@ -56,7 +56,7 @@ TEST_F(TestExplicitRegression, EvaluateIndividualFitnessWithNaN) {
 
 TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradient) {
   ExplicitRegression regressor(training_data_);
-  Eigen::ArrayXd expected_gradient = Eigen::VectorXd::Constant(5, 1, 1.0);
+  Eigen::ArrayXd expected_gradient = Eigen::ArrayXd::Constant(5, 1, 1.0);
 
   double fitness;
   Eigen::ArrayXd gradient;
@@ -68,7 +68,7 @@ TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradient) {
 
 TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradientRelative) {
   ExplicitRegression regressor(training_data_, "mae", true);
-  Eigen::ArrayXd expected_gradient = Eigen::VectorXd::Constant(5, 1, 1.0/2.5);
+  Eigen::ArrayXd expected_gradient = Eigen::ArrayXd::Constant(5, 1, 1.0/2.5);
 
   double fitness;
   Eigen::ArrayXd gradient;
@@ -80,7 +80,7 @@ TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradientRelative) {
 
 TEST_F(TestExplicitRegression, GetFitnessVectorAndJacobian) {
   ExplicitRegression regressor(training_data_);
-  Eigen::ArrayXd expected_fitness_vector = Eigen::VectorXd::Constant(10, 1, 2.5);
+  Eigen::ArrayXd expected_fitness_vector = Eigen::ArrayXd::Constant(10, 1, 2.5);
   Eigen::ArrayXXd expected_jacobian = training_data_->x;
 
   Eigen::ArrayXd fitness_vector;
@@ -93,7 +93,7 @@ TEST_F(TestExplicitRegression, GetFitnessVectorAndJacobian) {
 
 TEST_F(TestExplicitRegression, GetFitnessVectorAndJacobianRelative) {
   ExplicitRegression regressor(training_data_, "mae", true);
-  Eigen::ArrayXd expected_fitness_vector = Eigen::VectorXd::Constant(10, 1, 1.0);
+  Eigen::ArrayXd expected_fitness_vector = Eigen::ArrayXd::Constant(10, 1, 1.0);
   Eigen::ArrayXXd expected_jacobian = Eigen::ArrayXXd::Constant(10, 5, 1.0/2.5);
 
   Eigen::ArrayXd fitness_vector;
