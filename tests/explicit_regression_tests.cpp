@@ -56,10 +56,10 @@ TEST_F(TestExplicitRegression, EvaluateIndividualFitnessWithNaN) {
 
 TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradient) {
   ExplicitRegression regressor(training_data_);
-  Eigen::VectorXd expected_gradient = Eigen::VectorXd::Constant(5, 1, 1.0);
+  Eigen::ArrayXd expected_gradient = Eigen::VectorXd::Constant(5, 1, 1.0);
 
   double fitness;
-  Eigen::VectorXd gradient;
+  Eigen::ArrayXd gradient;
   std::tie(fitness, gradient) = regressor.GetIndividualFitnessAndGradient(sum_equation_);
 
   ASSERT_NEAR(fitness, 2.5, 1e-10);
@@ -68,10 +68,10 @@ TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradient) {
 
 TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradientRelative) {
   ExplicitRegression regressor(training_data_, "mae", true);
-    Eigen::VectorXd expected_gradient = Eigen::VectorXd::Constant(5, 1, 1.0/2.5);
+  Eigen::ArrayXd expected_gradient = Eigen::VectorXd::Constant(5, 1, 1.0/2.5);
 
   double fitness;
-  Eigen::VectorXd gradient;
+  Eigen::ArrayXd gradient;
   std::tie(fitness, gradient) = regressor.GetIndividualFitnessAndGradient(sum_equation_);
 
   ASSERT_NEAR(fitness, 1.0, 1e-10);
@@ -80,10 +80,10 @@ TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradientRelative) {
 
 TEST_F(TestExplicitRegression, GetFitnessVectorAndJacobian) {
   ExplicitRegression regressor(training_data_);
-  Eigen::VectorXd expected_fitness_vector = Eigen::VectorXd::Constant(10, 1, 2.5);
+  Eigen::ArrayXd expected_fitness_vector = Eigen::VectorXd::Constant(10, 1, 2.5);
   Eigen::ArrayXXd expected_jacobian = training_data_->x;
 
-  Eigen::VectorXd fitness_vector;
+  Eigen::ArrayXd fitness_vector;
   Eigen::ArrayXXd jacobian;
   std::tie(fitness_vector, jacobian) = regressor.GetFitnessVectorAndJacobian(sum_equation_);
 
@@ -93,10 +93,10 @@ TEST_F(TestExplicitRegression, GetFitnessVectorAndJacobian) {
 
 TEST_F(TestExplicitRegression, GetFitnessVectorAndJacobianRelative) {
   ExplicitRegression regressor(training_data_, "mae", true);
-  Eigen::VectorXd expected_fitness_vector = Eigen::VectorXd::Constant(10, 1, 1.0);
+  Eigen::ArrayXd expected_fitness_vector = Eigen::VectorXd::Constant(10, 1, 1.0);
   Eigen::ArrayXXd expected_jacobian = Eigen::ArrayXXd::Constant(10, 5, 1.0/2.5);
 
-  Eigen::VectorXd fitness_vector;
+  Eigen::ArrayXd fitness_vector;
   Eigen::ArrayXXd jacobian;
   std::tie(fitness_vector, jacobian) = regressor.GetFitnessVectorAndJacobian(sum_equation_);
 

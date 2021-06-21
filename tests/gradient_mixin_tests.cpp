@@ -19,18 +19,18 @@ class VectorGradFitnessFunction : public VectorGradientMixin, public VectorBased
       VectorBasedFunction(training_data, metric) {
   }
 
-  Eigen::VectorXd EvaluateFitnessVector(Equation &individual) const {
-    Eigen::VectorXd fitnessVector(3);
-    fitnessVector << -2.0, 0.0, 2.0;
-    return fitnessVector;
+  Eigen::ArrayXd EvaluateFitnessVector(Equation &individual) const {
+    Eigen::ArrayXd fitness_vector(3);
+    fitness_vector << -2.0, 0.0, 2.0;
+    return fitness_vector;
   }
 
-  std::tuple<Eigen::VectorXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const {
+  std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const {
     Eigen::ArrayXXd jacobian(3, 2);
     jacobian << 0.5, 1.0,
                 1.0, 2.0,
                -0.5, 3.0;
-    return std::tuple<Eigen::VectorXd, Eigen::ArrayXXd>{this->EvaluateFitnessVector(individual), jacobian};
+    return std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd>{this->EvaluateFitnessVector(individual), jacobian};
   }
 };
 
@@ -39,22 +39,22 @@ class ImplementedVectorMixin : public VectorGradientMixin {
   ImplementedVectorMixin(TrainingData *training_data = nullptr, std::string metric = "mae") :
       VectorGradientMixin(training_data, metric) {}
 
-  std::tuple<Eigen::VectorXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const {
-    Eigen::VectorXd emptyVector;
+  std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const {
+    Eigen::ArrayXd emptyVector;
     Eigen::ArrayXXd emptyArray;
-    return std::tuple<Eigen::VectorXd, Eigen::ArrayXXd>{emptyVector, emptyArray};
+    return std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd>{emptyVector, emptyArray};
   }
 };
 
 class GradientMixinTest : public ::testing::TestWithParam<std::tuple<std::string, double, std::vector<double>>> {
  public:
   VectorGradFitnessFunction fitness_function_;
-  Eigen::VectorXd expected_gradient_;
+  Eigen::ArrayXd expected_gradient_;
   double expected_fitness_;
 
   void SetUp() {
     std::tie(fitness_function_metric_, expected_fitness_, expected_gradient_data_) = GetParam();
-    expected_gradient_ = Eigen::VectorXd(2);
+    expected_gradient_ = Eigen::ArrayXd(2);
     expected_gradient_ << expected_gradient_data_[0], expected_gradient_data_[1];
     fitness_function_ = VectorGradFitnessFunction(nullptr, fitness_function_metric_);
   }
@@ -69,7 +69,7 @@ class GradientMixinTest : public ::testing::TestWithParam<std::tuple<std::string
 
 TEST_P(GradientMixinTest, VectorIndividualFitnessAndGradient) {
   double fitness;
-  Eigen::VectorXd gradient;
+  Eigen::ArrayXd gradient;
   AGraph empty_individual(false);
   std::tie(fitness, gradient) = fitness_function_.GetIndividualFitnessAndGradient(empty_individual);
   ASSERT_EQ(fitness, expected_fitness_);

@@ -82,11 +82,11 @@ class VectorBasedFunction : public FitnessFunction {
   virtual ~VectorBasedFunction() { }
 
   double EvaluateIndividualFitness(Equation &individual) const {
-    Eigen::VectorXd fitness_vector = EvaluateFitnessVector(individual);
+    Eigen::ArrayXd fitness_vector = EvaluateFitnessVector(individual);
     return this->metric_function_(fitness_vector);
   }
 
-  virtual Eigen::VectorXd
+  virtual Eigen::ArrayXd
   EvaluateFitnessVector(Equation &individual) const = 0;
 
  protected:

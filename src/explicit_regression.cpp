@@ -22,7 +22,7 @@ ExplicitTrainingData *ExplicitTrainingData::GetItem(
   return new ExplicitTrainingData(temp_in, temp_out);
 }
 
-Eigen::VectorXd ExplicitRegression::EvaluateFitnessVector(
+Eigen::ArrayXd ExplicitRegression::EvaluateFitnessVector(
     Equation &individual) const {
   ++ eval_count_;
   const Eigen::ArrayXXd x = ((ExplicitTrainingData*)training_data_)->x;
@@ -33,7 +33,7 @@ Eigen::VectorXd ExplicitRegression::EvaluateFitnessVector(
   return error;
 }
 
-std::tuple<Eigen::VectorXd, Eigen::ArrayXXd> ExplicitRegression::GetFitnessVectorAndJacobian(
+std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd> ExplicitRegression::GetFitnessVectorAndJacobian(
     Equation &individual) const {
   Eigen::ArrayXXd f_of_x, df_dc;
   const Eigen::ArrayXXd x = ((ExplicitTrainingData*)training_data_)->x;
@@ -41,7 +41,7 @@ std::tuple<Eigen::VectorXd, Eigen::ArrayXXd> ExplicitRegression::GetFitnessVecto
   if (relative_) {
     df_dc.colwise() /= ((ExplicitTrainingData*)training_data_)->y(Eigen::all, 0);
   }
-  return std::tuple<Eigen::VectorXd, Eigen::ArrayXXd>{this->EvaluateFitnessVector(individual), df_dc};
+  return std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd>{this->EvaluateFitnessVector(individual), df_dc};
 }
 
 ExplicitRegressionState ExplicitRegression::DumpState() {

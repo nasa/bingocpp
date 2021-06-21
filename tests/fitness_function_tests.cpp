@@ -37,7 +37,7 @@ class SampleFitnessFunction : public bingo::VectorBasedFunction {
       std::string metric = "mae") :
       bingo::VectorBasedFunction(training_data, metric) {}
   ~SampleFitnessFunction() {} 
-  Eigen::VectorXd EvaluateFitnessVector(bingo::Equation &individual) const {
+  Eigen::ArrayXd EvaluateFitnessVector(bingo::Equation &individual) const {
     Eigen::ArrayXXd f_of_x =
         individual.EvaluateEquationAt(((SampleTrainingData*)training_data_)->x);
     return f_of_x - ((SampleTrainingData*)training_data_)->y;

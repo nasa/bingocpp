@@ -92,9 +92,9 @@ class ExplicitRegression : public VectorGradientMixin, public VectorBasedFunctio
 
   ExplicitRegressionState DumpState();
 
-  Eigen::VectorXd EvaluateFitnessVector(Equation &individual) const;
+  Eigen::ArrayXd EvaluateFitnessVector(Equation &individual) const;
 
-  std::tuple<Eigen::VectorXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const;
+  std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const;
 
   private:
    bool relative_;
