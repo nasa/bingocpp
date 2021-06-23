@@ -29,18 +29,18 @@
 namespace metric_functions {
 
 const std::unordered_set<std::string> kMeanAbsoluteError = {
-    "mean_absolute_error",
-    "mae"
+  "mean_absolute_error",
+  "mae"
 };
 
 const std::unordered_set<std::string> kMeanSquaredError = {
-    "mean_squared_error",
-    "mse"
+  "mean_squared_error",
+  "mse"
 };
 
 const std::unordered_set<std::string> kRootMeanSquaredError = {
-    "root_mean_squared_error",
-    "rmse"
+  "root_mean_squared_error",
+  "rmse"
 };
 
 inline bool metric_found(const std::unordered_set<std::string> &set,
