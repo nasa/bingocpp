@@ -26,22 +26,42 @@
 #include <bingocpp/equation.h>
 #include <bingocpp/training_data.h>
 
-namespace bingo {
+namespace metric_functions {
 
 const std::unordered_set<std::string> kMeanAbsoluteError = {
-  "mean_absolute_error",
-  "mae"
+    "mean_absolute_error",
+    "mae"
 };
 
 const std::unordered_set<std::string> kMeanSquaredError = {
-  "mean_squared_error",
-  "mse"
+    "mean_squared_error",
+    "mse"
 };
 
 const std::unordered_set<std::string> kRootMeanSquaredError = {
-  "root_mean_squared_error",
-  "rmse"
+    "root_mean_squared_error",
+    "rmse"
 };
+
+inline bool metric_found(const std::unordered_set<std::string> &set,
+                         std::string metric) {
+  return set.find(metric) != set.end();
+}
+
+inline double mean_absolute_error(const Eigen::ArrayXd &fitness_vector) {
+  return fitness_vector.abs().mean();
+}
+
+inline double root_mean_squared_error(const Eigen::ArrayXd &fitness_vector) {
+  return sqrt(fitness_vector.square().mean());
+}
+
+inline double mean_squared_error(const Eigen::ArrayXd &fitness_vector) {
+  return fitness_vector.square().mean();
+}
+} // namespace metric_functions
+
+namespace bingo {
 
 class FitnessFunction {
  public:
@@ -65,11 +85,6 @@ class FitnessFunction {
   TrainingData* training_data_;
 };
 
-inline bool metric_found(const std::unordered_set<std::string> &set,
-                         std::string metric) {
-  return set.find(metric) != set.end();
-}
-
 class VectorBasedFunction : public FitnessFunction {
  public:
   typedef double (VectorBasedFunction::* MetricFunctionPointer)(const Eigen::ArrayXXd&);
@@ -92,25 +107,13 @@ class VectorBasedFunction : public FitnessFunction {
  protected:
   std::string metric_;
 
-  static double mean_absolute_error(const Eigen::ArrayXd &fitness_vector) {
-    return fitness_vector.abs().mean();
-  }
-
-  static double root_mean_squared_error(const Eigen::ArrayXd &fitness_vector) {
-    return sqrt(fitness_vector.square().mean());
-  }
-
-  static double mean_squared_error(const Eigen::ArrayXd &fitness_vector) {
-    return fitness_vector.square().mean();
-  }
-
   std::function<double(Eigen::ArrayXd)> GetMetric(std::string metric) {
-    if (metric_found(kMeanAbsoluteError, metric)) {
-      return VectorBasedFunction::mean_absolute_error;
-    } else if (metric_found(kMeanSquaredError, metric)) {
-      return VectorBasedFunction::mean_squared_error;
-    } else if (metric_found(kRootMeanSquaredError, metric)) {
-      return VectorBasedFunction::root_mean_squared_error;
+    if (metric_functions::metric_found(metric_functions::kMeanAbsoluteError, metric)) {
+      return metric_functions::mean_absolute_error;
+    } else if (metric_functions::metric_found(metric_functions::kMeanSquaredError, metric)) {
+      return metric_functions::mean_squared_error;
+    } else if (metric_functions::metric_found(metric_functions::kRootMeanSquaredError, metric)) {
+      return metric_functions::root_mean_squared_error;
     } else {
       throw std::invalid_argument("Invalid metric for Fitness Function");
     }
