@@ -1,1 +1,10 @@
-from .build.bingocpp import *
+from .build.bingocpp import Equation, \
+                            AGraph, \
+                            ExplicitRegression, \
+                            ExplicitTrainingData, \
+                            ImplicitRegression, \
+                            ImplicitTrainingData, \
+                            evaluation_backend, \
+                            simplification_backend
+
+del build
