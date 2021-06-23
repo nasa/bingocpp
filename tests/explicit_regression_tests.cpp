@@ -1,4 +1,5 @@
 #include <cmath>
+#include <tuple>
 
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
@@ -51,6 +52,56 @@ TEST_F(TestExplicitRegression, EvaluateIndividualFitnessWithNaN) {
   ExplicitRegression regressor(training_data_);
   double fitness = regressor.EvaluateIndividualFitness(sum_equation_);
   ASSERT_TRUE(std::isnan(fitness));
+}
+
+TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradient) {
+  ExplicitRegression regressor(training_data_);
+  Eigen::ArrayXd expected_gradient = Eigen::ArrayXd::Constant(5, 1, 1.0);
+
+  double fitness;
+  Eigen::ArrayXd gradient;
+  std::tie(fitness, gradient) = regressor.GetIndividualFitnessAndGradient(sum_equation_);
+
+  ASSERT_NEAR(fitness, 2.5, 1e-10);
+  ASSERT_TRUE(expected_gradient.isApprox(gradient));
+}
+
+TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradientRelative) {
+  ExplicitRegression regressor(training_data_, "mae", true);
+  Eigen::ArrayXd expected_gradient = Eigen::ArrayXd::Constant(5, 1, 1.0/2.5);
+
+  double fitness;
+  Eigen::ArrayXd gradient;
+  std::tie(fitness, gradient) = regressor.GetIndividualFitnessAndGradient(sum_equation_);
+
+  ASSERT_NEAR(fitness, 1.0, 1e-10);
+  ASSERT_TRUE(expected_gradient.isApprox(gradient));
+}
+
+TEST_F(TestExplicitRegression, GetFitnessVectorAndJacobian) {
+  ExplicitRegression regressor(training_data_);
+  Eigen::ArrayXd expected_fitness_vector = Eigen::ArrayXd::Constant(10, 1, 2.5);
+  Eigen::ArrayXXd expected_jacobian = training_data_->x;
+
+  Eigen::ArrayXd fitness_vector;
+  Eigen::ArrayXXd jacobian;
+  std::tie(fitness_vector, jacobian) = regressor.GetFitnessVectorAndJacobian(sum_equation_);
+
+  ASSERT_TRUE(expected_fitness_vector.isApprox(fitness_vector));
+  ASSERT_TRUE(expected_jacobian.isApprox(jacobian));
+}
+
+TEST_F(TestExplicitRegression, GetFitnessVectorAndJacobianRelative) {
+  ExplicitRegression regressor(training_data_, "mae", true);
+  Eigen::ArrayXd expected_fitness_vector = Eigen::ArrayXd::Constant(10, 1, 1.0);
+  Eigen::ArrayXXd expected_jacobian = Eigen::ArrayXXd::Constant(10, 5, 1.0/2.5);
+
+  Eigen::ArrayXd fitness_vector;
+  Eigen::ArrayXXd jacobian;
+  std::tie(fitness_vector, jacobian) = regressor.GetFitnessVectorAndJacobian(sum_equation_);
+
+  ASSERT_TRUE(expected_fitness_vector.isApprox(fitness_vector));
+  ASSERT_TRUE(expected_jacobian.isApprox(jacobian));
 }
 
 TEST_F(TestExplicitRegression, GetSubsetOfTrainingData) {

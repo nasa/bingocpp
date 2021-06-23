@@ -26,6 +26,7 @@
 #include "bingocpp/equation.h"
 #include "bingocpp/fitness_function.h"
 #include "bingocpp/training_data.h"
+#include "bingocpp/gradient_mixin.h"
 
 typedef std::tuple<Eigen::ArrayXXd, Eigen::ArrayXXd> ExplicitTrainingDataState;
 typedef std::tuple<ExplicitTrainingDataState, std::string, int> ExplicitRegressionState;
@@ -69,14 +70,15 @@ struct ExplicitTrainingData : TrainingData {
   }
 };
 
-class ExplicitRegression : public VectorBasedFunction {
+class ExplicitRegression : public VectorGradientMixin, public VectorBasedFunction {
  public:
   ExplicitRegression(ExplicitTrainingData *training_data,
                      std::string metric="mae",
                      bool relative=false) :
+      VectorGradientMixin(new ExplicitTrainingData(*training_data), metric),
       VectorBasedFunction(new ExplicitTrainingData(*training_data), metric) {
       relative_ = relative;
-      }
+  }
 
   ExplicitRegression(const ExplicitRegressionState &state):
       VectorBasedFunction(new ExplicitTrainingData(std::get<0>(state)),
@@ -90,7 +92,9 @@ class ExplicitRegression : public VectorBasedFunction {
 
   ExplicitRegressionState DumpState();
 
-  Eigen::VectorXd EvaluateFitnessVector(Equation &individual) const;
+  Eigen::ArrayXd EvaluateFitnessVector(Equation &individual) const;
+
+  std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const;
 
   private:
    bool relative_;

@@ -97,7 +97,7 @@ class ImplicitRegression : public VectorBasedFunction {
 
   ImplicitRegressionState DumpState();
 
-  Eigen::VectorXd EvaluateFitnessVector(Equation &equation) const;
+  Eigen::ArrayXd EvaluateFitnessVector(Equation &equation) const;
 
  private:
   int required_params_;

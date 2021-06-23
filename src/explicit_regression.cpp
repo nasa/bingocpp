@@ -1,4 +1,5 @@
 #include <iostream>
+#include <tuple>
 
 #include "bingocpp/explicit_regression.h"
 
@@ -21,7 +22,7 @@ ExplicitTrainingData *ExplicitTrainingData::GetItem(
   return new ExplicitTrainingData(temp_in, temp_out);
 }
 
-Eigen::VectorXd ExplicitRegression::EvaluateFitnessVector(
+Eigen::ArrayXd ExplicitRegression::EvaluateFitnessVector(
     Equation &individual) const {
   ++ eval_count_;
   const Eigen::ArrayXXd x = ((ExplicitTrainingData*)training_data_)->x;
@@ -32,11 +33,21 @@ Eigen::VectorXd ExplicitRegression::EvaluateFitnessVector(
   return error;
 }
 
+std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd> ExplicitRegression::GetFitnessVectorAndJacobian(
+    Equation &individual) const {
+  Eigen::ArrayXXd f_of_x, df_dc;
+  const Eigen::ArrayXXd x = ((ExplicitTrainingData*)training_data_)->x;
+  std::tie(f_of_x, df_dc) = individual.EvaluateEquationWithLocalOptGradientAt(x);
+  if (relative_) {
+    df_dc.colwise() /= ((ExplicitTrainingData*)training_data_)->y(Eigen::all, 0);
+  }
+  return std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd>{this->EvaluateFitnessVector(individual), df_dc};
+}
+
 ExplicitRegressionState ExplicitRegression::DumpState() {
   return ExplicitRegressionState(
           ((ExplicitTrainingData*)training_data_)->DumpState(),
           metric_, eval_count_);
 }
-
 
 } // namespace bingo
