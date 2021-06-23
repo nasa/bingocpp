@@ -35,13 +35,17 @@ Eigen::ArrayXd ExplicitRegression::EvaluateFitnessVector(
 
 std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd> ExplicitRegression::GetFitnessVectorAndJacobian(
     Equation &individual) const {
+  ++ eval_count_;
   Eigen::ArrayXXd f_of_x, df_dc;
   const Eigen::ArrayXXd x = ((ExplicitTrainingData*)training_data_)->x;
   std::tie(f_of_x, df_dc) = individual.EvaluateEquationWithLocalOptGradientAt(x);
+
+  Eigen::ArrayXXd error = f_of_x - ((ExplicitTrainingData*)training_data_)->y;
   if (relative_) {
+    error /= ((ExplicitTrainingData*)training_data_)->y;
     df_dc.colwise() /= ((ExplicitTrainingData*)training_data_)->y(Eigen::all, 0);
   }
-  return std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd>{this->EvaluateFitnessVector(individual), df_dc};
+  return std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd>{error, df_dc};
 }
 
 ExplicitRegressionState ExplicitRegression::DumpState() {
