@@ -29,8 +29,15 @@ void add_evaluation_backend_submodule(py::module &parent) {
   py::module m = parent.def_submodule("evaluation_backend",
                                       "The evaluation backend for Agraphs");
   m.attr("ENGINE") = "c++";
-  m.def("evaluate", &evaluation_backend::Evaluate, "Evaluate an equation");
+  m.def("evaluate", &evaluation_backend::Evaluate, "Evaluate an equation",
+        py::arg("stack"),
+        py::arg("x"),
+        py::arg("constants"));
   m.def("evaluate_with_derivative",
         &evaluation_backend::EvaluateWithDerivative,
-        "Evaluate equation and take derivative");
+        "Evaluate equation and take derivative",
+        py::arg("stack"),
+        py::arg("x"),
+        py::arg("constants"),
+        py::arg("wrt_param_x_or_c"));
 }
