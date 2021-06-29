@@ -32,7 +32,7 @@ void add_regressor_classes(py::module &parent) {
     .def(py::init<Eigen::ArrayXXd &>(), py::arg("x"))
     .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>(),
          py::arg("x"),
-         py::arg("dx_dt") = static_cast<Eigen::ArrayXXd *>(nullptr))
+         py::arg("dx_dt"))
     .def_readwrite("x", &ImplicitTrainingData::x)
     .def_readwrite("dx_dt", &ImplicitTrainingData::dx_dt)
     .def("__getitem__", 
