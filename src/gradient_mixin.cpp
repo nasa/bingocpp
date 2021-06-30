@@ -6,14 +6,14 @@
 namespace bingo {
 
 VectorGradientMixin::VectorGradientMixin(TrainingData *training_data, std::string metric) {
-  if (metric_found(kMeanAbsoluteError, metric)) {
-    metric_function_ = VectorGradientMixin::mean_absolute_error;
+  if (metric_functions::metric_found(metric_functions::kMeanAbsoluteError, metric)) {
+    metric_function_ = metric_functions::mean_absolute_error;
     metric_derivative_ = VectorGradientMixin::mean_absolute_error_derivative;
-  } else if (metric_found(kMeanSquaredError, metric)) {
-    metric_function_ = VectorGradientMixin::mean_squared_error;
+  } else if (metric_functions::metric_found(metric_functions::kMeanSquaredError, metric)) {
+    metric_function_ = metric_functions::mean_squared_error;
     metric_derivative_ = VectorGradientMixin::mean_squared_error_derivative;
-  } else if (metric_found(kRootMeanSquaredError, metric)) {
-    metric_function_ = VectorGradientMixin::root_mean_squared_error;
+  } else if (metric_functions::metric_found(metric_functions::kRootMeanSquaredError, metric)) {
+    metric_function_ = metric_functions::root_mean_squared_error;
     metric_derivative_ = VectorGradientMixin::root_mean_squared_error_derivative;
   } else {
     throw std::invalid_argument("Invalid metric for VectorGradientMixin");

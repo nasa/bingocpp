@@ -37,25 +37,32 @@ class TestExplicitRegression : public testing::Test {
 
 TEST_F(TestExplicitRegression, EvaluateIndividualFitness) {
   ExplicitRegression regressor(training_data_);
+  ASSERT_EQ(regressor.GetEvalCount(), 0);
   double fitness = regressor.EvaluateIndividualFitness(sum_equation_);
   ASSERT_NEAR(fitness, 2.5, 1e-10);
+  ASSERT_EQ(regressor.GetEvalCount(), 1);
 }
 
 TEST_F(TestExplicitRegression, EvaluateIndividualFitnessRelative) {
   ExplicitRegression regressor(training_data_, "mae", true);
+  ASSERT_EQ(regressor.GetEvalCount(), 0);
   double fitness = regressor.EvaluateIndividualFitness(sum_equation_);
   ASSERT_NEAR(fitness, 1.0, 1e-10);
+  ASSERT_EQ(regressor.GetEvalCount(), 1);
 }
 
 TEST_F(TestExplicitRegression, EvaluateIndividualFitnessWithNaN) {
   training_data_->x(0, 0) = std::numeric_limits<double>::quiet_NaN();
   ExplicitRegression regressor(training_data_);
+  ASSERT_EQ(regressor.GetEvalCount(), 0);
   double fitness = regressor.EvaluateIndividualFitness(sum_equation_);
   ASSERT_TRUE(std::isnan(fitness));
+  ASSERT_EQ(regressor.GetEvalCount(), 1);
 }
 
 TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradient) {
   ExplicitRegression regressor(training_data_);
+  ASSERT_EQ(regressor.GetEvalCount(), 0);
   Eigen::ArrayXd expected_gradient = Eigen::ArrayXd::Constant(5, 1, 1.0);
 
   double fitness;
@@ -64,10 +71,12 @@ TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradient) {
 
   ASSERT_NEAR(fitness, 2.5, 1e-10);
   ASSERT_TRUE(expected_gradient.isApprox(gradient));
+  ASSERT_EQ(regressor.GetEvalCount(), 1);
 }
 
 TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradientRelative) {
   ExplicitRegression regressor(training_data_, "mae", true);
+  ASSERT_EQ(regressor.GetEvalCount(), 0);
   Eigen::ArrayXd expected_gradient = Eigen::ArrayXd::Constant(5, 1, 1.0/2.5);
 
   double fitness;
@@ -76,10 +85,12 @@ TEST_F(TestExplicitRegression, GetIndividualFitnessAndGradientRelative) {
 
   ASSERT_NEAR(fitness, 1.0, 1e-10);
   ASSERT_TRUE(expected_gradient.isApprox(gradient));
+  ASSERT_EQ(regressor.GetEvalCount(), 1);
 }
 
 TEST_F(TestExplicitRegression, GetFitnessVectorAndJacobian) {
   ExplicitRegression regressor(training_data_);
+  ASSERT_EQ(regressor.GetEvalCount(), 0);
   Eigen::ArrayXd expected_fitness_vector = Eigen::ArrayXd::Constant(10, 1, 2.5);
   Eigen::ArrayXXd expected_jacobian = training_data_->x;
 
@@ -89,10 +100,12 @@ TEST_F(TestExplicitRegression, GetFitnessVectorAndJacobian) {
 
   ASSERT_TRUE(expected_fitness_vector.isApprox(fitness_vector));
   ASSERT_TRUE(expected_jacobian.isApprox(jacobian));
+  ASSERT_EQ(regressor.GetEvalCount(), 1);
 }
 
 TEST_F(TestExplicitRegression, GetFitnessVectorAndJacobianRelative) {
   ExplicitRegression regressor(training_data_, "mae", true);
+  ASSERT_EQ(regressor.GetEvalCount(), 0);
   Eigen::ArrayXd expected_fitness_vector = Eigen::ArrayXd::Constant(10, 1, 1.0);
   Eigen::ArrayXXd expected_jacobian = Eigen::ArrayXXd::Constant(10, 5, 1.0/2.5);
 
@@ -102,6 +115,7 @@ TEST_F(TestExplicitRegression, GetFitnessVectorAndJacobianRelative) {
 
   ASSERT_TRUE(expected_fitness_vector.isApprox(fitness_vector));
   ASSERT_TRUE(expected_jacobian.isApprox(jacobian));
+  ASSERT_EQ(regressor.GetEvalCount(), 1);
 }
 
 TEST_F(TestExplicitRegression, GetSubsetOfTrainingData) {

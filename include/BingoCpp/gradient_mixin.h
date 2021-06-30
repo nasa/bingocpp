@@ -24,18 +24,6 @@ class VectorGradientMixin : public GradientMixin {
   virtual std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const = 0;
 
  protected:
-  static double mean_absolute_error(const Eigen::ArrayXd &fitness_vector) {
-    return fitness_vector.abs().mean();
-  }
-
-  static double mean_squared_error(const Eigen::ArrayXd &fitness_vector) {
-    return fitness_vector.square().mean();
-  }
-
-  static double root_mean_squared_error(const Eigen::ArrayXd &fitness_vector) {
-    return sqrt(fitness_vector.square().mean());
-  }
-
   static Eigen::ArrayXd mean_absolute_error_derivative(
       const Eigen::ArrayXd &fitness_vector, const Eigen::ArrayXXd &fitness_partials) {
     return (fitness_partials.rowwise() * fitness_vector.transpose().sign()).rowwise().mean();
