@@ -47,9 +47,24 @@ namespace py = pybind11;
 using namespace bingo;
 
 PYBIND11_MODULE(utils, m) {
-  m.def("calculate_partials", &CalculatePartials);
-  m.def("savitzky_golay", &SavitzkyGolay);
-  m.def("gen_fact", &GenFact);
-  m.def("gram_poly", &GramPoly);
-  m.def("gram_weight", &GramWeight);
+  m.def("_calculate_partials", &CalculatePartials,py::arg("X"));
+  m.def("_savitzky_golay_gram", &SavitzkyGolay,
+        py::arg("y"),
+        py::arg("window_size"),
+        py::arg("order"),
+        py::arg("deriv") = 0);
+  m.def("generalized_factorial", &GenFact,
+        py::arg("a"),
+        py::arg("b"));
+  m.def("gram_polynomial", &GramPoly,
+        py::arg("gp_i"),
+        py::arg("gp_m"),
+        py::arg("gp_k"),
+        py::arg("gp_s"));
+  m.def("gram_weight", &GramWeight,
+        py::arg("gw_i"),
+        py::arg("gw_t"),
+        py::arg("gw_m"),
+        py::arg("gw_n"),
+        py::arg("gw_s"));
 }
