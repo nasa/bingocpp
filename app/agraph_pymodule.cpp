@@ -31,11 +31,14 @@ void add_agraph_class(py::module &parent) {
   py::class_<Equation, bingo::PyEquation /* <---trampoline */>(parent, "Equation")
     .def(py::init<>())
     .def("evaluate_equation_at",
-         &bingo::Equation::EvaluateEquationAt)
+         &bingo::Equation::EvaluateEquationAt,
+         py::arg("x"))
     .def("evaluate_equation_with_x_gradient_at",
-         &bingo::Equation::EvaluateEquationWithXGradientAt)
+         &bingo::Equation::EvaluateEquationWithXGradientAt,
+         py::arg("x"))
     .def("evaluate_equation_with_local_opt_gradient_at",
-          &bingo::Equation::EvaluateEquationWithLocalOptGradientAt)
+         &bingo::Equation::EvaluateEquationWithLocalOptGradientAt,
+         py::arg("x"))
     .def("get_complexity", &bingo::Equation::GetComplexity);
 
   py::class_<AGraph, bingo::Equation>(parent, "AGraph")
@@ -69,17 +72,19 @@ void add_agraph_class(py::module &parent) {
         &AGraph::GetNumberLocalOptimizationParams)
     .def("get_local_optimization_params",
         &AGraph::GetLocalOptimizationParams)
-    .def("set_local_optimization_params", &AGraph::SetLocalOptimizationParams)
-    .def("evaluate_equation_at", &AGraph::EvaluateEquationAt)
+    .def("set_local_optimization_params", &AGraph::SetLocalOptimizationParams, py::arg("params"))
+    .def("evaluate_equation_at", &AGraph::EvaluateEquationAt, py::arg("x"))
     .def("evaluate_equation_with_x_gradient_at",
-        &AGraph::EvaluateEquationWithXGradientAt)
+        &AGraph::EvaluateEquationWithXGradientAt,
+        py::arg("x"))
     .def("evaluate_equation_with_local_opt_gradient_at",
-        &AGraph::EvaluateEquationWithLocalOptGradientAt)
+        &AGraph::EvaluateEquationWithLocalOptGradientAt,
+        py::arg("x"))
     .def("__str__", &AGraph::GetConsoleString)
     .def("get_formatted_string", &AGraph::GetFormattedString,
-         py::arg("format"), py::arg("raw")=false)
+         py::arg("format_"), py::arg("raw")=false)
     .def("get_complexity", &AGraph::GetComplexity)
-    .def("distance", &AGraph::Distance)
+    .def("distance", &AGraph::Distance, py::arg("chromosome"))
     .def("copy", &AGraph::Copy)
     .def("__getstate__", &AGraph::DumpState)
     .def("__setstate__", [](AGraph &ag, const AGraphState &state) {

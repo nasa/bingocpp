@@ -29,31 +29,37 @@ using namespace bingo;
 
 void add_regressor_classes(py::module &parent) {
   py::class_<ImplicitTrainingData>(parent, "ImplicitTrainingData")
-    .def(py::init<Eigen::ArrayXXd &>())
-    .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>())
+    .def(py::init<Eigen::ArrayXXd &>(), py::arg("x"))
+    .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>(),
+         py::arg("x"),
+         py::arg("dx_dt"))
     .def_readonly("x", &ImplicitTrainingData::x)
     .def_readonly("dx_dt", &ImplicitTrainingData::dx_dt)
     .def("__getitem__", 
          (ImplicitTrainingData *(ImplicitTrainingData::*)(int))
-         &ImplicitTrainingData::GetItem)
+         &ImplicitTrainingData::GetItem,
+         py::arg("items"))
     .def("__getitem__",
          (ImplicitTrainingData *(ImplicitTrainingData::*)(const std::vector<int>&))
-         &ImplicitTrainingData::GetItem)
+         &ImplicitTrainingData::GetItem,
+         py::arg("items"))
     .def("__len__", &ImplicitTrainingData::Size)
     .def("__getstate__", &ImplicitTrainingData::DumpState)
     .def("__setstate__", [](ImplicitTrainingData &td, const ImplicitTrainingDataState &state) {
             new (&td) ImplicitTrainingData(state); });
   
   py::class_<ExplicitTrainingData>(parent, "ExplicitTrainingData")
-    .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd&>())
+    .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd&>(), py::arg("x"), py::arg("y"))
     .def_readonly("x", &ExplicitTrainingData::x)
     .def_readonly("y", &ExplicitTrainingData::y)
     .def("__getitem__", 
          (ExplicitTrainingData *(ExplicitTrainingData::*)(int))
-         &ExplicitTrainingData::GetItem)
+         &ExplicitTrainingData::GetItem,
+         py::arg("items"))
     .def("__getitem__",
          (ExplicitTrainingData *(ExplicitTrainingData::*)(const std::vector<int>&))
-         &ExplicitTrainingData::GetItem)
+         &ExplicitTrainingData::GetItem,
+         py::arg("items"))
     .def("__len__", &ExplicitTrainingData::Size)
     .def("__getstate__", &ExplicitTrainingData::DumpState)
     .def("__setstate__", [](ExplicitTrainingData &td, const ExplicitTrainingDataState &state) {
@@ -67,8 +73,10 @@ void add_regressor_classes(py::module &parent) {
     .def_property("eval_count",
                   &ExplicitRegression::GetEvalCount,
                   &ExplicitRegression::SetEvalCount)
-    .def("__call__", &ExplicitRegression::EvaluateIndividualFitness)
-    .def("evaluate_fitness_vector", &ExplicitRegression::EvaluateFitnessVector)
+    .def("__call__", &ExplicitRegression::EvaluateIndividualFitness, py::arg("individual"))
+    .def("evaluate_fitness_vector", &ExplicitRegression::EvaluateFitnessVector, py::arg("individual"))
+    .def("get_fitness_and_gradient", &ExplicitRegression::GetIndividualFitnessAndGradient, py::arg("individual"))
+    .def("get_fitness_vector_and_jacobian", &ExplicitRegression::GetFitnessVectorAndJacobian, py::arg("individual"))
     .def("__getstate__", &ExplicitRegression::DumpState)
     .def("__setstate__", [](ExplicitRegression &r, const ExplicitRegressionState &state) {
             new (&r) ExplicitRegression(state); });
@@ -81,8 +89,8 @@ void add_regressor_classes(py::module &parent) {
     .def_property("eval_count",
                   &ImplicitRegression::GetEvalCount,
                   &ImplicitRegression::SetEvalCount)
-    .def("__call__", &ImplicitRegression::EvaluateIndividualFitness)
-    .def("evaluate_fitness_vector", &ImplicitRegression::EvaluateFitnessVector)
+    .def("__call__", &ImplicitRegression::EvaluateIndividualFitness, py::arg("individual"))
+    .def("evaluate_fitness_vector", &ImplicitRegression::EvaluateFitnessVector, py::arg("individual"))
     .def("__getstate__", &ImplicitRegression::DumpState)
     .def("__setstate__", [](ImplicitRegression &r, const ImplicitRegressionState &state) {
             new (&r) ImplicitRegression(state); });

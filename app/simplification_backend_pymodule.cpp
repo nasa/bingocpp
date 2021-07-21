@@ -30,9 +30,12 @@ void add_simplification_backend_submodule(py::module &parent) {
                                       "The simplification backend for Agraphs");
   m.attr("ENGINE") = "c++";
   m.def("get_utilized_commands", &simplification_backend::GetUtilizedCommands,
-        "Find which commands are utilized");
+        "Find which commands are utilized",
+        py::arg("stack"));
   m.def("simplify_stack", &simplification_backend::SimplifyStack,
-        "Simplifies a stack based on computational algebra");
-  m.def("reduce_stack", &simplification_backend::SimplifyStack, "Reduces a stack");
+        "Simplifies a stack based on computational algebra",
+        py::arg("stack"));
+  m.def("reduce_stack", &simplification_backend::SimplifyStack, "Reduces a stack",
+        py::arg("stack"));
 
 }
