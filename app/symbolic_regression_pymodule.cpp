@@ -22,13 +22,15 @@
 
 #include "bingocpp/explicit_regression.h"
 #include "bingocpp/implicit_regression.h"
+#include "bingocpp/fitness_function.h"
+#include "bingocpp/training_data.h"
 
 
 namespace py = pybind11;
 using namespace bingo;
 
 void add_regressor_classes(py::module &parent) {
-  py::class_<ImplicitTrainingData>(parent, "ImplicitTrainingData")
+  py::class_<ImplicitTrainingData, TrainingData>(parent, "ImplicitTrainingData")
     .def(py::init<Eigen::ArrayXXd &>(), py::arg("x"))
     .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>(),
          py::arg("x"),
@@ -47,8 +49,8 @@ void add_regressor_classes(py::module &parent) {
     .def("__getstate__", &ImplicitTrainingData::DumpState)
     .def("__setstate__", [](ImplicitTrainingData &td, const ImplicitTrainingDataState &state) {
             new (&td) ImplicitTrainingData(state); });
-  
-  py::class_<ExplicitTrainingData>(parent, "ExplicitTrainingData")
+
+  py::class_<ExplicitTrainingData, TrainingData>(parent, "ExplicitTrainingData")
     .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd&>(), py::arg("x"), py::arg("y"))
     .def_readwrite("x", &ExplicitTrainingData::x)
     .def_readwrite("y", &ExplicitTrainingData::y)
@@ -64,8 +66,8 @@ void add_regressor_classes(py::module &parent) {
     .def("__getstate__", &ExplicitTrainingData::DumpState)
     .def("__setstate__", [](ExplicitTrainingData &td, const ExplicitTrainingDataState &state) {
             new (&td) ExplicitTrainingData(state); });
-  
-  py::class_<ExplicitRegression>(parent, "ExplicitRegression")
+
+  py::class_<ExplicitRegression, VectorBasedFunction>(parent, "ExplicitRegression")
     .def(py::init<ExplicitTrainingData *, std::string &, bool &>(),
         py::arg("training_data"),
         py::arg("metric")="mae",
@@ -81,7 +83,7 @@ void add_regressor_classes(py::module &parent) {
     .def("__setstate__", [](ExplicitRegression &r, const ExplicitRegressionState &state) {
             new (&r) ExplicitRegression(state); });
   
-  py::class_<ImplicitRegression>(parent, "ImplicitRegression")
+  py::class_<ImplicitRegression, VectorBasedFunction>(parent, "ImplicitRegression")
     .def(py::init<ImplicitTrainingData *, int &, std::string &>(),
          py::arg("training_data"),
          py::arg("required_params") = -1,

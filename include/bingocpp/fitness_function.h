@@ -80,6 +80,14 @@ class FitnessFunction {
     eval_count_ = eval_count;
   }
 
+  TrainingData* GetTrainingData() const {
+    return training_data_;
+  }
+
+  void SetTrainingData(TrainingData* training_data) {
+    training_data_ = training_data;
+  }
+
  protected:
   mutable int eval_count_;
   TrainingData* training_data_;

@@ -48,6 +48,7 @@
 #include "evaluation_backend_pymodule.cpp"
 #include "simplification_backend_pymodule.cpp"
 #include "agraph_pymodule.cpp"
+#include "fitness_function_pymodule.cpp"
 #include "symbolic_regression_pymodule.cpp"
 
 namespace py = pybind11;
@@ -58,5 +59,6 @@ PYBIND11_MODULE(bingocpp, m) {
     add_agraph_class(m);
     add_evaluation_backend_submodule(m);
     add_simplification_backend_submodule(m);
+    add_fitness_classes(m);
     add_regressor_classes(m);
 }
