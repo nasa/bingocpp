@@ -5,6 +5,10 @@ from .build.bingocpp import Equation, \
                             ImplicitRegression, \
                             ImplicitTrainingData, \
                             evaluation_backend, \
-                            simplification_backend
+                            simplification_backend, \
+                            FitnessFunction, \
+                            VectorBasedFunction, \
+                            TrainingData, \
+                            GradientMixin
 
 del build
