@@ -20,6 +20,8 @@
 
 #include <Eigen/Dense> 
 
+#include <python/py_gradient_mixin.h>
+#include "bingocpp/gradient_mixin.h"
 #include "bingocpp/explicit_regression.h"
 #include "bingocpp/implicit_regression.h"
 #include "bingocpp/fitness_function.h"
@@ -30,6 +32,18 @@ namespace py = pybind11;
 using namespace bingo;
 
 void add_regressor_classes(py::module &parent) {
+  py::class_<GradientMixin, PyGradientMixin /* trampoline */>(parent, "GradientMixin")
+    .def("get_fitness_and_gradient", &GradientMixin::GetIndividualFitnessAndGradient);
+
+  py::class_<VectorGradientMixin, GradientMixin, PyVectorGradientMixin /* trampoline */>(parent, "VectorGradientMixin")
+    .def(py::init<TrainingData *, std::string>(),
+         py::arg("training_data") = nullptr,
+         py::arg("metric") = "mae")
+    .def("get_fitness_and_gradient", &VectorGradientMixin::GetIndividualFitnessAndGradient,
+         py::arg("individual"))
+    .def("get_fitness_vector_and_jacobian", &VectorGradientMixin::GetFitnessVectorAndJacobian,
+         py::arg("individual"));
+
   py::class_<ImplicitTrainingData, TrainingData>(parent, "ImplicitTrainingData")
     .def(py::init<Eigen::ArrayXXd &>(), py::arg("x"))
     .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>(),
@@ -67,7 +81,7 @@ void add_regressor_classes(py::module &parent) {
     .def("__setstate__", [](ExplicitTrainingData &td, const ExplicitTrainingDataState &state) {
             new (&td) ExplicitTrainingData(state); });
 
-  py::class_<ExplicitRegression, VectorBasedFunction>(parent, "ExplicitRegression")
+  py::class_<ExplicitRegression, VectorGradientMixin, VectorBasedFunction>(parent, "ExplicitRegression")
     .def(py::init<ExplicitTrainingData *, std::string &, bool &>(),
         py::arg("training_data"),
         py::arg("metric")="mae",

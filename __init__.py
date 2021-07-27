@@ -9,6 +9,7 @@ from .build.bingocpp import Equation, \
                             FitnessFunction, \
                             VectorBasedFunction, \
                             TrainingData, \
-                            GradientMixin
+                            GradientMixin, \
+                            VectorGradientMixin
 
 del build
