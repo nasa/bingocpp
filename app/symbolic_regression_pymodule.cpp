@@ -40,11 +40,11 @@ void add_regressor_classes(py::module &parent) {
     .def("__getitem__", 
          (ImplicitTrainingData *(ImplicitTrainingData::*)(int))
          &ImplicitTrainingData::GetItem,
-         py::arg("items"))
+         py::arg("items"), py::return_value_policy::reference)
     .def("__getitem__",
          (ImplicitTrainingData *(ImplicitTrainingData::*)(const std::vector<int>&))
          &ImplicitTrainingData::GetItem,
-         py::arg("items"))
+         py::arg("items"), py::return_value_policy::reference)
     .def("__len__", &ImplicitTrainingData::Size)
     .def("__getstate__", &ImplicitTrainingData::DumpState)
     .def("__setstate__", [](ImplicitTrainingData &td, const ImplicitTrainingDataState &state) {
@@ -57,11 +57,11 @@ void add_regressor_classes(py::module &parent) {
     .def("__getitem__", 
          (ExplicitTrainingData *(ExplicitTrainingData::*)(int))
          &ExplicitTrainingData::GetItem,
-         py::arg("items"))
+         py::arg("items"), py::return_value_policy::reference)
     .def("__getitem__",
          (ExplicitTrainingData *(ExplicitTrainingData::*)(const std::vector<int>&))
          &ExplicitTrainingData::GetItem,
-         py::arg("items"))
+         py::arg("items"), py::return_value_policy::reference)
     .def("__len__", &ExplicitTrainingData::Size)
     .def("__getstate__", &ExplicitTrainingData::DumpState)
     .def("__setstate__", [](ExplicitTrainingData &td, const ExplicitTrainingDataState &state) {
