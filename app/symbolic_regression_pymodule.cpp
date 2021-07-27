@@ -49,8 +49,8 @@ void add_regressor_classes(py::module &parent) {
     .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd &>(),
          py::arg("x"),
          py::arg("dx_dt"))
-    .def_readwrite("x", &ImplicitTrainingData::x)
-    .def_readwrite("dx_dt", &ImplicitTrainingData::dx_dt)
+    .def_readonly("x", &ImplicitTrainingData::x)
+    .def_readonly("dx_dt", &ImplicitTrainingData::dx_dt)
     .def("__getitem__", 
          (ImplicitTrainingData *(ImplicitTrainingData::*)(int))
          &ImplicitTrainingData::GetItem,
@@ -66,8 +66,8 @@ void add_regressor_classes(py::module &parent) {
 
   py::class_<ExplicitTrainingData, TrainingData>(parent, "ExplicitTrainingData")
     .def(py::init<Eigen::ArrayXXd &, Eigen::ArrayXXd&>(), py::arg("x"), py::arg("y"))
-    .def_readwrite("x", &ExplicitTrainingData::x)
-    .def_readwrite("y", &ExplicitTrainingData::y)
+    .def_readonly("x", &ExplicitTrainingData::x)
+    .def_readonly("y", &ExplicitTrainingData::y)
     .def("__getitem__", 
          (ExplicitTrainingData *(ExplicitTrainingData::*)(int))
          &ExplicitTrainingData::GetItem,
