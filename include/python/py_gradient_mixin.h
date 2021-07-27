@@ -10,15 +10,11 @@
 
 namespace py = pybind11;
 
-// TODO move to gradient mixin
-typedef std::tuple<double, Eigen::ArrayXd> FitnessAndGradient;
-typedef std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd> FitnessVectorAndJacobian;
-
 namespace bingo {
 
 class PyGradientMixin : public GradientMixin {
  public:
-  std::tuple<double, Eigen::ArrayXd> GetIndividualFitnessAndGradient(Equation &individual) {
+  FitnessAndGradient GetIndividualFitnessAndGradient(Equation &individual) {
     PYBIND11_OVERLOAD_PURE_NAME(
       FitnessAndGradient,
       GradientMixin,
@@ -33,7 +29,7 @@ class PyVectorGradientMixin : public VectorGradientMixin {
  public:
   using VectorGradientMixin::VectorGradientMixin;
 
-  std::tuple<double, Eigen::ArrayXd> GetIndividualFitnessAndGradient(Equation &individual) const {
+  FitnessAndGradient GetIndividualFitnessAndGradient(Equation &individual) const {
     PYBIND11_OVERLOAD_NAME(
       FitnessAndGradient,
       VectorGradientMixin,
@@ -43,7 +39,7 @@ class PyVectorGradientMixin : public VectorGradientMixin {
     );
   }
 
-  virtual std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const {
+  virtual FitnessVectorAndJacobian GetFitnessVectorAndJacobian(Equation &individual) const {
     PYBIND11_OVERLOAD_PURE_NAME(
       FitnessVectorAndJacobian,
       VectorGradientMixin,
