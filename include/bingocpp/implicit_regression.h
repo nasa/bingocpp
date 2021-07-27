@@ -92,7 +92,10 @@ class ImplicitRegression : public VectorBasedFunction {
   }
 
   ~ImplicitRegression() {
-    delete training_data_;
+    if (training_data_ != nullptr) {
+      delete training_data_;
+      training_data_ = nullptr;
+    }
   }
 
   ImplicitRegressionState DumpState();
