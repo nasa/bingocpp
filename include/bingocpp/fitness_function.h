@@ -29,17 +29,17 @@
 namespace metric_functions {
 
 const std::unordered_set<std::string> kMeanAbsoluteError = {
-  "mean_absolute_error",
+  "mean absolute error",
   "mae"
 };
 
 const std::unordered_set<std::string> kMeanSquaredError = {
-  "mean_squared_error",
+  "mean squared error",
   "mse"
 };
 
 const std::unordered_set<std::string> kRootMeanSquaredError = {
-  "root_mean_squared_error",
+  "root mean squared error",
   "rmse"
 };
 
@@ -78,6 +78,14 @@ class FitnessFunction {
 
   void SetEvalCount(int eval_count) {
     eval_count_ = eval_count;
+  }
+
+  TrainingData* GetTrainingData() const {
+    return training_data_;
+  }
+
+  void SetTrainingData(TrainingData* training_data) {
+    training_data_ = training_data;
   }
 
  protected:

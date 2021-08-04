@@ -48,7 +48,7 @@ struct TrainingData {
 
   virtual ~TrainingData() { }
 
-  virtual TrainingData *GetItem(int item) = 0 ;
+  virtual TrainingData *GetItem(int item) = 0;
   /*! \brief gets a new training data with certain rows
   *
   *  \param[in] items The rows to retrieve. std::list<int>

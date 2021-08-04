@@ -8,20 +8,23 @@
 #include <functional>
 #include <cmath>
 
+typedef std::tuple<double, Eigen::ArrayXd> FitnessAndGradient;
+typedef std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd> FitnessVectorAndJacobian;
+
 namespace bingo {
 
 class GradientMixin {
  public:
-  virtual std::tuple<double, Eigen::ArrayXd> GetIndividualFitnessAndGradient(Equation &individual) const = 0;
+  virtual FitnessAndGradient GetIndividualFitnessAndGradient(Equation &individual) const = 0;
 };
 
 class VectorGradientMixin : public GradientMixin {
  public:
   VectorGradientMixin(TrainingData *training_data = nullptr, std::string metric = "mae");
 
-  std::tuple<double, Eigen::ArrayXd> GetIndividualFitnessAndGradient(Equation &individual) const;
+  FitnessAndGradient GetIndividualFitnessAndGradient(Equation &individual) const;
 
-  virtual std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const = 0;
+  virtual FitnessVectorAndJacobian GetFitnessVectorAndJacobian(Equation &individual) const = 0;
 
  protected:
   static Eigen::ArrayXd mean_absolute_error_derivative(

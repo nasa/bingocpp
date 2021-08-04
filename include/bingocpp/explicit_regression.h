@@ -87,14 +87,17 @@ class ExplicitRegression : public VectorGradientMixin, public VectorBasedFunctio
   }
 
   ~ExplicitRegression() {
-    delete training_data_;
+    if (training_data_ != nullptr) {
+      delete training_data_;
+      training_data_ = nullptr;
+    }
   }
 
   ExplicitRegressionState DumpState();
 
   Eigen::ArrayXd EvaluateFitnessVector(Equation &individual) const;
 
-  std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const;
+  FitnessVectorAndJacobian GetFitnessVectorAndJacobian(Equation &individual) const;
 
   private:
    bool relative_;

@@ -25,12 +25,12 @@ class VectorGradFitnessFunction : public VectorGradientMixin, public VectorBased
     return fitness_vector;
   }
 
-  std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const {
+  FitnessVectorAndJacobian GetFitnessVectorAndJacobian(Equation &individual) const {
     Eigen::ArrayXXd jacobian(3, 2);
     jacobian << 0.5, 1.0,
                 1.0, 2.0,
                -0.5, 3.0;
-    return std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd>{this->EvaluateFitnessVector(individual), jacobian};
+    return FitnessVectorAndJacobian{this->EvaluateFitnessVector(individual), jacobian};
   }
 };
 
@@ -39,10 +39,10 @@ class ImplementedVectorMixin : public VectorGradientMixin {
   ImplementedVectorMixin(TrainingData *training_data = nullptr, std::string metric = "mae") :
       VectorGradientMixin(training_data, metric) {}
 
-  std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd> GetFitnessVectorAndJacobian(Equation &individual) const {
+  FitnessVectorAndJacobian GetFitnessVectorAndJacobian(Equation &individual) const {
     Eigen::ArrayXd emptyVector;
     Eigen::ArrayXXd emptyArray;
-    return std::tuple<Eigen::ArrayXd, Eigen::ArrayXXd>{emptyVector, emptyArray};
+    return FitnessVectorAndJacobian{emptyVector, emptyArray};
   }
 };
 
