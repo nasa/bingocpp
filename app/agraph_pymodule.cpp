@@ -55,7 +55,7 @@ void add_agraph_class(py::module &parent) {
                   &AGraph::SetFitness)
     .def_property("fit_set",
                   &AGraph::IsFitnessSet,
-                  &AGraph::SetFitness)
+                  &AGraph::SetFitnessStatus)
     .def_property("genetic_age",
                   &AGraph::GetGeneticAge,
                   &AGraph::SetGeneticAge)
