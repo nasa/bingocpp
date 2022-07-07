@@ -57,7 +57,7 @@ set(TEST_MAIN unit_tests.x)  # Default name for test executable.
 # Compile all sources into a library.
 add_library( bingo STATIC ${SOURCES} )
 add_dependencies(bingo eigen)
-target_link_libraries(bingo eigen)
+target_link_libraries(bingo eigen pybind11::embed)
 set_target_properties(bingo PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 

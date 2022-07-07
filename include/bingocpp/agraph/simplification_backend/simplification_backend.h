@@ -24,6 +24,11 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
+#include <pybind11/pybind11.h>
+#include <pybind11/embed.h>
+#include <pybind11/stl.h>
+#include <pybind11/eigen.h>
+
 #include <bingocpp/agraph/agraph.h>
 
 namespace bingo {
@@ -43,6 +48,9 @@ namespace simplification_backend {
  * @return Simplified stack.
  */
 Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i &stack);
+
+// TODO documentation and change simplify_stack to reduce stack
+Eigen::ArrayX3i PythonSimplifyStack(const Eigen::ArrayX3i &stack);
 
 /**
  * @brief Finds which commands are utilized in a stack.

@@ -7,6 +7,13 @@
 #include <bingocpp/agraph/constants.h>
 #include <bingocpp/agraph/operator_definitions.h>
 
+#include <pybind11/pybind11.h>
+#include <pybind11/embed.h>
+#include <pybind11/stl.h>
+#include <pybind11/eigen.h>
+
+namespace py = pybind11;
+
 namespace bingo {
 namespace simplification_backend {
 
@@ -55,6 +62,13 @@ Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i &stack) {
     }
   }
   return new_stack;
+}
+
+Eigen::ArrayX3i PythonSimplifyStack(const Eigen::ArrayX3i &stack) {
+  py::object python_simp_module = py::module::import("bingo.symbolic_regression.agraph.simplification_backend.simplification_backend");
+  py::object python_simp = python_simp_module.attr("simplify_stack");
+  Eigen::ArrayX3i result = python_simp(stack).cast<Eigen::ArrayX3i>();
+  return result;
 }
 
 } // namespace simplification_backend
