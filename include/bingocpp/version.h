@@ -7,6 +7,6 @@
  * but make sure they match up with whats in CMakeLists.txt.
  */
 #define PROJECT_VERSION_MAJOR 0
-#define PROJECT_VERSION_MINOR 3
-#define PROJECT_VERSION_PATCH 2
+#define PROJECT_VERSION_MINOR 4
+#define PROJECT_VERSION_PATCH 0
 #define PROJECT_VERSION_TWEAK 0

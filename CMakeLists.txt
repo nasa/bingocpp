@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.1.3)
 # Set project name, version and laguages here.
 # Version numbers are available by including "BingoCpp/version.h" in 
 # the source. See version.h.in for some more details.
-project(bingocpp VERSION 0.3.2.0 LANGUAGES C CXX)
+project(bingocpp VERSION 0.4.0.0 LANGUAGES C CXX)
 
 
 # ---------- version ----------
