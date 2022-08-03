@@ -40,7 +40,7 @@ namespace simplification_backend {
 /**
  * @brief Reduces a stack.
  *
- * An acyclic graph is given in stack form.  The stack is first reduced to
+ * An acyclic graph is given in stack form. The stack is then reduced to
  * consist only of the commands used by the last command.
  *
  * @param stack Description of an acyclic graph in stack format.
@@ -49,8 +49,18 @@ namespace simplification_backend {
  */
 Eigen::ArrayX3i ReduceStack(const Eigen::ArrayX3i &stack);
 
-// TODO documentation and change simplify_stack to reduce stack
-Eigen::ArrayX3i PythonSimplifyStack(const Eigen::ArrayX3i &stack);
+/**
+ * @brief Simplifies a stack.
+ *
+ * An acyclic graph is given in stack form. The stack is then simplified to
+ * become algebraically simpler using a cas system (currently points to Python
+ * functionality).
+ *
+ * @param stack Description of an acyclic graph in stack format.
+ *
+ * @return Simplified stack.
+ */
+Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i &stack);
 
 /**
  * @brief Finds which commands are utilized in a stack.

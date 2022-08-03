@@ -230,7 +230,7 @@ int AGraph::Distance(const AGraph &agraph) {
 
 void AGraph::update() {
   if (use_simplification_) {
-    simplified_command_array_ = simplification_backend::PythonSimplifyStack(
+    simplified_command_array_ = simplification_backend::SimplifyStack(
         command_array_);
   } else {
     simplified_command_array_ = simplification_backend::ReduceStack(
