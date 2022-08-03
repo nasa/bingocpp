@@ -51,7 +51,7 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
     operator_x_derivs = init_op_x_derivs(sample_agraph_1_values);
     operator_c_derivs = init_op_c_derivs(sample_agraph_1_values);
 
-    simple_stack = testutils::stack_operators_0_to_5(); 
+    simple_stack = testutils::stack_operators_0_to_5();
     simple_stack2 = testutils::stack_unary_operator(4);
     x = testutils::one_to_nine_3_by_3();
     constants = testutils::pi_ten_constants();
@@ -181,4 +181,21 @@ TEST_F(AGraphBackend, get_utilized_commands) {
   }
   ASSERT_EQ(num_used_commands, 8);
 }
+
+TEST_F(AGraphBackend, reduce_stack) {
+  Eigen::ArrayX3i expected_stack(8, 3);
+  expected_stack << 0, 0, 0,
+                    0, 1, 1,
+                    1, 0, 0,
+                    1, 1, 1,
+                    5, 3, 1,
+                    2, 4, 2,
+                    4, 5, 0,
+                    3, 6, 0;  // (C_1 / X_1 + C_0) * X_0 - X_0
+
+  Eigen::ArrayX3i reduced_stack = ReduceStack(simple_stack);
+
+  ASSERT_TRUE(reduced_stack.isApprox(expected_stack));
+}
+
 } // namespace

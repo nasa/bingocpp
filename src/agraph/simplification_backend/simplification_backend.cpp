@@ -36,7 +36,7 @@ std::vector<bool> GetUtilizedCommands(const Eigen::ArrayX3i &stack) {
   return used_commands;
 }
 
-Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i &stack) {
+Eigen::ArrayX3i ReduceStack(const Eigen::ArrayX3i &stack) {
   std::vector<bool> used_command = GetUtilizedCommands(stack);
   std::map<int, int> reduced_param_map;
   int num_commands = 0;
@@ -64,8 +64,10 @@ Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i &stack) {
   return new_stack;
 }
 
-Eigen::ArrayX3i PythonSimplifyStack(const Eigen::ArrayX3i &stack) {
-  py::object python_simp_module = py::module::import("bingo.symbolic_regression.agraph.simplification_backend.simplification_backend");
+Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i &stack) {
+  py::object python_simp_module = py::module::import(
+      "bingo.symbolic_regression.agraph.simplification_backend."
+      "simplification_backend");
   py::object python_simp = python_simp_module.attr("simplify_stack");
   Eigen::ArrayX3i result = python_simp(stack).cast<Eigen::ArrayX3i>();
   return result;
