@@ -231,10 +231,10 @@ int AGraph::Distance(const AGraph &agraph) {
 void AGraph::update() {
   if (use_simplification_) {
     simplified_command_array_ = simplification_backend::PythonSimplifyStack(
-                                                               command_array_);
+        command_array_);
   } else {
-    simplified_command_array_ = simplification_backend::SimplifyStack(
-                                                               command_array_);
+    simplified_command_array_ = simplification_backend::ReduceStack(
+        command_array_);
   }
   int new_const_number = 0;
   for (int i = 0; i < simplified_command_array_.rows(); i++) {

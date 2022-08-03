@@ -38,16 +38,16 @@ namespace bingo {
  */
 namespace simplification_backend {
 /**
- * @brief Simplifies a stack.
+ * @brief Reduces a stack.
  *
- * An acyclic graph is given in stack form.  The stack is first simplified to
+ * An acyclic graph is given in stack form.  The stack is first reduced to
  * consist only of the commands used by the last command.
  *
  * @param stack Description of an acyclic graph in stack format.
  *
- * @return Simplified stack.
+ * @return Reduced stack.
  */
-Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i &stack);
+Eigen::ArrayX3i ReduceStack(const Eigen::ArrayX3i &stack);
 
 // TODO documentation and change simplify_stack to reduce stack
 Eigen::ArrayX3i PythonSimplifyStack(const Eigen::ArrayX3i &stack);

@@ -35,7 +35,7 @@ void add_simplification_backend_submodule(py::module &parent) {
   m.def("simplify_stack", &simplification_backend::PythonSimplifyStack,
         "Simplifies a stack based on computational algebra",
         py::arg("stack"));
-  m.def("reduce_stack", &simplification_backend::SimplifyStack, "Reduces a stack",
+  m.def("reduce_stack", &simplification_backend::ReduceStack, "Reduces a stack",
         py::arg("stack"));
 
 }

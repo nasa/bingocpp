@@ -36,7 +36,7 @@ std::vector<bool> GetUtilizedCommands(const Eigen::ArrayX3i &stack) {
   return used_commands;
 }
 
-Eigen::ArrayX3i SimplifyStack(const Eigen::ArrayX3i &stack) {
+Eigen::ArrayX3i ReduceStack(const Eigen::ArrayX3i &stack) {
   std::vector<bool> used_command = GetUtilizedCommands(stack);
   std::map<int, int> reduced_param_map;
   int num_commands = 0;
