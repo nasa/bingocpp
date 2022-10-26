@@ -20,9 +20,9 @@ const int N_OPS = 13;
 
 struct AGraphValues {
 Eigen::ArrayXXd x_vals;
-Eigen::VectorXd constants;
+Eigen::ArrayXXd constants;
 AGraphValues() {}
-AGraphValues(Eigen::ArrayXXd &x, Eigen::VectorXd &c) : 
+AGraphValues(Eigen::ArrayXXd &x, Eigen::ArrayXXd &c) : 
   x_vals(x), constants(c) {}
 };
 
@@ -41,7 +41,8 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
   Eigen::ArrayX3i simple_stack;
   Eigen::ArrayX3i simple_stack2;
   Eigen::ArrayXXd x;
-  Eigen::ArrayXd constants;
+  Eigen::ArrayXXd constants;
+  Eigen::ArrayXXd constants_2d;
 
   virtual void SetUp() {
     sample_agraph_1_values = init_agraph_vals(AGRAPH_VAL_START,
@@ -55,11 +56,12 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
     simple_stack2 = testutils::stack_unary_operator(4);
     x = testutils::one_to_nine_3_by_3();
     constants = testutils::pi_ten_constants();
+    constants_2d = testutils::pi_ten_constants_2d();
   }
   virtual void TearDown() {}
 
  AGraphValues init_agraph_vals(double begin, double end, int num_points) {
-  Eigen::VectorXd constants = Eigen::VectorXd(2);
+  Eigen::ArrayXXd constants = Eigen::ArrayXXd(2, 1);
   constants << 10, 3.14;
 
   Eigen::ArrayXXd x_vals(num_points, 2);
@@ -72,7 +74,7 @@ class AGraphBackend : public ::testing::TestWithParam<int> {
 std::vector<Eigen::ArrayXXd> init_op_evals_x0(
     const AGraphValues &sample_agraph_1_values) {
   Eigen::ArrayXXd x_0 = sample_agraph_1_values.x_vals.col(0);
-  double constant = sample_agraph_1_values.constants[0];
+  double constant = sample_agraph_1_values.constants(0, 0);
   Eigen::ArrayXXd c_0 = constant * Eigen::ArrayXd::Ones(x_0.rows());
 
   const std::vector<Eigen::ArrayXXd> op_evals_x0 = {
@@ -127,7 +129,7 @@ std::vector<Eigen::ArrayXXd> init_op_x_derivs(
 std::vector<Eigen::ArrayXXd> init_op_c_derivs(
     const AGraphValues &sample_agraph_1_values) {
   int size = sample_agraph_1_values.x_vals.rows();
-  Eigen::ArrayXXd c_1 = sample_agraph_1_values.constants[1] * Eigen::ArrayXd::Ones(size);
+  Eigen::ArrayXXd c_1 = sample_agraph_1_values.constants(1,0) * Eigen::ArrayXd::Ones(size);
 
   std::vector<Eigen::ArrayXXd> op_c_derivs =  {
     Eigen::ArrayXd::Zero(size),
@@ -153,7 +155,7 @@ INSTANTIATE_TEST_CASE_P(,AGraphBackend, ::testing::Range(0, N_OPS, 1));
 
 TEST_F(AGraphBackend, evaluate) {
   Eigen::ArrayXXd y = Evaluate(simple_stack, x, constants);
-  Eigen::ArrayXXd y_true = x.col(0) * (constants[0] + constants[1] 
+  Eigen::ArrayXXd y_true = x.col(0) * (constants(0,0) + constants(1,0) 
                           / x.col(1)) - x.col(0);
   ASSERT_TRUE(testutils::almost_equal(y, y_true));
 }
@@ -161,11 +163,11 @@ TEST_F(AGraphBackend, evaluate) {
 TEST_F(AGraphBackend, evaluate_and_derivative) {
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy =
     EvaluateWithDerivative(simple_stack, x, constants);
-  Eigen::ArrayXXd y_true = x.col(0) * (constants[0] + constants[1] 
+  Eigen::ArrayXXd y_true = x.col(0) * (constants(0,0) + constants(1,0) 
                           / x.col(1)) - x.col(0);
   Eigen::ArrayXXd dy_true = Eigen::ArrayXXd::Zero(3, 3);
-  dy_true.col(0) = constants[0] + constants[1] / x.col(1) - 1.;
-  dy_true.col(1) = - x.col(0) * constants[1] / x.col(1) / x.col(1);
+  dy_true.col(0) = constants(0,0) + constants(1,0) / x.col(1) - 1.;
+  dy_true.col(1) = - x.col(0) * constants(1,0) / x.col(1) / x.col(1);
 
   ASSERT_TRUE(testutils::almost_equal(y_and_dy.first, y_true));
   ASSERT_TRUE(testutils::almost_equal(y_and_dy.second, dy_true));

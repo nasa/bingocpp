@@ -70,9 +70,15 @@ inline Eigen::ArrayX3i stack_operators_0_to_5() {
   return stack;
 }
 
-inline Eigen::VectorXd pi_ten_constants() {
-  Eigen::VectorXd constants(2);
+inline Eigen::ArrayXXd pi_ten_constants() {
+  Eigen::ArrayXXd constants(2, 1);
   constants << 3.14, 10;
+  return constants;
+} 
+
+inline Eigen::ArrayXXd pi_ten_constants_2d() {
+  Eigen::ArrayXXd constants(2, 2);
+  constants << 3.14, 10, 10, 3.14;
   return constants;
 } 
 
