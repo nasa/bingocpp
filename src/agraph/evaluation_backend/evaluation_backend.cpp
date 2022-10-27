@@ -32,9 +32,9 @@ namespace bingo
           const bool param_x_or_c);
     } // namespace
 
-    Eigen::ArrayXXd Evaluate(const Eigen::ArrayX3i &stack,
-                             const Eigen::ArrayXXd &x,
-                             const Eigen::ArrayXXd &constants)
+    Eigen::ArrayXXd Evaluate(const Eigen::Ref<const Stack3i> &stack,
+                             const Eigen::Ref<const RowArrayXXd> &x,
+                             const Eigen::Ref<const RowArrayXXd> &constants)
     {
       std::vector<Eigen::ArrayXXd> _forward_eval = forward_eval(
           stack, x, constants);
@@ -42,9 +42,9 @@ namespace bingo
     }
 
     std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> EvaluateWithDerivative(
-        const Eigen::ArrayX3i &stack,
-        const Eigen::ArrayXXd &x,
-        const Eigen::ArrayXXd &constants,
+        const Eigen::Ref<const Stack3i> &stack,
+        const Eigen::Ref<const RowArrayXXd> &x,
+        const Eigen::Ref<const RowArrayXXd> &constants,
         const bool param_x_or_c)
     {
       return evaluate_with_derivative(
