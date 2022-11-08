@@ -160,7 +160,7 @@ namespace bingo
      *
      * @param params The optimized constants.
      */
-    void SetLocalOptimizationParams(Eigen::ArrayXXd params);
+    void SetLocalOptimizationParams(Eigen::Ref<Eigen::ArrayXXd> params);
 
     /**
      * @brief Get the constants in the graph.

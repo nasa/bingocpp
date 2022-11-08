@@ -32,9 +32,9 @@ namespace bingo
                                          const Eigen::ArrayXXd &constants,
                                          std::vector<Eigen::ArrayXXd> &)
       {
-        // return x.col(param1);
-        int num_cols = (constants.cols() == 0) ? 1 : constants.cols();
-        return x.col(param1).replicate(1, num_cols);
+        return x.col(param1);
+        // int num_cols = (constants.cols() == 0) ? 1 : constants.cols();
+        // return x.col(param1).replicate(1, num_cols);
       }
 
       void loadx_reverse_eval(int, int, int,
@@ -52,6 +52,7 @@ namespace bingo
       {
         // return Eigen::ArrayXXd::Constant(x.rows(), constants.columns(), constants(param1, 0));
         return constants.row(param1).replicate(x.rows(), 1);
+        // return constants.row(param1);
       }
 
       void loadc_reverse_eval(int, int, int,

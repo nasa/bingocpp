@@ -1,6 +1,7 @@
 #include <unordered_map>
 #include <string>
 #include <climits>
+#include <iostream>
 
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
@@ -122,8 +123,8 @@ namespace
     Eigen::ArrayX3i command_array = sample_agraph_1.GetCommandArray();
     command_array(1, 1) = 100;
     sample_agraph_1.SetCommandArray(command_array);
-    Eigen::VectorXd constants = sample_agraph_1.GetLocalOptimizationParams();
-    constants[0] = 100;
+    Eigen::ArrayXXd constants = sample_agraph_1.GetLocalOptimizationParams();
+    constants(0, 0) = 100;
     sample_agraph_1.SetLocalOptimizationParams(constants);
 
     ASSERT_EQ(agraph_copy.GetGeneticAge(), 10);

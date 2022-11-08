@@ -148,7 +148,7 @@ namespace bingo
     return simplified_constants_.rows();
   }
 
-  void AGraph::SetLocalOptimizationParams(Eigen::ArrayXXd params)
+  void AGraph::SetLocalOptimizationParams(Eigen::Ref<Eigen::ArrayXXd> params)
   {
     simplified_constants_ = params;
     needs_opt_ = false;

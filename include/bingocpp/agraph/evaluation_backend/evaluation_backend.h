@@ -53,9 +53,9 @@ namespace bingo
          *
          * @return Eigen::ArrayXXd The evaluation of the graph with x as the input data.
          */
-        Eigen::ArrayXXd Evaluate(const Eigen::Refconst Stack3i> &stack,
-                                 const Eigen::Ref<const RowArrayXXd> &x,
-                                 const Eigen::Ref<const RowArrayXXd> &constants);
+        Eigen::ArrayXXd Evaluate(const Eigen::Ref<const Eigen::ArrayX3i> &stack,
+                                 const Eigen::Ref<const Eigen::ArrayXXd> &x,
+                                 const Eigen::Ref<const Eigen::ArrayXXd> &constants);
 
         /**
          * @brief Evaluate equation and take derivative.
@@ -76,9 +76,9 @@ namespace bingo
          * @return EvalAndDerivative Derivatives of all dimensions of x/constants at location x.
          */
         EvalAndDerivative EvaluateWithDerivative(
-            const Eigen::Ref<const Stack3i> &stack,
-            const Eigen::Ref<const RowArrayXXd> &x,
-            const Eigen::Ref<const RowArrayXXd> &constants,
+            const Eigen::Ref<const Eigen::ArrayX3i> &stack,
+            const Eigen::Ref<const Eigen::ArrayXXd> &x,
+            const Eigen::Ref<const Eigen::ArrayXXd> &constants,
             const bool param_x_or_c = true);
 
     } // namespace evaluation_backend

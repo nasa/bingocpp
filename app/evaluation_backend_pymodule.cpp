@@ -31,14 +31,14 @@ void add_evaluation_backend_submodule(py::module &parent)
                                           "The evaluation backend for Agraphs");
       m.attr("ENGINE") = "c++";
       m.def("evaluate", &evaluation_backend::Evaluate, "Evaluate an equation",
-            py::arg("stack").noconvert(),
-            py::arg("x").noconvert(),
-            py::arg("constants").noconvert());
+            py::arg("stack"),
+            py::arg("x"),
+            py::arg("constants"));
       m.def("evaluate_with_derivative",
             &evaluation_backend::EvaluateWithDerivative,
             "Evaluate equation and take derivative",
-            py::arg("stack").noconvert(),
-            py::arg("x").noconvert(),
-            py::arg("constants").noconvert(),
+            py::arg("stack"),
+            py::arg("x"),
+            py::arg("constants"),
             py::arg("wrt_param_x_or_c"));
 }
