@@ -1,7 +1,6 @@
 #include <unordered_map>
 #include <string>
 #include <climits>
-#include <iostream>
 
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
