@@ -154,6 +154,12 @@ namespace bingo
     needs_opt_ = false;
   }
 
+  void AGraph::SetLocalOptimizationParamsV(Eigen::VectorXd params)
+  {
+    simplified_constants_ = params;
+    needs_opt_ = false;
+  }
+
   const Eigen::ArrayXXd &AGraph::GetLocalOptimizationParams() const
   {
     return simplified_constants_;

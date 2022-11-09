@@ -23,7 +23,7 @@ include(Colors)
 # Set the C++ standard you wish to use (will apply to all files).
 # If you do not use any features that limits the standard required,
 # you could omit this line.
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 # Things to always include as flags. Change as needed.
 IF (NOT CMAKE_CXX_FLAGS MATCHES "-Wall -Wextra$")
