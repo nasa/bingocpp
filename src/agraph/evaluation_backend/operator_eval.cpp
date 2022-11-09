@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <iostream>
 
 #include <bingocpp/agraph/evaluation_backend/operator_eval.h>
 #include <bingocpp/agraph/operator_definitions.h>
@@ -9,6 +10,37 @@ namespace bingo
   {
     namespace
     {
+      //reshaping utility
+      std::vector<Eigen::ArrayXXd> do_reshape(Eigen::ArrayXXd &buffer0, Eigen::ArrayXXd &buffer1)
+      {
+        Eigen::ArrayXXd tmp;
+        std::vector<Eigen::ArrayXXd> reshaped_buffers(2);
+        reshaped_buffers[0] = buffer0;
+        reshaped_buffers[1] = buffer1;
+        if (reshaped_buffers[0].rows() == reshaped_buffers[1].rows() 
+            && reshaped_buffers[0].cols() == reshaped_buffers[1].cols()) {
+          return reshaped_buffers;
+        }
+
+        if (reshaped_buffers[0].rows() == 1 && reshaped_buffers[1].rows() > 1) {
+          tmp = reshaped_buffers[0].replicate(reshaped_buffers[1].rows(), 1);
+          reshaped_buffers[0] = tmp;
+        } else if (reshaped_buffers[1].rows() == 1 && reshaped_buffers[0].rows() > 1) {
+          tmp = reshaped_buffers[1].replicate(reshaped_buffers[0].rows(), 1);
+          reshaped_buffers[1] = tmp;
+        } 
+
+        if (reshaped_buffers[0].cols() == 1 && reshaped_buffers[1].cols() > 1) {
+          tmp = reshaped_buffers[0].replicate(1, reshaped_buffers[1].cols());
+          reshaped_buffers[0] = tmp;
+        } else if (reshaped_buffers[1].cols() == 1 && reshaped_buffers[0].cols() > 1) {
+          tmp = reshaped_buffers[1].replicate(1, reshaped_buffers[0].cols());
+          reshaped_buffers[1] = tmp;
+        } 
+
+        return reshaped_buffers;
+      }
+
 
       // Integer
       Eigen::ArrayXXd integer_forward_eval(int param1, int,
@@ -16,7 +48,7 @@ namespace bingo
                                            const Eigen::ArrayXXd &,
                                            std::vector<Eigen::ArrayXXd> &)
       {
-        return Eigen::ArrayXd::Constant(x.rows(), param1);
+        return Eigen::ArrayXXd::Constant(1, 1, param1);
       }
 
       void integer_reverse_eval(int, int, int,
@@ -32,9 +64,9 @@ namespace bingo
                                          const Eigen::ArrayXXd &constants,
                                          std::vector<Eigen::ArrayXXd> &)
       {
-        // return x.col(param1);
-        int num_cols = (constants.cols() == 0) ? 1 : constants.cols();
-        return x.col(param1).replicate(1, num_cols);
+        return x.col(param1);
+        // int num_cols = (constants.cols() == 0) ? 1 : constants.cols();
+        // return x.col(param1).replicate(1, num_cols);
       }
 
       void loadx_reverse_eval(int, int, int,
@@ -51,8 +83,8 @@ namespace bingo
                                          std::vector<Eigen::ArrayXXd> &)
       {
         // return Eigen::ArrayXXd::Constant(x.rows(), constants.columns(), constants(param1, 0));
-        return constants.row(param1).replicate(x.rows(), 1);
-        // return constants.row(param1);
+        // return constants.row(param1).replicate(x.rows(), 1);
+        return constants.row(param1);
       }
 
       void loadc_reverse_eval(int, int, int,
@@ -68,7 +100,8 @@ namespace bingo
                                        const Eigen::ArrayXXd &,
                                        std::vector<Eigen::ArrayXXd> &forward_eval)
       {
-        return forward_eval[param1] + forward_eval[param2];
+        std::vector<Eigen::ArrayXXd> reshaped_buffers = do_reshape(forward_eval[param1], forward_eval[param2]);
+        return reshaped_buffers[0] + reshaped_buffers[1];
       }
 
       void add_reverse_eval(int reverse_index, int param1, int param2,
@@ -85,7 +118,8 @@ namespace bingo
                                             const Eigen::ArrayXXd &,
                                             std::vector<Eigen::ArrayXXd> &forward_eval)
       {
-        return forward_eval[param1] - forward_eval[param2];
+        std::vector<Eigen::ArrayXXd> reshaped_buffers = do_reshape(forward_eval[param1], forward_eval[param2]);
+        return reshaped_buffers[0] - reshaped_buffers[1];
       }
 
       void subtract_reverse_eval(int reverse_index, int param1, int param2,
@@ -102,7 +136,8 @@ namespace bingo
                                             const Eigen::ArrayXXd &,
                                             std::vector<Eigen::ArrayXXd> &forward_eval)
       {
-        return forward_eval[param1] * forward_eval[param2];
+        std::vector<Eigen::ArrayXXd> reshaped_buffers = do_reshape(forward_eval[param1], forward_eval[param2]);
+        return reshaped_buffers[0] * reshaped_buffers[1];
       }
 
       void multiply_reverse_eval(int reverse_index, int param1, int param2,
@@ -119,7 +154,8 @@ namespace bingo
                                           const Eigen::ArrayXXd &,
                                           std::vector<Eigen::ArrayXXd> &forward_eval)
       {
-        return forward_eval[param1] / forward_eval[param2];
+        std::vector<Eigen::ArrayXXd> reshaped_buffers = do_reshape(forward_eval[param1], forward_eval[param2]);
+        return reshaped_buffers[0] / reshaped_buffers[1];
       }
 
       void divide_reverse_eval(int reverse_index, int param1, int param2,
@@ -200,7 +236,8 @@ namespace bingo
                                        const Eigen::ArrayXXd &,
                                        std::vector<Eigen::ArrayXXd> &forward_eval)
       {
-        return forward_eval[param1].pow(forward_eval[param2]);
+        std::vector<Eigen::ArrayXXd> reshaped_buffers = do_reshape(forward_eval[param1], forward_eval[param2]);
+        return reshaped_buffers[0].pow(reshaped_buffers[1]);
       }
 
       void pow_reverse_eval(int reverse_index, int param1, int param2,
@@ -217,7 +254,8 @@ namespace bingo
                                            const Eigen::ArrayXXd &,
                                            std::vector<Eigen::ArrayXXd> &forward_eval)
       {
-        return forward_eval[param1].abs().pow(forward_eval[param2]);
+        std::vector<Eigen::ArrayXXd> reshaped_buffers = do_reshape(forward_eval[param1], forward_eval[param2]);
+        return reshaped_buffers[0].abs().pow(reshaped_buffers[1]);
       }
 
       void safepow_reverse_eval(int reverse_index, int param1, int param2,

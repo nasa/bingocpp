@@ -160,6 +160,13 @@ TEST_F(AGraphBackend, evaluate) {
   ASSERT_TRUE(testutils::almost_equal(y, y_true));
 }
 
+TEST_F(AGraphBackend, evaluate_2d) {
+  Eigen::ArrayXXd y = Evaluate(simple_stack, x, constants_2d);
+  Eigen::ArrayXXd y_true = x.col(0).replicate(1,2) * (constants_2d.row(0).replicate(x.rows(), 1) + constants_2d.row(1).replicate(x.rows(), 1)
+                          / x.col(1).replicate(1,2)) - x.col(0).replicate(1,2);
+  ASSERT_TRUE(testutils::almost_equal(y, y_true));
+}
+
 TEST_F(AGraphBackend, evaluate_and_derivative) {
   std::pair<Eigen::ArrayXXd, Eigen::ArrayXXd> y_and_dy =
     EvaluateWithDerivative(simple_stack, x, constants);

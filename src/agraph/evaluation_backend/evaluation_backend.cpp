@@ -1,5 +1,6 @@
 #include <map>
 #include <numeric>
+#include <iostream>
 
 #include <Eigen/Dense>
 
@@ -93,6 +94,9 @@ namespace bingo
           const Eigen::ArrayXXd &x,
           const Eigen::ArrayXXd &constants)
       {
+        // std::cout << "---Evaluating Equation--\n";
+        // std::cout << "x (" << x.rows() << ", " << x.cols() << ")\n";
+        // std::cout << "consts (" << constants.rows() << ", " << constants.cols() << ")\n";
         std::vector<Eigen::ArrayXXd> _forward_eval(stack.rows());
 
         for (int i = 0; i < stack.rows(); ++i)
@@ -100,9 +104,22 @@ namespace bingo
           int node = stack(i, kOpIdx);
           int op1 = stack(i, kParam1Idx);
           int op2 = stack(i, kParam2Idx);
+          // std::cout<< i << ": ["<<node << " " <<op1 << " " <<op2 <<"]";
           _forward_eval[i] = ForwardEvalFunction(
               node, op1, op2, x, constants, _forward_eval);
+            // std::cout<<"  (" << _forward_eval[i].rows() << ", " << _forward_eval[i].cols() << "): " << _forward_eval[i] << "\n";
         }
+
+        Eigen::ArrayXXd tmp;
+        if (_forward_eval.back().rows() == 1 && x.rows() > 1) {
+          tmp = _forward_eval.back().replicate(x.rows(), 1);
+          _forward_eval.back() = tmp;
+        }
+        if (_forward_eval.back().cols() == 1 && constants.cols() > 1) {
+          tmp = _forward_eval.back().replicate(1, constants.cols());
+          _forward_eval.back() = tmp;
+        }
+
         return _forward_eval;
       }
 
