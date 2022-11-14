@@ -74,6 +74,7 @@ void add_agraph_class(py::module &parent) {
         &AGraph::GetLocalOptimizationParams)
     .def("set_local_optimization_params", py::overload_cast<Eigen::Ref<Eigen::ArrayXXd>>(&AGraph::SetLocalOptimizationParams), py::arg("params"))
     .def("set_local_optimization_params", py::overload_cast<Eigen::VectorXd>(&AGraph::SetLocalOptimizationParamsV), py::arg("params"))
+    .def("set_local_optimization_params", py::overload_cast<Eigen::ArrayXXd>(&AGraph::SetLocalOptimizationParamsA), py::arg("params"))
     .def("evaluate_equation_at", &AGraph::EvaluateEquationAt, py::arg("x"))
     .def("evaluate_equation_with_x_gradient_at",
         &AGraph::EvaluateEquationWithXGradientAt,

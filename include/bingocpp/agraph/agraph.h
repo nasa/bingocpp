@@ -162,6 +162,7 @@ namespace bingo
      */
     void SetLocalOptimizationParams(Eigen::Ref<Eigen::ArrayXXd> params);
     void SetLocalOptimizationParamsV(Eigen::VectorXd params);
+    void SetLocalOptimizationParamsA(Eigen::ArrayXXd params);
 
     /**
      * @brief Get the constants in the graph.
