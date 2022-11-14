@@ -41,6 +41,11 @@ namespace bingo
         return reshaped_buffers;
       }
 
+      Eigen::ArrayXXd broadcast(const Eigen::ArrayXXd &array, int rows, int cols)
+      {
+          return array.replicate(rows / array.rows(), cols / array.cols());
+      }
+
 
       // Integer
       Eigen::ArrayXXd integer_forward_eval(int param1, int,
@@ -144,8 +149,14 @@ namespace bingo
                                  const std::vector<Eigen::ArrayXXd> &forward_eval,
                                  std::vector<Eigen::ArrayXXd> &reverse_eval)
       {
-        reverse_eval[param1] += reverse_eval[reverse_index] * forward_eval[param2];
-        reverse_eval[param2] += reverse_eval[reverse_index] * forward_eval[param1];
+        Eigen::ArrayXXd fe1 = broadcast(forward_eval[param1], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        Eigen::ArrayXXd fe2 = broadcast(forward_eval[param2], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        reverse_eval[param1] += reverse_eval[reverse_index] * fe2;
+        reverse_eval[param2] += reverse_eval[reverse_index] * fe1;
       }
 
       // Division
@@ -162,8 +173,14 @@ namespace bingo
                                const std::vector<Eigen::ArrayXXd> &forward_eval,
                                std::vector<Eigen::ArrayXXd> &reverse_eval)
       {
-        reverse_eval[param1] += reverse_eval[reverse_index] / forward_eval[param2];
-        reverse_eval[param2] -= reverse_eval[reverse_index] * forward_eval[reverse_index] / forward_eval[param2];
+        Eigen::ArrayXXd fe2 = broadcast(forward_eval[param2], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        Eigen::ArrayXXd fer = broadcast(forward_eval[reverse_index], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        reverse_eval[param1] += reverse_eval[reverse_index] / fe2;
+        reverse_eval[param2] -= reverse_eval[reverse_index] * fer / fe2;
       }
 
       // Sine
@@ -179,7 +196,10 @@ namespace bingo
                             const std::vector<Eigen::ArrayXXd> &forward_eval,
                             std::vector<Eigen::ArrayXXd> &reverse_eval)
       {
-        reverse_eval[param1] += reverse_eval[reverse_index] * forward_eval[param1].cos();
+        Eigen::ArrayXXd fe1 = broadcast(forward_eval[param1], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        reverse_eval[param1] += reverse_eval[reverse_index] * fe1.cos();
       }
 
       // Cosine
@@ -195,7 +215,10 @@ namespace bingo
                             const std::vector<Eigen::ArrayXXd> &forward_eval,
                             std::vector<Eigen::ArrayXXd> &reverse_eval)
       {
-        reverse_eval[param1] -= reverse_eval[reverse_index] * forward_eval[param1].sin();
+        Eigen::ArrayXXd fe1 = broadcast(forward_eval[param1], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        reverse_eval[param1] -= reverse_eval[reverse_index] * fe1.sin();
       }
 
       // Exponential
@@ -211,7 +234,10 @@ namespace bingo
                             const std::vector<Eigen::ArrayXXd> &forward_eval,
                             std::vector<Eigen::ArrayXXd> &reverse_eval)
       {
-        reverse_eval[param1] += reverse_eval[reverse_index] * forward_eval[reverse_index];
+        Eigen::ArrayXXd fer = broadcast(forward_eval[reverse_index], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        reverse_eval[param1] += reverse_eval[reverse_index] * fer;
       }
 
       // Logarithm
@@ -227,7 +253,10 @@ namespace bingo
                             const std::vector<Eigen::ArrayXXd> &forward_eval,
                             std::vector<Eigen::ArrayXXd> &reverse_eval)
       {
-        reverse_eval[param1] += reverse_eval[reverse_index] / forward_eval[param1];
+        Eigen::ArrayXXd fe1 = broadcast(forward_eval[param1], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        reverse_eval[param1] += reverse_eval[reverse_index] / fe1;
       }
 
       // Power
@@ -244,8 +273,17 @@ namespace bingo
                             const std::vector<Eigen::ArrayXXd> &forward_eval,
                             std::vector<Eigen::ArrayXXd> &reverse_eval)
       {
-        reverse_eval[param1] += reverse_eval[reverse_index] * forward_eval[reverse_index] * forward_eval[param2] / forward_eval[param1];
-        reverse_eval[param2] += reverse_eval[reverse_index] * forward_eval[reverse_index] * (forward_eval[param1].log());
+        Eigen::ArrayXXd fe1 = broadcast(forward_eval[param1], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        Eigen::ArrayXXd fe2 = broadcast(forward_eval[param2], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        Eigen::ArrayXXd fer = broadcast(forward_eval[reverse_index], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        reverse_eval[param1] += reverse_eval[reverse_index] * fer * fe2 / fe1;
+        reverse_eval[param2] += reverse_eval[reverse_index] * fer * (fe1.log());
       }
 
       // Safe Power
@@ -262,8 +300,17 @@ namespace bingo
                                 const std::vector<Eigen::ArrayXXd> &forward_eval,
                                 std::vector<Eigen::ArrayXXd> &reverse_eval)
       {
-        reverse_eval[param1] += reverse_eval[reverse_index] * forward_eval[reverse_index] * forward_eval[param2] / forward_eval[param1];
-        reverse_eval[param2] += reverse_eval[reverse_index] * forward_eval[reverse_index] * (forward_eval[param1].abs().log());
+        Eigen::ArrayXXd fe1 = broadcast(forward_eval[param1], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        Eigen::ArrayXXd fe2 = broadcast(forward_eval[param2], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        Eigen::ArrayXXd fer = broadcast(forward_eval[reverse_index], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        reverse_eval[param1] += reverse_eval[reverse_index] * fer * fe2 / fe1;
+        reverse_eval[param2] += reverse_eval[reverse_index] * fer * (fe1.abs().log());
       }
 
       // Absolute Value
@@ -279,7 +326,10 @@ namespace bingo
                             const std::vector<Eigen::ArrayXXd> &forward_eval,
                             std::vector<Eigen::ArrayXXd> &reverse_eval)
       {
-        reverse_eval[param1] += reverse_eval[reverse_index] * forward_eval[param1].sign();
+        Eigen::ArrayXXd fe1 = broadcast(forward_eval[param1], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        reverse_eval[param1] += reverse_eval[reverse_index] * fe1.sign();
       }
 
       // Sqruare root
@@ -295,7 +345,13 @@ namespace bingo
                              const std::vector<Eigen::ArrayXXd> &forward_eval,
                              std::vector<Eigen::ArrayXXd> &reverse_eval)
       {
-        reverse_eval[param1] += 0.5 * reverse_eval[reverse_index] / forward_eval[reverse_index] * forward_eval[param1].sign();
+        Eigen::ArrayXXd fe1 = broadcast(forward_eval[param1], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        Eigen::ArrayXXd fer = broadcast(forward_eval[reverse_index], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        reverse_eval[param1] += 0.5 * reverse_eval[reverse_index] / fer * fe1.sign();
       }
 
       // Sinh
@@ -311,7 +367,10 @@ namespace bingo
                              const std::vector<Eigen::ArrayXXd> &forward_eval,
                              std::vector<Eigen::ArrayXXd> &reverse_eval)
       {
-        reverse_eval[param1] += reverse_eval[reverse_index] * forward_eval[param1].cosh();
+        Eigen::ArrayXXd fe1 = broadcast(forward_eval[param1], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        reverse_eval[param1] += reverse_eval[reverse_index] * fe1.cosh();
       }
 
       // Cosh
@@ -327,7 +386,10 @@ namespace bingo
                              const std::vector<Eigen::ArrayXXd> &forward_eval,
                              std::vector<Eigen::ArrayXXd> &reverse_eval)
       {
-        reverse_eval[param1] += reverse_eval[reverse_index] * forward_eval[param1].sinh();
+        Eigen::ArrayXXd fe1 = broadcast(forward_eval[param1], 
+                                        reverse_eval[reverse_index].rows(),
+                                        reverse_eval[reverse_index].cols());
+        reverse_eval[param1] += reverse_eval[reverse_index] * fe1.sinh();
       }
 
     } // namespace
