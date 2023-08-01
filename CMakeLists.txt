@@ -1,20 +1,27 @@
 cmake_minimum_required(VERSION 3.1.3)
 
+option(USE_MKL "Whether to build Eigen with Intel MKL or not" OFF)
+
 # Set project name, version and laguages here.
-# Version numbers are available by including "BingoCpp/version.h" in 
+# Version numbers are available by including "BingoCpp/version.h" in
 # the source. See version.h.in for some more details.
 project(bingocpp VERSION 0.4.0.0 LANGUAGES C CXX)
-
 
 # ---------- version ----------
 configure_file (
   "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/version.h.in"
   "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/version.h")
 
-# Include stuff. 
+
+# Include stuff.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 include(ConfigSafeGuards)
 include(Colors)
+
+IF (USE_MKL)
+  add_compile_definitions(EIGEN_USE_MKL_ALL)
+  find_package(MKL CONFIG REQUIRED)
+ENDIF ()
 
 
 # ------------------------------------------------------------------------------
@@ -38,12 +45,16 @@ message(STATUS "Building with the following extra flags: ${CMAKE_CXX_FLAGS}")
 #                         Locate files (no change needed).
 # ------------------------------------------------------------------------------
 # We make sure that CMake sees all the files.
-include_directories(
-    ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/tests
-    ${PROJECT_SOURCE_DIR}/external/googletest
-    ${PROJECT_SOURCE_DIR}/external/googletest/googletest/include)
+
+set(project_INCLUDES ${PROJECT_SOURCE_DIR}/src
+                     ${PROJECT_SOURCE_DIR}/include
+                     ${PROJECT_SOURCE_DIR}/tests
+                     ${PROJECT_SOURCE_DIR}/external/googletest
+                     ${PROJECT_SOURCE_DIR}/external/googletest/googletest/include)
+IF (USE_MKL)
+  set(project_INCLUDES ${project_INCLUDES} $<TARGET_PROPERTY:MKL::MKL,INTERFACE_INCLUDE_DIRECTORIES>)
+ENDIF ()
+include_directories(${project_INCLUDES})
 
 # Make variables referring to all the sources and test files.
 file(GLOB_RECURSE SOURCES "src/*.cpp")
@@ -57,7 +68,13 @@ set(TEST_MAIN unit_tests.x)  # Default name for test executable.
 # Compile all sources into a library.
 add_library( bingo STATIC ${SOURCES} )
 add_dependencies(bingo eigen)
-target_link_libraries(bingo eigen pybind11::embed)
+
+set(bingo_LIBRARIES eigen pybind11::embed)
+IF (USE_MKL)
+  target_compile_options(bingo PUBLIC $<TARGET_PROPERTY:MKL::MKL,INTERFACE_COMPILE_OPTIONS>)
+  set(bingo_LIBRARIES ${bingo_LIBRARIES} $<LINK_ONLY:MKL::MKL>)
+ENDIF ()
+target_link_libraries(bingo ${bingo_LIBRARIES})
 set_target_properties(bingo PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 
@@ -70,7 +87,7 @@ set_target_properties(benchmarking PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 # ---------- performance benchmark executable ----------
 add_executable(performanceBenchmark app/performance_benchmarks.cpp)
-add_dependencies(performanceBenchmark bingo benchmarking )  
+add_dependencies(performanceBenchmark bingo benchmarking )
 target_link_libraries(performanceBenchmark bingo benchmarking)
 
 #----------- fitness benchmark executable ---------------
@@ -90,7 +107,7 @@ configure_file(app/test-agraph-x-vals.csv test-agraph-x-vals.csv COPYONLY)
 add_executable(${TEST_MAIN} ${TESTFILES})
 add_dependencies(${TEST_MAIN} googletest bingo)
 target_link_libraries(${TEST_MAIN} googletest bingo pthread)
-add_custom_target(gtest 
+add_custom_target(gtest
     COMMAND "${PROJECT_BINARY_DIR}/${TEST_MAIN}"
     DEPENDS bingo ${TEST_MAIN})
 
@@ -127,7 +144,7 @@ endforeach(pymodule ${MODULE_LIST})
 # ------------------------------------------------------------------------------
 #                         Code Coverage
 # ------------------------------------------------------------------------------
-# If CMake aborts due to missing dependencies for code coverage 
+# If CMake aborts due to missing dependencies for code coverage
 # (gcov, lcov, genhtml and supported compiler), comment this line.
 string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_tolower)
 if (cmake_build_type_tolower STREQUAL "coverage")
@@ -142,7 +159,7 @@ endif()
 # You should set options to your liking in the file 'Doxyfile.in'.
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-    add_custom_target(doc 
+    add_custom_target(doc
         ${DOXYGEN_EXECUTABLE} ${PROJECT_SOURCE_DIR}/doc/doxy.config &> doxygen.log
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/doc
         COMMENT "${BoldMagenta}Generating API documentation with Doxygen (open ${PROJECT_SOURCE_DIR}/doc/html/index.html to view).${ColourReset}" VERBATIM
@@ -153,7 +170,7 @@ endif(DOXYGEN_FOUND)
 # ------------------------------------------------------------------------------
 #                         Git Submodule Updating
 # ------------------------------------------------------------------------------
-# This is a target which can be used to ensure the most up to date versions of 
+# This is a target which can be used to ensure the most up to date versions of
 # the submodules are used
 add_custom_target( git_update
     COMMAND git submodule init
@@ -165,7 +182,7 @@ add_custom_target( git_update
 #                         Google Test
 # ------------------------------------------------------------------------------
 # The following makes sure that an up-to-date version of googletest is available,
-# and built so that it may be used by your tests. 
+# and built so that it may be used by your tests.
 add_library( googletest
     ${PROJECT_SOURCE_DIR}/external/googletest/googletest/src/gtest-all.cc
     ${PROJECT_SOURCE_DIR}/external/googletest/googletest/src/gtest_main.cc )
@@ -180,7 +197,7 @@ add_library( googletest
 # ------------------------------------------------------------------------------
 # The following makes sure that an up-to-date version of eigen is available
 add_library(eigen INTERFACE)
-target_include_directories(eigen INTERFACE 
+target_include_directories(eigen INTERFACE
                            ${CMAKE_CURRENT_SOURCE_DIR}/external/eigen)
 # add_dependencies(eigen git_update)
 
