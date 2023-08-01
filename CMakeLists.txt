@@ -12,7 +12,6 @@ configure_file (
   "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/version.h.in"
   "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/version.h")
 
-
 # Include stuff.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 include(ConfigSafeGuards)
