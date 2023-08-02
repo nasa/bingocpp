@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.1.3)
 
 option(USE_MKL "Whether to build Eigen with Intel MKL or not" OFF)
+IF (DEFINED ENV{USE_MKL})
+  set(USE_MKL $ENV{USE_MKL})
+ENDIF ()
 
 # Set project name, version and laguages here.
 # Version numbers are available by including "BingoCpp/version.h" in
