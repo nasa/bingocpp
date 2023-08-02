@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.1.3)
 
 option(USE_MKL "Whether to build Eigen with Intel MKL or not" OFF)
-IF (DEFINED ENV{USE_MKL})
-  set(USE_MKL $ENV{USE_MKL})
-ENDIF ()
+if (DEFINED ENV{USE_MKL})
+    set(USE_MKL $ENV{USE_MKL})
+endif ()
 
 # Set project name, version and laguages here.
 # Version numbers are available by including "BingoCpp/version.h" in
@@ -20,10 +20,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 include(ConfigSafeGuards)
 include(Colors)
 
-IF (USE_MKL)
-  add_compile_definitions(EIGEN_USE_MKL_ALL)
-  find_package(MKL CONFIG REQUIRED)
-ENDIF ()
+if (USE_MKL)
+    add_compile_definitions(EIGEN_USE_MKL_ALL)
+    find_package(MKL CONFIG REQUIRED)
+endif ()
 
 
 # ------------------------------------------------------------------------------
@@ -35,9 +35,9 @@ ENDIF ()
 set(CMAKE_CXX_STANDARD 11)
 
 # Things to always include as flags. Change as needed.
-IF (NOT CMAKE_CXX_FLAGS MATCHES "-Wall -Wextra$")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra" CACHE STRING "" FORCE)
-ENDIF (NOT CMAKE_CXX_FLAGS MATCHES "-Wall -Wextra$")
+if (NOT CMAKE_CXX_FLAGS MATCHES "-Wall -Wextra$")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra" CACHE STRING "" FORCE)
+endif (NOT CMAKE_CXX_FLAGS MATCHES "-Wall -Wextra$")
 # Build-type specific flags. Change as needed.
 
 message(STATUS "Building with the following extra flags: ${CMAKE_CXX_FLAGS}")
@@ -53,9 +53,9 @@ set(project_INCLUDES ${PROJECT_SOURCE_DIR}/src
                      ${PROJECT_SOURCE_DIR}/tests
                      ${PROJECT_SOURCE_DIR}/external/googletest
                      ${PROJECT_SOURCE_DIR}/external/googletest/googletest/include)
-IF (USE_MKL)
-  set(project_INCLUDES ${project_INCLUDES} $<TARGET_PROPERTY:MKL::MKL,INTERFACE_INCLUDE_DIRECTORIES>)
-ENDIF ()
+if (USE_MKL)
+    set(project_INCLUDES ${project_INCLUDES} $<TARGET_PROPERTY:MKL::MKL,INTERFACE_INCLUDE_DIRECTORIES>)
+endif ()
 include_directories(${project_INCLUDES})
 
 # Make variables referring to all the sources and test files.
@@ -72,10 +72,10 @@ add_library( bingo STATIC ${SOURCES} )
 add_dependencies(bingo eigen)
 
 set(bingo_LIBRARIES eigen pybind11::embed)
-IF (USE_MKL)
-  target_compile_options(bingo PUBLIC $<TARGET_PROPERTY:MKL::MKL,INTERFACE_COMPILE_OPTIONS>)
-  set(bingo_LIBRARIES ${bingo_LIBRARIES} $<LINK_ONLY:MKL::MKL>)
-ENDIF ()
+if (USE_MKL)
+    target_compile_options(bingo PUBLIC $<TARGET_PROPERTY:MKL::MKL,INTERFACE_COMPILE_OPTIONS>)
+    set(bingo_LIBRARIES ${bingo_LIBRARIES} $<LINK_ONLY:MKL::MKL>)
+endif ()
 target_link_libraries(bingo ${bingo_LIBRARIES})
 set_target_properties(bingo PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
