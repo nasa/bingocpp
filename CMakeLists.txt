@@ -50,7 +50,7 @@ file(GLOB_RECURSE SOURCES "src/*.cpp")
 file(GLOB_RECURSE TESTFILES "tests/*.cpp")
 set(TEST_MAIN unit_tests.x)  # Default name for test executable.
 
-find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
 message(STATUS "Python3_FOUND: ${Python3_FOUND}")
 message(STATUS "Python3_Interpreter_FOUND: ${Python3_Interpreter_FOUND}")
 message(STATUS "Python3_EXECUTABLE: ${Python3_EXECUTABLE}")
