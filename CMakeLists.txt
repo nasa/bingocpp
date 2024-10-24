@@ -50,6 +50,7 @@ file(GLOB_RECURSE SOURCES "src/*.cpp")
 file(GLOB_RECURSE TESTFILES "tests/*.cpp")
 set(TEST_MAIN unit_tests.x)  # Default name for test executable.
 
+find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
 # ------------------------------------------------------------------------------
 #                            Build!
