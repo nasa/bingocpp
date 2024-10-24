@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1.3)
+cmake_minimum_required(VERSION 3.4...3.18)
 
 # Set project name, version and laguages here.
 # Version numbers are available by including "BingoCpp/version.h" in 
