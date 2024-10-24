@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4...3.18)
+cmake_minimum_required(VERSION 3.18)
 
 # Set project name, version and laguages here.
 # Version numbers are available by including "BingoCpp/version.h" in 
@@ -49,6 +49,8 @@ include_directories(
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 file(GLOB_RECURSE TESTFILES "tests/*.cpp")
 set(TEST_MAIN unit_tests.x)  # Default name for test executable.
+
+find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
 # ------------------------------------------------------------------------------
 #                            Build!
