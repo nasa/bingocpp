@@ -51,6 +51,19 @@ file(GLOB_RECURSE TESTFILES "tests/*.cpp")
 set(TEST_MAIN unit_tests.x)  # Default name for test executable.
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
+message(STATUS "Python3_FOUND: ${Python3_FOUND}")
+message(STATUS "Python3_Interpreter_FOUND: ${Python3_Interpreter_FOUND}")
+message(STATUS "Python3_EXECUTABLE: ${Python3_EXECUTABLE}")
+message(STATUS "Python3_INTERPRETER_ID: ${Python3_INTERPRETER_ID}")
+message(STATUS "Python3_STDLIB: ${Python3_STDLIB}")
+message(STATUS "Python3_STDARCH: ${Python3_STDARCH}")
+message(STATUS "Python3_SITELIB: ${Python3_SITELIB}")
+message(STATUS "Python3_SITEARCH: ${Python3_SITEARCH}")
+message(STATUS "Python3_SOABI: ${Python3_SOABI}")
+message(STATUS "Python3_INCLUDE_DIRS: ${Python3_INCLUDE_DIRS}")
+message(STATUS "Python3_Development.Module_FOUND: ${Python3_Development.Module_FOUND}")
+message(STATUS "Python3_LINK_OPTIONS: ${Python3_LINK_OPTIONS}")
+message(STATUS "Python3_VERSION: ${Python3_VERSION}")
 
 # ------------------------------------------------------------------------------
 #                            Build!
