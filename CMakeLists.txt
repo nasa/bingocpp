@@ -65,6 +65,9 @@ message(STATUS "Python3_Development.Module_FOUND: ${Python3_Development.Module_F
 message(STATUS "Python3_LINK_OPTIONS: ${Python3_LINK_OPTIONS}")
 message(STATUS "Python3_VERSION: ${Python3_VERSION}")
 
+set(PYBIND11_FINDPYTHON ON)
+find_package(pybind11 CONFIG REQUIRED)
+
 # ------------------------------------------------------------------------------
 #                            Build!
 # ------------------------------------------------------------------------------
@@ -121,9 +124,9 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/pybind/CMakeLists.txt")
     message("Unable to find pybind")
     execute_process(COMMAND git submodule update --init -- external/pybind
                     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-    add_subdirectory( external/pybind EXCLUDE_FROM_ALL)
+    # add_subdirectory( external/pybind EXCLUDE_FROM_ALL)
 else()
-    add_subdirectory( external/pybind EXCLUDE_FROM_ALL)
+    # add_subdirectory( external/pybind EXCLUDE_FROM_ALL)
 endif()
 
 set( MODULE_LIST
