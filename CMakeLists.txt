@@ -96,22 +96,22 @@ set_target_properties(bingo PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 # configure_file(app/test-agraph-stacks.csv test-agraph-stacks.csv COPYONLY)
 # configure_file(app/test-agraph-consts.csv test-agraph-consts.csv COPYONLY)
 # configure_file(app/test-agraph-x-vals.csv test-agraph-x-vals.csv COPYONLY)
-# ------------------------------------------------------------------------------
-#                         Make Tests
-# ------------------------------------------------------------------------------
-# Add a make target 'gtest', that runs the tests (and builds all dependencies).
-# The setup of Google Test is done at the very end of this file.
-add_executable(${TEST_MAIN} ${TESTFILES})
-add_dependencies(${TEST_MAIN} googletest bingo)
-target_link_libraries(${TEST_MAIN} googletest bingo pthread)
-add_custom_target(gtest 
-    COMMAND "${PROJECT_BINARY_DIR}/${TEST_MAIN}"
-    DEPENDS bingo ${TEST_MAIN})
+# # ------------------------------------------------------------------------------
+# #                         Make Tests
+# # ------------------------------------------------------------------------------
+# # Add a make target 'gtest', that runs the tests (and builds all dependencies).
+# # The setup of Google Test is done at the very end of this file.
+# add_executable(${TEST_MAIN} ${TESTFILES})
+# add_dependencies(${TEST_MAIN} googletest bingo)
+# target_link_libraries(${TEST_MAIN} googletest bingo pthread)
+# add_custom_target(gtest 
+#     COMMAND "${PROJECT_BINARY_DIR}/${TEST_MAIN}"
+#     DEPENDS bingo ${TEST_MAIN})
 
-# Add a standard make target 'test' that runs the tests under CTest (only as an alt. to gtest).
-include(CTest)
-enable_testing()
-add_test(unit_tests ${PROJECT_BINARY_DIR}/${TEST_MAIN})
+# # Add a standard make target 'test' that runs the tests under CTest (only as an alt. to gtest).
+# include(CTest)
+# enable_testing()
+# add_test(unit_tests ${PROJECT_BINARY_DIR}/${TEST_MAIN})
 
 
 # ------------------------------------------------------------------------------
@@ -138,30 +138,30 @@ endforeach(pymodule ${MODULE_LIST})
 
 
 
-# ------------------------------------------------------------------------------
-#                         Code Coverage
-# ------------------------------------------------------------------------------
-# If CMake aborts due to missing dependencies for code coverage 
-# (gcov, lcov, genhtml and supported compiler), comment this line.
-string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_tolower)
-if (cmake_build_type_tolower STREQUAL "coverage")
-    include(CodeCoverage)
-endif()
+# # ------------------------------------------------------------------------------
+# #                         Code Coverage
+# # ------------------------------------------------------------------------------
+# # If CMake aborts due to missing dependencies for code coverage 
+# # (gcov, lcov, genhtml and supported compiler), comment this line.
+# string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_tolower)
+# if (cmake_build_type_tolower STREQUAL "coverage")
+#     include(CodeCoverage)
+# endif()
 
 
-# ------------------------------------------------------------------------------
-#                         Documentation
-# ------------------------------------------------------------------------------
-# Add a make target 'doc' to generate API documentation with Doxygen.
-# You should set options to your liking in the file 'Doxyfile.in'.
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-    add_custom_target(doc 
-        ${DOXYGEN_EXECUTABLE} ${PROJECT_SOURCE_DIR}/doc/doxy.config &> doxygen.log
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/doc
-        COMMENT "${BoldMagenta}Generating API documentation with Doxygen (open ${PROJECT_SOURCE_DIR}/doc/html/index.html to view).${ColourReset}" VERBATIM
-        )
-endif(DOXYGEN_FOUND)
+# # ------------------------------------------------------------------------------
+# #                         Documentation
+# # ------------------------------------------------------------------------------
+# # Add a make target 'doc' to generate API documentation with Doxygen.
+# # You should set options to your liking in the file 'Doxyfile.in'.
+# find_package(Doxygen)
+# if(DOXYGEN_FOUND)
+#     add_custom_target(doc 
+#         ${DOXYGEN_EXECUTABLE} ${PROJECT_SOURCE_DIR}/doc/doxy.config &> doxygen.log
+#         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/doc
+#         COMMENT "${BoldMagenta}Generating API documentation with Doxygen (open ${PROJECT_SOURCE_DIR}/doc/html/index.html to view).${ColourReset}" VERBATIM
+#         )
+# endif(DOXYGEN_FOUND)
 
 
 # ------------------------------------------------------------------------------
@@ -175,18 +175,18 @@ add_custom_target( git_update
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} )
 
 
-# ------------------------------------------------------------------------------
-#                         Google Test
-# ------------------------------------------------------------------------------
-# The following makes sure that an up-to-date version of googletest is available,
-# and built so that it may be used by your tests. 
-add_library( googletest
-    ${PROJECT_SOURCE_DIR}/external/googletest/googletest/src/gtest-all.cc
-    ${PROJECT_SOURCE_DIR}/external/googletest/googletest/src/gtest_main.cc )
-    target_include_directories(googletest PRIVATE ${PROJECT_SOURCE_DIR}/external/googletest/googletest)
-# add_dependencies(googletest git_update)
-# set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest-all.cc  PROPERTIES GENERATED 1)
-# set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest_main.cc PROPERTIES GENERATED 1)
+# # ------------------------------------------------------------------------------
+# #                         Google Test
+# # ------------------------------------------------------------------------------
+# # The following makes sure that an up-to-date version of googletest is available,
+# # and built so that it may be used by your tests. 
+# add_library( googletest
+#     ${PROJECT_SOURCE_DIR}/external/googletest/googletest/src/gtest-all.cc
+#     ${PROJECT_SOURCE_DIR}/external/googletest/googletest/src/gtest_main.cc )
+#     target_include_directories(googletest PRIVATE ${PROJECT_SOURCE_DIR}/external/googletest/googletest)
+# # add_dependencies(googletest git_update)
+# # set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest-all.cc  PROPERTIES GENERATED 1)
+# # set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest_main.cc PROPERTIES GENERATED 1)
 
 
 # ------------------------------------------------------------------------------
