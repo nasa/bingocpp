@@ -71,7 +71,7 @@ message(STATUS "Python3_VERSION: ${Python3_VERSION}")
 # Compile all sources into a library.
 add_library( bingo STATIC ${SOURCES} )
 add_dependencies(bingo eigen)
-target_link_libraries(bingo eigen pybind11::embed)
+target_link_libraries(bingo eigen pybind::module pybind11::pybind11 pybind::embed)
 set_target_properties(bingo PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 
