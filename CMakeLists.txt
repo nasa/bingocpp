@@ -75,27 +75,27 @@ target_link_libraries(bingo eigen pybind11::embed)
 set_target_properties(bingo PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 
-# ---------- benchmarking library ----------
-file (GLOB BENCHMARK_SRC "include/benchmarking/*.cpp")
-add_library( benchmarking STATIC ${BENCHMARK_SRC} )
-add_dependencies( benchmarking bingo eigen)
-target_link_libraries( benchmarking bingo eigen)
-set_target_properties(benchmarking PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+# # ---------- benchmarking library ----------
+# file (GLOB BENCHMARK_SRC "include/benchmarking/*.cpp")
+# add_library( benchmarking STATIC ${BENCHMARK_SRC} )
+# add_dependencies( benchmarking bingo eigen)
+# target_link_libraries( benchmarking bingo eigen)
+# set_target_properties(benchmarking PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
-# ---------- performance benchmark executable ----------
-add_executable(performanceBenchmark app/performance_benchmarks.cpp)
-add_dependencies(performanceBenchmark bingo benchmarking )  
-target_link_libraries(performanceBenchmark bingo benchmarking)
+# # ---------- performance benchmark executable ----------
+# add_executable(performanceBenchmark app/performance_benchmarks.cpp)
+# add_dependencies(performanceBenchmark bingo benchmarking )  
+# target_link_libraries(performanceBenchmark bingo benchmarking)
 
-#----------- fitness benchmark executable ---------------
-add_executable(fitnessBenchmark app/fitness_benchmarks.cpp)
-add_dependencies(fitnessBenchmark bingo benchmarking)
-target_link_libraries(fitnessBenchmark bingo benchmarking)
+# #----------- fitness benchmark executable ---------------
+# add_executable(fitnessBenchmark app/fitness_benchmarks.cpp)
+# add_dependencies(fitnessBenchmark bingo benchmarking)
+# target_link_libraries(fitnessBenchmark bingo benchmarking)
 
 
-configure_file(app/test-agraph-stacks.csv test-agraph-stacks.csv COPYONLY)
-configure_file(app/test-agraph-consts.csv test-agraph-consts.csv COPYONLY)
-configure_file(app/test-agraph-x-vals.csv test-agraph-x-vals.csv COPYONLY)
+# configure_file(app/test-agraph-stacks.csv test-agraph-stacks.csv COPYONLY)
+# configure_file(app/test-agraph-consts.csv test-agraph-consts.csv COPYONLY)
+# configure_file(app/test-agraph-x-vals.csv test-agraph-x-vals.csv COPYONLY)
 # ------------------------------------------------------------------------------
 #                         Make Tests
 # ------------------------------------------------------------------------------
