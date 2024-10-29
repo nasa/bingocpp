@@ -48,22 +48,7 @@ include_directories(
 # Make variables referring to all the sources and test files.
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 file(GLOB_RECURSE TESTFILES "tests/*.cpp")
-set(TEST_MAIN unit_tests.x)  # Default name for test executable.
-
-find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
-message(STATUS "Python3_FOUND: ${Python3_FOUND}")
-message(STATUS "Python3_Interpreter_FOUND: ${Python3_Interpreter_FOUND}")
-message(STATUS "Python3_EXECUTABLE: ${Python3_EXECUTABLE}")
-message(STATUS "Python3_INTERPRETER_ID: ${Python3_INTERPRETER_ID}")
-message(STATUS "Python3_STDLIB: ${Python3_STDLIB}")
-message(STATUS "Python3_STDARCH: ${Python3_STDARCH}")
-message(STATUS "Python3_SITELIB: ${Python3_SITELIB}")
-message(STATUS "Python3_SITEARCH: ${Python3_SITEARCH}")
-message(STATUS "Python3_SOABI: ${Python3_SOABI}")
-message(STATUS "Python3_INCLUDE_DIRS: ${Python3_INCLUDE_DIRS}")
-message(STATUS "Python3_Development.Module_FOUND: ${Python3_Development.Module_FOUND}")
-message(STATUS "Python3_LINK_OPTIONS: ${Python3_LINK_OPTIONS}")
-message(STATUS "Python3_VERSION: ${Python3_VERSION}")
+set(TEST_MAIN unit_tests)  # Default name for test executable.
 
 set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 CONFIG REQUIRED)
@@ -74,9 +59,9 @@ find_package(pybind11 CONFIG REQUIRED)
 # Compile all sources into a library.
 add_library( bingo STATIC ${SOURCES} )
 add_dependencies(bingo eigen)
-target_link_libraries(bingo eigen pybind11::module pybind11::pybind11 pybind11::embed)
+target_link_libraries(bingo eigen pybind11::module pybind11::headers)
 set_target_properties(bingo PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
-
+pybind11_extension(bingo)
 
 # ---------- benchmarking library ----------
 file (GLOB BENCHMARK_SRC "include/benchmarking/*.cpp")
@@ -88,57 +73,42 @@ set_target_properties(benchmarking PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 # ---------- performance benchmark executable ----------
 add_executable(performanceBenchmark app/performance_benchmarks.cpp)
 add_dependencies(performanceBenchmark bingo benchmarking )  
-target_link_libraries(performanceBenchmark bingo benchmarking)
+target_link_libraries(performanceBenchmark bingo benchmarking pybind11::embed)
+get_target_property(INCLUDE_DIRS performanceBenchmark INCLUDE_DIRECTORIES)
 
 #----------- fitness benchmark executable ---------------
 add_executable(fitnessBenchmark app/fitness_benchmarks.cpp)
 add_dependencies(fitnessBenchmark bingo benchmarking)
-target_link_libraries(fitnessBenchmark bingo benchmarking)
+target_link_libraries(fitnessBenchmark bingo benchmarking pybind11::embed)
 
 
 configure_file(app/test-agraph-stacks.csv test-agraph-stacks.csv COPYONLY)
 configure_file(app/test-agraph-consts.csv test-agraph-consts.csv COPYONLY)
 configure_file(app/test-agraph-x-vals.csv test-agraph-x-vals.csv COPYONLY)
+
 # ------------------------------------------------------------------------------
 #                         Make Tests
 # ------------------------------------------------------------------------------
-# Add a make target 'gtest', that runs the tests (and builds all dependencies).
-# The setup of Google Test is done at the very end of this file.
-add_executable(${TEST_MAIN} ${TESTFILES})
-add_dependencies(${TEST_MAIN} googletest bingo)
-target_link_libraries(${TEST_MAIN} googletest bingo pthread)
-add_custom_target(gtest 
-    COMMAND "${PROJECT_BINARY_DIR}/${TEST_MAIN}"
-    DEPENDS bingo ${TEST_MAIN})
-
-# Add a standard make target 'test' that runs the tests under CTest (only as an alt. to gtest).
-include(CTest)
+# The setup of Google Test
+add_subdirectory(${PROJECT_SOURCE_DIR}/external/googletest)
 enable_testing()
-add_test(unit_tests ${PROJECT_BINARY_DIR}/${TEST_MAIN})
+include(GoogleTest)
+# Build executable that runs the tests (and builds all dependencies).
+add_executable(${TEST_MAIN} ${TESTFILES})
+add_dependencies(${TEST_MAIN} bingo)
+target_link_libraries(${TEST_MAIN} GTest::gtest_main bingo eigen pthread pybind11::embed)
 
 
 # ------------------------------------------------------------------------------
 #                         Make bingocpp (python binding)
 # ------------------------------------------------------------------------------
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/pybind/CMakeLists.txt")
-    message("Unable to find pybind")
-    execute_process(COMMAND git submodule update --init -- external/pybind
-                    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-    # add_subdirectory( external/pybind EXCLUDE_FROM_ALL)
-else()
-    # add_subdirectory( external/pybind EXCLUDE_FROM_ALL)
-endif()
-
 set( MODULE_LIST
     bingocpp
 )
-
 foreach(pymodule ${MODULE_LIST})
     pybind11_add_module(${pymodule} "app/${pymodule}_pymodule.cpp") # EXCLUDE_FROM_ALL)
     target_link_libraries(${pymodule} PUBLIC bingo)
 endforeach(pymodule ${MODULE_LIST})
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -168,36 +138,10 @@ endif(DOXYGEN_FOUND)
 
 
 # ------------------------------------------------------------------------------
-#                         Git Submodule Updating
-# ------------------------------------------------------------------------------
-# This is a target which can be used to ensure the most up to date versions of 
-# the submodules are used
-add_custom_target( git_update
-    COMMAND git submodule init
-    COMMAND git submodule update
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} )
-
-
-# ------------------------------------------------------------------------------
-#                         Google Test
-# ------------------------------------------------------------------------------
-# The following makes sure that an up-to-date version of googletest is available,
-# and built so that it may be used by your tests. 
-add_library( googletest
-    ${PROJECT_SOURCE_DIR}/external/googletest/googletest/src/gtest-all.cc
-    ${PROJECT_SOURCE_DIR}/external/googletest/googletest/src/gtest_main.cc )
-    target_include_directories(googletest PRIVATE ${PROJECT_SOURCE_DIR}/external/googletest/googletest)
-# add_dependencies(googletest git_update)
-# set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest-all.cc  PROPERTIES GENERATED 1)
-# set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest_main.cc PROPERTIES GENERATED 1)
-
-
-# ------------------------------------------------------------------------------
 #                         Eigen
 # ------------------------------------------------------------------------------
 # The following makes sure that an up-to-date version of eigen is available
 add_library(eigen INTERFACE)
 target_include_directories(eigen INTERFACE 
                            ${CMAKE_CURRENT_SOURCE_DIR}/external/eigen)
-# add_dependencies(eigen git_update)
 

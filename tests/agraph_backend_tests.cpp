@@ -151,8 +151,6 @@ std::vector<Eigen::ArrayXXd> init_op_c_derivs(
 }
 };
 
-INSTANTIATE_TEST_CASE_P(,AGraphBackend, ::testing::Range(0, N_OPS, 1));
-
 TEST_F(AGraphBackend, evaluate) {
   Eigen::ArrayXXd y = Evaluate(simple_stack, x, constants);
   Eigen::ArrayXXd y_true = x.col(0) * (constants(0,0) + constants(1,0) 
